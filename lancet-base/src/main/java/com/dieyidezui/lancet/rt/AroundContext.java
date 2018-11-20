@@ -12,13 +12,13 @@ public interface AroundContext {
 
     /**
      * @return The context where your target method called.
-     * If static, return the class of method.
+     * If static, returns null.
      */
     Object getTarget();
 
     /**
      * @return The object when your target method executed.
-     * If static, return the class of method.
+     * If static, returns null.
      */
     Object getThis();
 
