@@ -22,15 +22,19 @@ public interface AroundContext {
      */
     Object getThis();
 
+    @AutoReplaced
     @Nullable
     Object proceed();
 
+    @AutoReplaced
     @Nullable
     <T1 extends Throwable> Object proceedThrow1() throws T1;
 
+    @AutoReplaced
     @Nullable
     <T1 extends Throwable, T2 extends Throwable> Object proceedThrow2() throws T1, T2;
 
+    @AutoReplaced
     @Nullable
     <T1 extends Throwable, T2 extends Throwable, T3 extends Throwable> Object proceedThrow3() throws T1, T2, T3;
 }

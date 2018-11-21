@@ -74,7 +74,6 @@ public class AroundMethodChain implements AroundContext {
         if (this.index > interceptors.size()) {
             throw new AssertionError();
         }
-        // Clone args when pass to next!
         AroundMethodChain next = new AroundMethodChain(target, thiz, index + 1, interceptors, args);
         return interceptors.get(index).intercept(next);
     }
