@@ -14,4 +14,9 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @AutoReplaced
 public @interface TryCatchHandler {
+
+    /**
+     * @return priority
+     */
+    int priority() default 0;
 }
