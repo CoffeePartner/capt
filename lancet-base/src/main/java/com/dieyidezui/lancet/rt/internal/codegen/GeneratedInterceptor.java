@@ -24,5 +24,5 @@ public abstract class GeneratedInterceptor implements Interceptor {
     }
 
     @Nullable
-    protected abstract Object intercept(Object[] args);
+    abstract Object intercept(Object[] args);
 }
