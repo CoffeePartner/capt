@@ -12,7 +12,11 @@ public abstract class GeneratedInterceptor implements Interceptor {
     @Override
     public final Object intercept(AroundContext context) {
         this.context = context;
-        return intercept(context.getArgs());
+        try {
+            return intercept(context.getArgs());
+        } finally {
+            this.context = null;
+        }
     }
 
     final public AroundContext getContext() {
