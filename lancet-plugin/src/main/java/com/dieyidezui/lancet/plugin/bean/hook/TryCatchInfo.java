@@ -2,21 +2,15 @@ package com.dieyidezui.lancet.plugin.bean.hook;
 
 import javax.annotation.Nullable;
 
-public class ProxyInfo {
-
-    @Nullable
-    public TargetClassInfo targetClass;
-
-    @Nullable
-    public ImplementedInterfaceInfo interfaces;
-
+public class TryCatchInfo {
 
     @Nullable
     public String regex;
 
-    public String targetMethod;
+    public String type;
 
     public int priority;
+
 
     public MethodLocator locator;
 }

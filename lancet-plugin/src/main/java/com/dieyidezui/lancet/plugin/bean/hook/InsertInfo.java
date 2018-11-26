@@ -1,8 +1,9 @@
 package com.dieyidezui.lancet.plugin.bean.hook;
 
+
 import javax.annotation.Nullable;
 
-public class ProxyInfo {
+public class InsertInfo {
 
     @Nullable
     public TargetClassInfo targetClass;
@@ -10,11 +11,9 @@ public class ProxyInfo {
     @Nullable
     public ImplementedInterfaceInfo interfaces;
 
-
-    @Nullable
-    public String regex;
-
     public String targetMethod;
+
+    public boolean createSuper;
 
     public int priority;
 
