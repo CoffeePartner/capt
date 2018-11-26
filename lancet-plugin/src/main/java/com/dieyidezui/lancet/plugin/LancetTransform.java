@@ -6,7 +6,10 @@ import com.android.build.api.transform.TransformException;
 import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.internal.pipeline.TransformManager;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 public class LancetTransform extends Transform {
@@ -27,6 +30,13 @@ public class LancetTransform extends Transform {
         return TransformManager.SCOPE_FULL_PROJECT;
     }
 
+
+    @Override
+    public Collection<File> getSecondaryDirectoryOutputs() {
+        // TODO
+        return Collections.emptyList();
+    }
+
     @Override
     public boolean isIncremental() {
         return true;
@@ -34,6 +44,6 @@ public class LancetTransform extends Transform {
 
     @Override
     public void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
-
+        TransformInvocation invocation;
     }
 }

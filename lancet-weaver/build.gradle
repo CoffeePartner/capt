@@ -6,10 +6,10 @@ dependencies {
     testCompile 'org.assertj:assertj-core:3.6.2'
 
     compileClasspath "com.android.tools.build:gradle:$android_tools_version"
-    compile "me.ele:lancet-base:1.0.4"
+    compile project(":lancet-base")
     compile gradleApi()
     compileClasspath "com.google.guava:guava:$guava_version"
-    compile "org.ow2.asm:asm:$asm_version"
+    compile "org.ow2.asm:asm:7.0"
     compile 'org.ow2.asm:asm-tree:7.0'
     compile 'org.ow2.asm:asm-util:7.0'
     compile 'org.ow2.asm:asm-commons:7.0'
