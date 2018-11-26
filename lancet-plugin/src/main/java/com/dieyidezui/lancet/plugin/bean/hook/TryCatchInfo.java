@@ -11,6 +11,5 @@ public class TryCatchInfo {
 
     public int priority;
 
-
     public MethodLocator locator;
 }

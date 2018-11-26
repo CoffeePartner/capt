@@ -1,7 +1,6 @@
 package com.dieyidezui.lancet.plugin;
 
 import com.android.build.gradle.BaseExtension;
-import me.ele.lancet.plugin.LancetExtension;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.ProjectConfigurationException;
