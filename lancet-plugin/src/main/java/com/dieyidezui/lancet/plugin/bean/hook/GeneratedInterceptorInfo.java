@@ -1,7 +1,6 @@
 package com.dieyidezui.lancet.plugin.bean.hook;
 
 import com.dieyidezui.lancet.rt.annotations.Insert;
-import me.ele.lancet.weaver.internal.meta.HookInfoLocator;
 
 import javax.annotation.Nullable;
 import java.util.List;

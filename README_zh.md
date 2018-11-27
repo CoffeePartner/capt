@@ -13,15 +13,15 @@ Lancet 是一个轻量级Android AOP框架。
 在根目录的 `build.gradle` 添加:
 ```groovy
 dependencies{
-    classpath 'me.ele:lancet-plugin:1.0.4'
+    classpath 'com.dieyidezui:lancet-plugin:1.0.4'
 }
 ```
 在 app 目录的'build.gradle' 添加：
 ```groovy
-apply plugin: 'me.ele.lancet'
+apply plugin: 'com.dieyidezui.lancet'
 
 dependencies {
-    provided 'me.ele:lancet-base:1.0.4'
+    provided 'com.dieyidezui:lancet-base:1.0.4'
 }
 ```
 
@@ -242,7 +242,7 @@ public int read(byte[] bytes) throws IOException {
 For example:
 
 ```java
-package me.ele;
+package com.dieyidezui;
 public class Main {
     private int a = 1;
 
@@ -255,7 +255,7 @@ public class Main {
     }
 }
 
-@TargetClass("me.ele.Main")
+@TargetClass("com.dieyidezui.Main")
 @Insert("nothing")
 public void testThis() {
     Log.e("debug", This.get().getClass().getName());
@@ -267,7 +267,7 @@ public void testThis() {
 
 ## Tips
 1. 内部类应该命名为  ```package.outer_class$inner_class```  
-2. SDK 开发者不需要 `apply` 插件, 只需要 ```provided me.ele:lancet-base:x.y.z```  
+2. SDK 开发者不需要 `apply` 插件, 只需要 ```provided com.dieyidezui:lancet-base:x.y.z```
 3. 尽管我们支持增量编译. 但当我们使用 ```Scope.LEAF、Scope.ALL``` 覆盖的类有变动 或者修改 Hook 类时, 本次编译将会变成全量编译.  
 
 ## License

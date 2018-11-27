@@ -19,16 +19,16 @@ Firstly, add following code in root **build.gradle** of your project.
 
 ```groovy
 dependencies{
-    classpath 'me.ele:lancet-plugin:1.0.4'
+    classpath 'com.dieyidezui:lancet-plugin:1.0.4'
 }
 ```
 And then, add following code in your **application module's build.gradle**
 
 ```groovy
-apply plugin: 'me.ele.lancet'
+apply plugin: 'com.dieyidezui.lancet'
 
 dependencies {
-    provided 'me.ele:lancet-base:1.0.4'
+    provided 'com.dieyidezui:lancet-base:1.0.4'
 }
 ```
 
@@ -157,7 +157,7 @@ But with the ```@NameRegex```, something is different.
 
 String value in @NameRegex will be compiled to pattern. the hook method only works if the pattern matches the class name where appear the cut point.
 
-Such as the above example, every class will be ignored if it's package name start with "me.ele.";
+Such as the above example, every class will be ignored if it's package name start with "com.dieyidezui.";
 
 @NameRegex can only be used with @Proxy or @TryCatchHandler.
 
@@ -318,7 +318,7 @@ Also, we have some restricts:
 For example:
 
 ```java
-package me.ele;
+package com.dieyidezui;
 public class Main {
     private int a = 1;
 
@@ -331,7 +331,7 @@ public class Main {
     }
 }
 
-@TargetClass("me.ele.Main")
+@TargetClass("com.dieyidezui.Main")
 @Insert("nothing")
 public void testThis() {
     Log.e("debug", This.get().getClass().getName());
@@ -352,13 +352,13 @@ Log.e("debug", "a = " + main.getA());
 We will see:
 
 ```
-E/debug: me.ele.Main
+E/debug: com.dieyidezui.Main
 E/debug: a = 3
 ```
 
 ## Tips
 1. Inner classes should be named like  ```package.outer_class$inner_class```
-2. SDK developer needn't to apply plugin, just ```provided me.ele:lancet-base:x.y.z```
+2. SDK developer needn't to apply plugin, just ```provided com.dieyidezui:lancet-base:x.y.z```
 3. Although we support incremental compilation. But when you use ```Scope.LEAF、Scope.ALL``` or edit the hook class, the incremental judgement will be a little special. It may cause full compilation.
 
 ## License

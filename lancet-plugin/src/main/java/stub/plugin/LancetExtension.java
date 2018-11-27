@@ -1,5 +1,5 @@
 
-package com.dieyidezui.lancet.plugin;
+package stub.plugin;
 
 import com.google.common.base.Strings;
 import stub.weaver.internal.log.Log;
@@ -10,6 +10,7 @@ import java.util.Objects;
 public class LancetExtension {
     private Log.Level level = Log.Level.INFO;
     private String fileName = null;
+    private boolean incremental = true;
 
     public void logLevel(Log.Level level) {
         this.level = Objects.requireNonNull(level, "Log.Level is null");
@@ -51,15 +52,15 @@ public class LancetExtension {
     }
 
     public void setIncremental(boolean incremental) {
-        Log.w("Incremental is always true from Lancet2.");
+        this.incremental = incremental;
     }
 
     public boolean getIncremental() {
-        return true;
+        return this.incremental;
     }
 
     public void incremental(boolean incremental) {
-        Log.w("Incremental is always true from Lancet2.");
+        this.incremental = incremental;
     }
 
     public Log.Level getLogLevel() {
