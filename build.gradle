@@ -5,10 +5,8 @@ buildscript {
         Properties properties = new Properties()
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
-        if (!ele) {
-            bintrayUser = properties.getProperty('bintrayUser')
-            bintrayKey = properties.getProperty('bintrayKey')
-        }
+        bintrayUser = properties.getProperty('bintrayUser')
+        bintrayKey = properties.getProperty('bintrayKey')
         lancet_group = 'com.dieyidezui'
         lancet_version = '2.0.0-SNAPSHOT'
         //lancet_version = '0.0.1.8-SNAPSHOT'
@@ -83,6 +81,12 @@ subprojects { pro ->
                                 name '朱晨曦'
                                 email '973829691@qq.com'
                             }
+
+                            developer {
+                                id 'bxbxbai'
+                                name '白雪斌'
+                                email 'bxbxbai@gmail.com'
+                            }
                         }
                     }
                 }
@@ -102,8 +106,6 @@ subprojects { pro ->
             publish = true
         }
     }
-}
-
 }
 
 task uploadAll { task ->
