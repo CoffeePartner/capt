@@ -23,6 +23,10 @@ public abstract class GeneratedInterceptor implements Interceptor {
         return context;
     }
 
+    final public void setArg(int index, Object o) {
+        context.getArgs()[index] = o;
+    }
+
     @Nullable
     abstract Object intercept(Object[] args);
 }

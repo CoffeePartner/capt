@@ -6,5 +6,7 @@ public class GeneratedStaticEntranceInfo {
     static class GeneratedMethodInfo {
         String desc;
 
+
+
     }
 }

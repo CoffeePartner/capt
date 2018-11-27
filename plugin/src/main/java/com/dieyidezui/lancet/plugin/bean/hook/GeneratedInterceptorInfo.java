@@ -1,6 +1,5 @@
 package com.dieyidezui.lancet.plugin.bean.hook;
 
-import com.dieyidezui.lancet.rt.annotations.Insert;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -11,15 +10,9 @@ public class GeneratedInterceptorInfo {
 
     public String bindMethod;
 
-    /**
-     * Just for {@link Insert}
-     */
     @Nullable
     public String associatedMethod;
 
-    /**
-     * Just for {@link Insert}
-     */
     @Nullable
     public String virtualMethod;
 
