@@ -5,7 +5,7 @@ dependencies {
     compile gradleApi()
     compileOnly "com.android.tools.build:gradle:$android_tools_version"
     compile "com.google.code.gson:gson:2.8.0"
-    compile project(':lancet-weaver')
+    compile project(':noop')
     testCompile gradleTestKit()
     testCompile 'junit:junit:4.12'
 }
