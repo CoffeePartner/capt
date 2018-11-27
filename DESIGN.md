@@ -79,3 +79,10 @@ class Insert  -> remove update add(定点)
 
 
 class TryCatch  -> remove update add(定点)
+
+
+Generated Interceptor
+
+1. 1 Hook Method = 1 Interceptor(insert proxy try_catch)
+2. 1 Insert matched method = 1 Interceptor(invoke synthetic)
+3. 1 Proxy matched method = 1 Interceptor(invoke synthetic or invoke directly)
