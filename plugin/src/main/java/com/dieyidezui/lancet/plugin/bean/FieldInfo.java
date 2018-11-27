@@ -1,8 +1,5 @@
 package com.dieyidezui.lancet.plugin.bean;
 
-/**
- * Created by gengwanpeng on 17/5/11.
- */
 public class FieldInfo {
 
     public int access;

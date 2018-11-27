@@ -5,9 +5,6 @@ import com.dieyidezui.lancet.plugin.bean.hook.MethodLocator;
 import java.util.List;
 import java.util.jar.JarFile;
 
-/**
- * Created by gengwanpeng on 17/5/11.
- */
 public class MethodInfo {
 
     public int access;
