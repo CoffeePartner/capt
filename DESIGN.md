@@ -86,3 +86,11 @@ Generated Interceptor
 1. 1 Hook Method = 1 Interceptor(insert proxy try_catch)
 2. 1 Insert matched method = 1 Interceptor(invoke synthetic)
 3. 1 Proxy matched method = 1 Interceptor(invoke synthetic or invoke directly)
+
+
+Proxy
+直接要算出需要生成几个拦截器，在处理 Proxy 源方法时，
+在调用处，直接指定调用目标拦截器，Hook 代码拦截器，看有没有匹配的
+
+Insert 
+生成的 伴生方法 权限 access 保持一致，这样就不一定需要虚拟方法了。
