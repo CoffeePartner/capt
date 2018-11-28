@@ -3,6 +3,7 @@ package com.dieyidezui.lancet.rt.internal.codegen;
 import com.dieyidezui.lancet.rt.Interceptor;
 import com.dieyidezui.lancet.rt.Lancet;
 import com.dieyidezui.lancet.rt.AroundContext;
+import com.dieyidezui.lancet.rt.annotations.Interceptable;
 import com.dieyidezui.lancet.rt.annotations.TryCatchHandler;
 import com.dieyidezui.lancet.rt.internal.AroundMethodChain;
 
@@ -13,6 +14,10 @@ import java.util.List;
 
 public class CodegenHelper {
 
+    /**
+     * For {@link Interceptable}
+     */
+    private static GeneratedInterceptor[] EMPTY = new GeneratedInterceptor[0];
     /**
      * Invoked by generated code at hook point.
      * @param interceptorArray sorted by priority
@@ -42,5 +47,9 @@ public class CodegenHelper {
      */
     public static AroundContext getContext(GeneratedInterceptor interceptor) {
         return interceptor.getContext();
+    }
+
+    public static GeneratedInterceptor[] emptyArray() {
+        return EMPTY;
     }
 }
