@@ -5,6 +5,7 @@ import com.google.common.base.Strings;
 import stub.weaver.internal.util.AsmUtil;
 import org.objectweb.asm.tree.MethodNode;
 
+import java.nio.file.FileSystems;
 import java.util.regex.Pattern;
 
 
@@ -36,7 +37,7 @@ public class ProxyInfo {
         this.targetDesc = targetDesc;
         this.sourceClass = sourceClass;
         this.sourceMethod = sourceMethod;
-
+        FileSystems.getDefault().getPathMatcher("glob");
         if (!Strings.isNullOrEmpty(regex)) {
             this.pattern = Pattern.compile(regex);
         }
