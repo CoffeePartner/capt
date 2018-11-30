@@ -27,9 +27,6 @@ public class LancetPlugin implements Plugin<Project> {
             throw new ProjectConfigurationException("Need android application/library plugin to be applied first", null);
         }
 
-        // TODO
-        project.getGradle().getTaskGraph().whenReady();
-
         BaseExtension baseExtension = (BaseExtension) project.getExtensions().getByName("android");
         project.getExtensions().create(LancetTransform.NAME, LancetExtension.class);
 
@@ -41,7 +38,7 @@ public class LancetPlugin implements Plugin<Project> {
                 .disableHtmlEscaping()
                 // optimize for List<ClassInfo>, reduce array copy
                 .registerTypeAdapter(new TypeToken<List<ClassInfo>>() {
-                }.getType(), (InstanceCreator) type -> new ArrayList<ClassInfo>())
+                }.getType(), (InstanceCreator) type -> new ArrayList<ClassInfo>(8192))
                 .create();
 
 
