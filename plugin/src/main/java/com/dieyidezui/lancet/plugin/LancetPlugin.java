@@ -2,19 +2,17 @@ package com.dieyidezui.lancet.plugin;
 
 import com.android.build.gradle.BaseExtension;
 import com.dieyidezui.lancet.plugin.bean.ClassInfo;
-import com.dieyidezui.lancet.plugin.cache.DirCache;
+import com.dieyidezui.lancet.plugin.cache.DirJsonCache;
 import com.dieyidezui.lancet.plugin.util.LancetThreadFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import com.google.gson.reflect.TypeToken;
-import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.ProjectConfigurationException;
 
 import java.io.File;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -47,7 +45,7 @@ public class LancetPlugin implements Plugin<Project> {
                 .create();
 
 
-        DirCache dirCache = new DirCache(new File(project.getBuildDir(), LancetTransform.NAME),
+        DirJsonCache dirCache = new DirJsonCache(new File(project.getBuildDir(), LancetTransform.NAME),
                 lancetExecutor,
                 gson);
 

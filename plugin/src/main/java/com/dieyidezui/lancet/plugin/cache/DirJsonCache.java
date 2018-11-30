@@ -11,15 +11,17 @@ import java.lang.reflect.ParameterizedType;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class DirCache {
+@SuppressWarnings("ResultOfMethodCallIgnored")
+public class DirJsonCache {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(DirCache.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(DirJsonCache.class);
 
     private final boolean cacheUseful;
     private final File mDir;
@@ -27,7 +29,7 @@ public class DirCache {
     private final Gson gson;
     private final List<Future<?>> futures = new ArrayList<>();
 
-    public DirCache(File dir, ExecutorService executor, Gson gson) {
+    public DirJsonCache(File dir, ExecutorService executor, Gson gson) {
         this.mDir = dir;
         this.executor = executor;
         this.gson = gson;
@@ -66,12 +68,21 @@ public class DirCache {
         return ret;
     }
 
+    public void clear() {
+        File[] children = mDir.listFiles();
+        if (children != null) {
+            for (File f : children) {
+                f.delete();
+            }
+        }
+    }
+
     private static Class<?> getTargetType(Object t) {
         return (Class<?>) ((ParameterizedType) t.getClass().getGenericInterfaces()[0]).getActualTypeArguments()[0];
     }
 
 
-    class SingleReadTask<T> implements Runnable {
+    class SingleReadTask<T> implements Callable<Void> {
 
         private final Consumer<T> consumer;
 
@@ -80,7 +91,7 @@ public class DirCache {
         }
 
         @Override
-        public void run() {
+        public Void call() throws Exception {
             Class<?> targetType = getTargetType(consumer);
             String fileName = targetType.getSimpleName() + ".json";
             Reader reader = null;
@@ -89,14 +100,17 @@ public class DirCache {
                 reader = Files.newReader(new File(mDir, fileName), Charset.defaultCharset());
                 gson.fromJson(reader, targetType);
             } catch (IOException | RuntimeException e) {
-                LOGGER.error("Read failed for: " + fileName, e);
+                LOGGER.error("Read failed for {}", fileName);
+                throw e;
             } finally {
                 IOUtils.closeQuietly(reader);
             }
+
+            return null;
         }
     }
 
-    class SingleWriteTask<T> implements Runnable {
+    class SingleWriteTask<T> implements Callable<Void> {
         private final Supplier<T> supplier;
 
         SingleWriteTask(Supplier<T> supplier) {
@@ -104,17 +118,20 @@ public class DirCache {
         }
 
         @Override
-        public void run() {
+        public Void call() throws Exception {
             String fileName = getTargetType(supplier).getSimpleName() + ".json";
             Writer writer = null;
             try {
                 writer = Files.newWriter(new File(mDir, fileName), Charset.defaultCharset());
                 gson.toJson(supplier.get(), writer);
             } catch (IOException | RuntimeException e) {
-                LOGGER.error("Write failed for: " + fileName, e);
+                LOGGER.error("Write failed for {}" + fileName);
+                throw e;
             } finally {
                 IOUtils.closeQuietly(writer);
             }
+
+            return null;
         }
     }
 }
