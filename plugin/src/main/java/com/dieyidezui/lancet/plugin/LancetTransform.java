@@ -8,6 +8,8 @@ import com.android.build.gradle.internal.pipeline.TransformManager;
 import com.dieyidezui.lancet.plugin.cache.DirCache;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -19,6 +21,7 @@ import java.util.concurrent.Executor;
 
 public class LancetTransform extends Transform {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(LancetTransform.class);
     static final String NAME = "lancet";
 
     private DirCache mCache;
@@ -56,11 +59,17 @@ public class LancetTransform extends Transform {
 
     @Override
     public void transform(TransformInvocation invocation) throws TransformException, InterruptedException, IOException {
-        if (mCache.isCacheUseful() && invocation.isIncremental() && mCache.await()) {
-            // incremental mode
-        } else {
-            // full mode
+        if (mCache.isCacheUseful() && invocation.isIncremental()) {
+            // try incremental mode
+            if (mCache.await()) {
+                // incremental mode
+
+            } else {
+                LOGGER.warn("Load cache failed, use full mode");
+            }
         }
+
+        // full mode
         // parse
 
 

@@ -1,13 +1,24 @@
 package com.dieyidezui.lancet.plugin;
 
 import com.android.build.gradle.BaseExtension;
+import com.dieyidezui.lancet.plugin.bean.ClassInfo;
 import com.dieyidezui.lancet.plugin.cache.DirCache;
+import com.dieyidezui.lancet.plugin.util.LancetThreadFactory;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.InstanceCreator;
+import com.google.gson.reflect.TypeToken;
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.ProjectConfigurationException;
 
 import java.io.File;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class LancetPlugin implements Plugin<Project> {
 
@@ -24,10 +35,23 @@ public class LancetPlugin implements Plugin<Project> {
         BaseExtension baseExtension = (BaseExtension) project.getExtensions().getByName("android");
         project.getExtensions().create(LancetTransform.NAME, LancetExtension.class);
 
-        DirCache dirCache = new DirCache(new File(project.getBuildDir(), LancetTransform.NAME));
+
+        int core = Runtime.getRuntime().availableProcessors();
+
+        ExecutorService lancetExecutor = Executors.newFixedThreadPool(core, new LancetThreadFactory());
+        Gson gson = new GsonBuilder()
+                .disableHtmlEscaping()
+                // optimize for List<ClassInfo>, reduce array copy
+                .registerTypeAdapter(new TypeToken<List<ClassInfo>>() {
+                }.getType(), (InstanceCreator) type -> new ArrayList<ClassInfo>())
+                .create();
+
+
+        DirCache dirCache = new DirCache(new File(project.getBuildDir(), LancetTransform.NAME),
+                lancetExecutor,
+                gson);
 
         LancetTransform lancetTransform = new LancetTransform(dirCache);
         baseExtension.registerTransform(lancetTransform);
-        project.afterEvaluate(lancetTransform);
     }
 }
