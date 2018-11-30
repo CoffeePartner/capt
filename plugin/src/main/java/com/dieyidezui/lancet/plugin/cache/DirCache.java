@@ -21,21 +21,20 @@ public class DirCache {
 
     private static Logger LOGGER = LoggerFactory.getLogger(DirCache.class);
 
-    private boolean cacheUseful = true;
-
-    private File mDir;
-    private ExecutorService executor;
-    private Gson gson;
-    private List<Future<?>> futures = new ArrayList<>();
+    private final boolean cacheUseful;
+    private final File mDir;
+    private final ExecutorService executor;
+    private final Gson gson;
+    private final List<Future<?>> futures = new ArrayList<>();
 
     public DirCache(File dir, ExecutorService executor, Gson gson) {
         this.mDir = dir;
         this.executor = executor;
         this.gson = gson;
-        dir.mkdirs();
-        if (!dir.isDirectory()) {
-            cacheUseful = false;
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
+        cacheUseful = dir.isDirectory();
     }
 
     public boolean isCacheUseful() {
