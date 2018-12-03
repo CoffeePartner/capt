@@ -1,8 +1,8 @@
 package com.dieyidezui.lancet.plugin.cache;
 
+import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +23,6 @@ public class DirJsonCache {
 
     private static Logger LOGGER = LoggerFactory.getLogger(DirJsonCache.class);
 
-    private final boolean cacheUseful;
     private final File mDir;
     private final ExecutorService executor;
     private final Gson gson;
@@ -36,11 +35,13 @@ public class DirJsonCache {
         if (!dir.exists()) {
             dir.mkdirs();
         }
-        cacheUseful = dir.isDirectory();
     }
 
     public boolean isCacheUseful() {
-        return cacheUseful;
+        if(!mDir.exists()) {
+            mDir.mkdirs();
+        }
+        return mDir.isDirectory();
     }
 
     public <T> void loadAsync(Consumer<T> consumer) {
@@ -103,7 +104,7 @@ public class DirJsonCache {
                 LOGGER.error("Read failed for {}", fileName);
                 throw e;
             } finally {
-                IOUtils.closeQuietly(reader);
+                Closeables.close(reader, true);
             }
 
             return null;
@@ -128,7 +129,7 @@ public class DirJsonCache {
                 LOGGER.error("Write failed for {}" + fileName);
                 throw e;
             } finally {
-                IOUtils.closeQuietly(writer);
+                Closeables.close(writer, true);
             }
 
             return null;
