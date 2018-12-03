@@ -3,6 +3,7 @@ package com.dieyidezui.lancet.plugin.bean.hook;
 import javafx.util.Pair;
 
 import java.util.List;
+import java.util.Set;
 
 public class HookClassInfo {
 
@@ -15,10 +16,10 @@ public class HookClassInfo {
     /**
      * info with extra matched classes
      */
-    public List<Pair<InsertInfo, List<String>>> insertInfos;
+    public List<Pair<InsertInfo, Set<String>>> insertInfos;
 
     /**
      * same as insert
      */
-    public List<Pair<ProxyInfo, List<String>>> proxyInfos;
+    public List<Pair<ProxyInfo, Set<String>>> proxyInfos;
 }
