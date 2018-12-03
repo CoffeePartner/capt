@@ -1,5 +1,7 @@
 package com.dieyidezui.lancet.plugin.bean.hook;
 
+import javafx.util.Pair;
+
 import java.util.List;
 
 public class HookClassInfo {
@@ -8,9 +10,15 @@ public class HookClassInfo {
 
     public String belongToInputName;
 
-    public List<TryCatchInfo> tryCatchInfos;
+    public TryCatchInfo tryCatchInfos;
 
-    public List<InsertInfo> insertInfos;
+    /**
+     * info with extra matched classes
+     */
+    public List<Pair<InsertInfo, List<String>>> insertInfos;
 
-    public List<ProxyInfo> proxyInfos;
+    /**
+     * same as insert
+     */
+    public List<Pair<ProxyInfo, List<String>>> proxyInfos;
 }

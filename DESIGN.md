@@ -94,3 +94,16 @@ Proxy
 
 Insert 
 生成的 伴生方法 权限 access 保持一致，这样就不一定需要虚拟方法了。
+
+
+
+List<ClassInfo>
+
+List<InputInfo>
+
+List<HookClassInfo>
+
+List<GeneratedInterceptorInfo>
+
+List<GeneratedStaticEntranceInfo>
+

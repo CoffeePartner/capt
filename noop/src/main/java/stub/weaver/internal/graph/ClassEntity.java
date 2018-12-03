@@ -14,8 +14,8 @@ public class ClassEntity {
     public String superName;
     public List<String> interfaces;
 
-    public List<FieldEntity> fields = new ArrayList<>();
-    public List<MethodEntity> methods = new ArrayList<>();
+    public List<FieldEntity> fields;
+    public List<MethodEntity> methods;
 
     // placeholder
     public ClassEntity(String name) {

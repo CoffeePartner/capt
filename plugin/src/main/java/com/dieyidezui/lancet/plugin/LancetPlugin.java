@@ -3,6 +3,8 @@ package com.dieyidezui.lancet.plugin;
 import com.android.build.gradle.BaseExtension;
 import com.dieyidezui.lancet.plugin.bean.ClassInfo;
 import com.dieyidezui.lancet.plugin.cache.DirJsonCache;
+import com.dieyidezui.lancet.plugin.transform.graph.ClassSet;
+import com.dieyidezui.lancet.plugin.util.Constants;
 import com.dieyidezui.lancet.plugin.util.LancetThreadFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -35,16 +37,19 @@ public class LancetPlugin implements Plugin<Project> {
 
         ExecutorService lancetExecutor = Executors.newFixedThreadPool(core, new LancetThreadFactory());
         Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
                 .disableHtmlEscaping()
                 // optimize for List<ClassInfo>, reduce array copy
                 .registerTypeAdapter(new TypeToken<List<ClassInfo>>() {
-                }.getType(), (InstanceCreator) type -> new ArrayList<ClassInfo>(8192))
+                }.getType(), (InstanceCreator) type -> new ArrayList<ClassInfo>(Constants.OPT_SIZE))
                 .create();
 
 
         DirJsonCache dirCache = new DirJsonCache(new File(project.getBuildDir(), LancetTransform.NAME),
                 lancetExecutor,
                 gson);
+
+        ClassSet classSet = new ClassSet();
 
         LancetTransform lancetTransform = new LancetTransform(dirCache);
         baseExtension.registerTransform(lancetTransform);
