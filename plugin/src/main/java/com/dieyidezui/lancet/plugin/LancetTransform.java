@@ -44,8 +44,7 @@ public class LancetTransform extends Transform {
 
     @Override
     public Collection<File> getSecondaryDirectoryOutputs() {
-        // TODO
-        return Collections.emptyList();
+        return Collections.singleton(mCache.rootDir());
     }
 
     @Override
@@ -60,7 +59,6 @@ public class LancetTransform extends Transform {
 
         if (mCache.isCacheUseful() && invocation.isIncremental()) {
             // try incremental mode, load cache from file
-
             mCache.loadAsync();
             incremental = mCache.await();
         }

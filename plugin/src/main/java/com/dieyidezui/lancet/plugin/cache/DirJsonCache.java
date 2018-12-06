@@ -82,6 +82,10 @@ public class DirJsonCache {
         return (Class<?>) ((ParameterizedType) t.getClass().getGenericInterfaces()[0]).getActualTypeArguments()[0];
     }
 
+    public File rootDir() {
+        return mDir;
+    }
+
 
     class SingleReadTask<T> implements Callable<Void> {
 

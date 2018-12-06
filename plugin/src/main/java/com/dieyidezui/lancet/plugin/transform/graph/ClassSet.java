@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class ClassSet {
 
-    private Map<String, ClassNode> classes = new ConcurrentHashMap<>(Constants.OPT_SIZE);
+    private final Map<String, ClassNode> classes = new ConcurrentHashMap<>(Constants.OPT_SIZE);
 
     public Consumer<List<ClassInfo>> asConsumer() {
         return list -> list.parallelStream()

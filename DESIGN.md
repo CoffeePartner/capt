@@ -107,3 +107,9 @@ List<GeneratedInterceptorInfo>
 
 List<GeneratedStaticEntranceInfo>
 
+
+Remove @NameRegex
+
+Add @Restrict, A annotation of annotation to describe the point cut hook if
+
+@Restrict can easily create @NameRegex
