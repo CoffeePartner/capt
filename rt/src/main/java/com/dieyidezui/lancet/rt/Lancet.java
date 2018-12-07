@@ -1,5 +1,7 @@
 package com.dieyidezui.lancet.rt;
 
+import com.dieyidezui.lancet.rt.internal.annotations.AutoReplaced;
+
 import javax.annotation.Nullable;
 
 public class Lancet {

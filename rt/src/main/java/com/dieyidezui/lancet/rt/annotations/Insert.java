@@ -1,6 +1,6 @@
 package com.dieyidezui.lancet.rt.annotations;
 
-import com.dieyidezui.lancet.rt.AutoReplaced;
+import com.dieyidezui.lancet.rt.internal.annotations.AutoReplaced;
 
 import java.lang.annotation.*;
 
