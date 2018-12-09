@@ -3,6 +3,7 @@ package com.dieyidezui.lancet.plugin;
 import com.android.build.gradle.BaseExtension;
 import com.dieyidezui.lancet.plugin.bean.ClassInfo;
 import com.dieyidezui.lancet.plugin.cache.DirJsonCache;
+import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.transform.graph.ClassSet;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import com.dieyidezui.lancet.plugin.util.LancetThreadFactory;
@@ -30,7 +31,8 @@ public class LancetPlugin implements Plugin<Project> {
         }
 
         BaseExtension baseExtension = (BaseExtension) project.getExtensions().getByName("android");
-        project.getExtensions().create(LancetTransform.NAME, LancetExtension.class);
+
+        project.getExtensions().create(LancetTransform.NAME, LancetExtension.class, project.container(LancetPluginExtension.class));
 
 
         int core = Runtime.getRuntime().availableProcessors();

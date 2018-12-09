@@ -6,8 +6,8 @@ import com.android.build.api.transform.TransformException;
 import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.internal.pipeline.TransformManager;
 import com.dieyidezui.lancet.plugin.cache.DirJsonCache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.util.Set;
 
 public class LancetTransform extends Transform {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LancetTransform.class);
+    private static final Logger LOGGER = Logging.getLogger(LancetTransform.class);
     static final String NAME = "lancet";
 
     private DirJsonCache mCache;
@@ -54,9 +54,7 @@ public class LancetTransform extends Transform {
 
     @Override
     public void transform(TransformInvocation invocation) throws TransformException, InterruptedException, IOException {
-
         boolean incremental = false;
-
         if (mCache.isCacheUseful() && invocation.isIncremental()) {
             // try incremental mode, load cache from file
             mCache.loadAsync();
