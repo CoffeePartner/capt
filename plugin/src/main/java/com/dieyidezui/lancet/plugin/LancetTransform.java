@@ -5,7 +5,7 @@ import com.android.build.api.transform.Transform;
 import com.android.build.api.transform.TransformException;
 import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.internal.pipeline.TransformManager;
-import com.dieyidezui.lancet.plugin.cache.DirJsonCache;
+import com.dieyidezui.lancet.plugin.util.Constants;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -15,15 +15,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-public class LancetTransform extends Transform {
+public class LancetTransform extends Transform implements Constants {
 
     private static final Logger LOGGER = Logging.getLogger(LancetTransform.class);
-    static final String NAME = "lancet";
+    private final ClassLoaderMaker maker;
 
-    private DirJsonCache mCache;
-
-    public LancetTransform(DirJsonCache mCache) {
-        this.mCache = mCache;
+    public LancetTransform(ClassLoaderMaker maker) {
+        this.maker = maker;
     }
 
     @Override
@@ -44,7 +42,7 @@ public class LancetTransform extends Transform {
 
     @Override
     public Collection<File> getSecondaryDirectoryOutputs() {
-        return Collections.singleton(mCache.rootDir());
+        return Collections.emptyList();
     }
 
     @Override
@@ -54,18 +52,8 @@ public class LancetTransform extends Transform {
 
     @Override
     public void transform(TransformInvocation invocation) throws TransformException, InterruptedException, IOException {
-        boolean incremental = false;
-        if (mCache.isCacheUseful() && invocation.isIncremental()) {
-            // try incremental mode, load cache from file
-            mCache.loadAsync();
-            incremental = mCache.await();
-        }
 
-        if (incremental) {
-
-        } else {
-
-        }
+        maker.beforeTransform(invocation);
 
         // full mode
         // parse

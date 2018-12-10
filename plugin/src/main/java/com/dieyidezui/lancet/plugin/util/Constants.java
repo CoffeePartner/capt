@@ -1,6 +1,12 @@
 package com.dieyidezui.lancet.plugin.util;
 
-public class Constants {
+public interface Constants {
 
-    public static final int OPT_SIZE = 8192;
+    int OPT_SIZE = 8192;
+
+    String NAME = "lancet";
+
+    String CAPITALIZED_NAME = "Lancet";
+
+    String META = "META-INF/lancet.properties";
 }

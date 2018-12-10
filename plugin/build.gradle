@@ -5,8 +5,8 @@ dependencies {
     compile gradleApi()
     compileOnly "com.android.tools.build:gradle:$android_tools_version"
     compile "com.google.code.gson:gson:2.8.5"
-    compile project(':noop')
-    compile project(":core")
+    //compile project(':noop')
+    //compile project(":core")
     testCompile gradleTestKit()
     testCompile 'junit:junit:4.12'
 }

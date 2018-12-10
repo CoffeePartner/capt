@@ -19,13 +19,16 @@ public @interface Def {
      * It can be override by configure the lancet extension, like:
      * <p/>
      * lancet {
-     *     plugins {
-     *         your_plugin_name {
-     *             priority 10
-     *         }
-     *     }
+     * plugins {
+     * your_plugin_name {
+     * priority 10
      * }
+     * }
+     * }
+     *
      * @return priority of your plugin, default 0.
      */
     int priority() default 0;
+
+    Class<? extends Annotation>[] interested();
 }
