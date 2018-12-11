@@ -1,4 +1,4 @@
-package com.dieyidezui.lancet.core;
+package com.dieyidezui.lancet.core.annotations;
 
 
 import java.lang.annotation.ElementType;

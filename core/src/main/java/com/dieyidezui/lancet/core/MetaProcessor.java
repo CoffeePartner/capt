@@ -1,5 +1,6 @@
 package com.dieyidezui.lancet.core;
 
+import com.dieyidezui.lancet.core.annotations.Meta;
 import com.dieyidezui.lancet.core.graph.ClassInfo;
 
 import javax.annotation.Nullable;
