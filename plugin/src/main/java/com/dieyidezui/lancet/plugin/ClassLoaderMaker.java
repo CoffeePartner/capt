@@ -3,9 +3,9 @@ package com.dieyidezui.lancet.plugin;
 import com.android.build.api.transform.QualifiedContent;
 import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.AppExtension;
+import com.android.builder.Version;
 import com.android.builder.model.SourceProvider;
 import com.dieyidezui.lancet.plugin.util.Constants;
-import com.google.common.collect.Streams;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
@@ -19,6 +19,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.stream.Stream;
 
 public class ClassLoaderMaker implements Constants {
 
@@ -37,7 +38,6 @@ public class ClassLoaderMaker implements Constants {
 
     public void beforeTransform(TransformInvocation invocation) {
         String variantName = invocation.getContext().getVariantName();
-
         ConfigurationContainer configurations = project.getConfigurations();
 
         Configuration target = configurations.getByName(computeConfigurationName(variantName));
@@ -64,7 +64,7 @@ public class ClassLoaderMaker implements Constants {
                         .toArray(URL[]::new), Thread.currentThread().getContextClassLoader());
 
         URL[] runtimeUrls = invocation.getInputs().stream()
-                .flatMap(s -> Streams.concat(s.getDirectoryInputs().stream(), s.getJarInputs().stream()))
+                .flatMap(s -> Stream.concat(s.getDirectoryInputs().stream(), s.getJarInputs().stream()))
                 .map(QualifiedContent::getFile)
                 .map(f -> {
                     try {

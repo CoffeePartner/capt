@@ -53,6 +53,4 @@ public class LancetPlugin implements Plugin<Project> {
         LancetTransform lancetTransform = new LancetTransform(maker);
         appExtension.registerTransform(lancetTransform);
     }
-
-
 }

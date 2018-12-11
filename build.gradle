@@ -12,7 +12,7 @@ buildscript {
         //lancet_version = '0.0.1.8-SNAPSHOT'
 
         asm_version = '7.0'
-        android_tools_version = '3.2.1'
+        android_tools_version = '3.0.0'
         guava_version = '23.0'
     }
     repositories {
