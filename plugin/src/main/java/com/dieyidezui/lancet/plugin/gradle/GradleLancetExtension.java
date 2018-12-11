@@ -1,5 +1,5 @@
 
-package com.dieyidezui.lancet.plugin;
+package com.dieyidezui.lancet.plugin.gradle;
 
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import org.gradle.api.Action;
@@ -7,13 +7,13 @@ import org.gradle.api.NamedDomainObjectContainer;
 
 import javax.inject.Inject;
 
-public class LancetExtension {
+public class GradleLancetExtension {
 
     private NamedDomainObjectContainer<LancetPluginExtension> plugins;
     private boolean autoRemoveCore = true;
 
     @Inject
-    public LancetExtension(NamedDomainObjectContainer<LancetPluginExtension> plugins) {
+    public GradleLancetExtension(NamedDomainObjectContainer<LancetPluginExtension> plugins) {
         this.plugins = plugins;
     }
 

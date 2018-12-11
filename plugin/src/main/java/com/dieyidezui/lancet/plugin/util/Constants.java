@@ -8,5 +8,9 @@ public interface Constants {
 
     String CAPITALIZED_NAME = "Lancet";
 
-    String META = "META-INF/lancet.properties";
+    String PLUGIN_PATH = "META-INF/lancet-plugins/";
+
+    String ANDROID_TEST = "AndroidTest";
+
+    String TEST = "test";
 }

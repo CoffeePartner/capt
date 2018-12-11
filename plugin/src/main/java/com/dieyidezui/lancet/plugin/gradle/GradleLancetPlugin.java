@@ -1,6 +1,7 @@
-package com.dieyidezui.lancet.plugin;
+package com.dieyidezui.lancet.plugin.gradle;
 
 import com.android.build.gradle.AppExtension;
+import com.dieyidezui.lancet.plugin.LancetLoader;
 import com.dieyidezui.lancet.plugin.cache.DirJsonCache;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.util.LancetThreadFactory;
@@ -14,7 +15,7 @@ import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class LancetPlugin implements Plugin<Project> {
+public class GradleLancetPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
@@ -26,9 +27,9 @@ public class LancetPlugin implements Plugin<Project> {
         AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
 
 
-        project.getExtensions().create(LancetTransform.NAME, LancetExtension.class, project.container(LancetPluginExtension.class));
+        project.getExtensions().create(LancetTransform.NAME, GradleLancetExtension.class, project.container(LancetPluginExtension.class));
 
-        ClassLoaderMaker maker = new ClassLoaderMaker(appExtension, project);
+        LancetLoader maker = new LancetLoader(appExtension, project);
         // create configurations for separate variant
         maker.createConfigurationForVariant();
 

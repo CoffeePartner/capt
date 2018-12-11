@@ -1,10 +1,11 @@
-package com.dieyidezui.lancet.plugin;
+package com.dieyidezui.lancet.plugin.gradle;
 
 import com.android.build.api.transform.QualifiedContent;
 import com.android.build.api.transform.Transform;
 import com.android.build.api.transform.TransformException;
 import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.internal.pipeline.TransformManager;
+import com.dieyidezui.lancet.plugin.LancetLoader;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -18,9 +19,9 @@ import java.util.Set;
 public class LancetTransform extends Transform implements Constants {
 
     private static final Logger LOGGER = Logging.getLogger(LancetTransform.class);
-    private final ClassLoaderMaker maker;
+    private final LancetLoader maker;
 
-    public LancetTransform(ClassLoaderMaker maker) {
+    public LancetTransform(LancetLoader maker) {
         this.maker = maker;
     }
 
