@@ -46,7 +46,7 @@ public abstract class MetaProcessor {
     /**
      * Class removed, pre has {@link Meta}.
      *
-     * @param basicInfo info
+     * @param basicInfo last info
      */
     public void onMetaClassRemoved(ClassInfo basicInfo) {
     }

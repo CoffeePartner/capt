@@ -1,5 +1,5 @@
 # Lancet
-A lightweight and fast AOP library for Android App and SDK developers.
+~~A lightweight and fast AOP library for Android App and SDK developers.~~
 
 ## WIP
 
@@ -8,4 +8,9 @@ A lightweight and fast AOP library for Android App and SDK developers.
 3. other API optimize
 4. support almost totally incremental builds
 
+
+## Updated 2018.12.11
+**More than AOP, Lancet can do everything you imagine.**
+
+--------
 Thanks for waiting!
