@@ -77,7 +77,7 @@ public class LancetLoader implements Constants {
     public void createConfigurationForVariant() {
         ConfigurationContainer configurations = project.getConfigurations();
         extension.getSourceSets().all(androidSourceSet -> {
-            if (!androidSourceSet.getName().startsWith("test")) { // don't support test
+            if (!androidSourceSet.getName().startsWith(TEST)) { // don't support test
                 configurations.maybeCreate(computeConfigurationName(androidSourceSet.getName()));
             }
         });
