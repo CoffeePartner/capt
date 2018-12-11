@@ -3,9 +3,14 @@ package com.dieyidezui.lancet.plugin;
 import com.android.build.api.transform.QualifiedContent;
 import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.AppExtension;
+import com.android.build.gradle.BaseExtension;
+import com.android.build.gradle.LibraryExtension;
+import com.android.build.gradle.api.BaseVariant;
 import com.android.build.gradle.api.TestVariant;
+import com.android.build.gradle.internal.api.TestedVariant;
 import com.android.builder.model.SourceProvider;
 import com.dieyidezui.lancet.plugin.util.Constants;
+import org.gradle.api.DomainObjectCollection;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
@@ -17,7 +22,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.stream.Stream;
 
@@ -25,12 +29,12 @@ public class LancetLoader implements Constants {
 
     private static final Logger LOGGER = Logging.getLogger(LancetLoader.class);
 
-    private final AppExtension extension;
+    private final BaseExtension extension;
     private final Project project;
     private URLClassLoader runnerLoader;
     private URLClassLoader runtimeLoader;
 
-    public LancetLoader(AppExtension extension, Project project) {
+    public LancetLoader(BaseExtension extension, Project project) {
         this.extension = extension;
         this.project = project;
     }
@@ -70,8 +74,12 @@ public class LancetLoader implements Constants {
         this.runnerLoader = URLClassLoader.newInstance(runtimeUrls, lancetDependencies);
         this.runtimeLoader = URLClassLoader.newInstance(runtimeUrls, null);
 
-        LOGGER.debug(Arrays.toString(lancetDependencies.getURLs()));
-        LOGGER.debug(Arrays.toString(runtimeUrls));
+        //LOGGER.error(Arrays.toString(lancetDependencies.getURLs()));
+        //LOGGER.error(Arrays.toString(runtimeUrls));
+    }
+
+    public boolean isApplication() {
+        return extension instanceof AppExtension;
     }
 
     public void createConfigurationForVariant() {
@@ -82,16 +90,21 @@ public class LancetLoader implements Constants {
             }
         });
 
-        extension.getApplicationVariants().all(v -> {
-            Configuration lancetVariant = configurations.getByName(computeConfigurationName(v.getName()));
-            v.getSourceSets().stream()
+        DomainObjectCollection<?> collection = extension instanceof AppExtension ?
+                ((AppExtension) extension).getApplicationVariants()
+                : ((LibraryExtension) extension).getLibraryVariants();
+
+        collection.all(v -> {
+            BaseVariant base = (BaseVariant) v;
+            Configuration lancetVariant = configurations.getByName(computeConfigurationName(base.getName()));
+            base.getSourceSets().stream()
                     .map(SourceProvider::getName)
                     .map(LancetLoader::computeConfigurationName)
-                    .map(configurations::maybeCreate)
+                    .map(configurations::getByName)
                     .filter(c -> c != lancetVariant)
                     .forEach(lancetVariant::extendsFrom);
 
-            TestVariant t = v.getTestVariant();
+            TestVariant t = ((TestedVariant) v).getTestVariant();
             if (t != null) {
                 Configuration testLancetVariant = configurations.getByName(computeConfigurationName(androidTestVariantToSourceSetName(t.getName())));
 
@@ -100,7 +113,7 @@ public class LancetLoader implements Constants {
                 t.getSourceSets().stream()
                         .map(SourceProvider::getName)
                         .map(LancetLoader::computeConfigurationName)
-                        .map(configurations::maybeCreate)
+                        .map(configurations::getByName)
                         .filter(c -> c != testLancetVariant)
                         .forEach(testLancetVariant::extendsFrom);
             }

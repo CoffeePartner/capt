@@ -7,6 +7,7 @@ import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.internal.pipeline.TransformManager;
 import com.dieyidezui.lancet.plugin.LancetLoader;
 import com.dieyidezui.lancet.plugin.util.Constants;
+import com.google.common.collect.ImmutableSet;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class LancetTransform extends Transform implements Constants {
 
@@ -37,9 +39,13 @@ public class LancetTransform extends Transform implements Constants {
 
     @Override
     public Set<? super QualifiedContent.Scope> getScopes() {
-        return TransformManager.SCOPE_FULL_PROJECT;
+        return maker.isApplication() ? TransformManager.SCOPE_FULL_PROJECT : TransformManager.PROJECT_ONLY;
     }
 
+    @Override
+    public Set<? super QualifiedContent.Scope> getReferencedScopes() {
+        return ImmutableSet.of(QualifiedContent.Scope.TESTED_CODE, QualifiedContent.Scope.PROVIDED_ONLY);
+    }
 
     @Override
     public Collection<File> getSecondaryDirectoryOutputs() {
@@ -56,6 +62,20 @@ public class LancetTransform extends Transform implements Constants {
 
         maker.beforeTransform(invocation);
 
+        invocation.getInputs()
+                .stream()
+                .flatMap(i-> Stream.<QualifiedContent>concat(i.getDirectoryInputs().stream(), i.getJarInputs().stream()))
+                .forEach(i -> {
+                    LOGGER.error(i.toString());
+                });
+
+        LOGGER.error("------------------------");
+        invocation.getReferencedInputs()
+                .stream()
+                .flatMap(i-> Stream.<QualifiedContent>concat(i.getDirectoryInputs().stream(), i.getJarInputs().stream()))
+                .forEach(i -> {
+                    LOGGER.error(i.toString());
+                });
         // full mode
         // parse
 

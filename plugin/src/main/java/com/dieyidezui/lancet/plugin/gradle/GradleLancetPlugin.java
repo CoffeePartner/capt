@@ -1,6 +1,8 @@
 package com.dieyidezui.lancet.plugin.gradle;
 
 import com.android.build.gradle.AppExtension;
+import com.android.build.gradle.BaseExtension;
+import com.android.build.gradle.LibraryExtension;
 import com.dieyidezui.lancet.plugin.LancetLoader;
 import com.dieyidezui.lancet.plugin.cache.DirJsonCache;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
@@ -19,17 +21,21 @@ public class GradleLancetPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        if (project.getPlugins().findPlugin("com.android.application") == null &&
-                project.getPlugins().findPlugin("android") == null) {
-            throw new ProjectConfigurationException("Need com.android.application / android plugin to be applied first", null);
+        if (project.getPlugins().findPlugin("com.android.application") == null
+                && project.getPlugins().findPlugin("android") == null
+                && project.getPlugins().findPlugin("com.android.library") == null
+                && project.getPlugins().findPlugin("android-library") == null) {
+            throw new ProjectConfigurationException("Need android application or library plugin to be applied first", null);
         }
 
-        AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
-
+        BaseExtension baseExtension = (BaseExtension) project.getExtensions().getByName("android");
+        if (!(baseExtension instanceof AppExtension || baseExtension instanceof LibraryExtension)) {
+            throw new ProjectConfigurationException("Only application or library is supported by lancet", null);
+        }
 
         project.getExtensions().create(LancetTransform.NAME, GradleLancetExtension.class, project.container(LancetPluginExtension.class));
 
-        LancetLoader maker = new LancetLoader(appExtension, project);
+        LancetLoader maker = new LancetLoader(baseExtension, project);
         // create configurations for separate variant
         maker.createConfigurationForVariant();
 
@@ -49,9 +55,9 @@ public class GradleLancetPlugin implements Plugin<Project> {
                 lancetExecutor,
                 gson);
 
-       // ClassGraph classGraph = new ClassGraph();
+        // ClassGraph classGraph = new ClassGraph();
 
         LancetTransform lancetTransform = new LancetTransform(maker);
-        appExtension.registerTransform(lancetTransform);
+        baseExtension.registerTransform(lancetTransform);
     }
 }
