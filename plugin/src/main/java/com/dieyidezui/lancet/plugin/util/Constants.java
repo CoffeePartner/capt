@@ -13,4 +13,6 @@ public interface Constants {
     String ANDROID_TEST = "AndroidTest";
 
     String TEST = "test";
+
+    String PLUGIN_KEY = "implementation-class";
 }

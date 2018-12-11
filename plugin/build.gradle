@@ -5,6 +5,7 @@ dependencies {
     compile gradleApi()
     compile "com.android.tools.build:gradle:$android_tools_version"
     compile "com.google.code.gson:gson:2.8.5"
+    compile "com.squareup.okio:okio:1.16.0"
     //compile project(':noop')
     compile project(":core")
     testCompile gradleTestKit()

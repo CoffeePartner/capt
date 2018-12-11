@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 
 public class LancetLoader implements Constants {
 
-    static final Logger LOGGER = Logging.getLogger(LancetLoader.class);
+    private static final Logger LOGGER = Logging.getLogger(LancetLoader.class);
 
     private final AppExtension extension;
     private final Project project;
@@ -111,8 +111,8 @@ public class LancetLoader implements Constants {
         return runtimeLoader.loadClass(className);
     }
 
-    public Class<?> loadClass(String className) throws ClassNotFoundException {
-        return runnerLoader.loadClass(className);
+    public <T> Class<? extends T> loadClass(String className) throws ClassNotFoundException {
+        return (Class<? extends T>) runnerLoader.loadClass(className);
     }
 
     public Enumeration<URL> loadPluginOnLancet(String pluginName) throws IOException {
