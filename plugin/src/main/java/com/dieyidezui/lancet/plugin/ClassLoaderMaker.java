@@ -7,6 +7,7 @@ import com.android.builder.model.SourceProvider;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import com.google.common.collect.Streams;
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -39,15 +40,20 @@ public class ClassLoaderMaker implements Constants {
 
         ConfigurationContainer configurations = project.getConfigurations();
 
+        Configuration target = configurations.getByName(computeConfigurationName(variantName));
+
+        target.extendsFrom(extension.getApplicationVariants()
+                .stream()
+                .filter(variant -> variant.getName().equals(variantName))
+                .flatMap(variant -> variant.getSourceSets().stream())
+                .map(SourceProvider::getName)
+                .map(ClassLoaderMaker::computeConfigurationName)
+                .map(configurations::getByName)
+                .filter(c -> c != target)
+                .toArray(Configuration[]::new));
+
         URLClassLoader lancetDependencies = URLClassLoader.newInstance(
-                extension.getApplicationVariants()
-                        .stream()
-                        .filter(variant -> variant.getName().equals(variantName))
-                        .flatMap(variant -> variant.getSourceSets().stream())
-                        .map(SourceProvider::getName)
-                        .map(ClassLoaderMaker::computeConfigurationName)
-                        .map(configurations::getByName)
-                        .flatMap(c -> c.getFiles().stream())
+                target.getFiles().stream()
                         .map(f -> {
                             try {
                                 return f.toURI().toURL();
