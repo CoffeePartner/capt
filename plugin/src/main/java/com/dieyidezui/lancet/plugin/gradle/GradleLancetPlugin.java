@@ -11,18 +11,25 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.gradle.BuildListener;
 import org.gradle.BuildResult;
-import org.gradle.api.Action;
-import org.gradle.api.Plugin;
-import org.gradle.api.Project;
-import org.gradle.api.ProjectConfigurationException;
+import org.gradle.api.*;
+import org.gradle.api.execution.TaskExecutionGraph;
+import org.gradle.api.execution.TaskExecutionGraphListener;
+import org.gradle.api.execution.TaskExecutionListener;
 import org.gradle.api.initialization.Settings;
 import org.gradle.api.invocation.Gradle;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
+import org.gradle.api.tasks.TaskState;
+import org.xml.sax.helpers.XMLFilterImpl;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class GradleLancetPlugin implements Plugin<Project> {
+
+    private static final Logger LOGGER = Logging.getLogger(GradleLancetPlugin.class);
 
     @Override
     public void apply(Project project) {
@@ -63,5 +70,21 @@ public class GradleLancetPlugin implements Plugin<Project> {
         // ClassGraph classGraph = new ClassGraph();
         LancetTransform lancetTransform = new LancetTransform(maker);
         baseExtension.registerTransform(lancetTransform);
+        project.getGradle().getTaskGraph().addTaskExecutionListener(new TaskExecutionListener() {
+            @Override
+            public void beforeExecute(Task task) {
+                if(task.getName().startsWith("createFullJar")) {
+                    LOGGER.error(task.toString());
+                    task.getDependsOn().forEach(o -> {
+                        LOGGER.error("d: " + o.toString());
+                    });
+                }
+            }
+
+            @Override
+            public void afterExecute(Task task, TaskState state) {
+
+            }
+        });
     }
 }

@@ -6,23 +6,23 @@ import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.BaseExtension;
 import com.android.build.gradle.LibraryExtension;
+import com.android.build.gradle.api.ApplicationVariant;
 import com.android.build.gradle.api.BaseVariant;
-import com.android.build.gradle.api.TestVariant;
-import com.android.build.gradle.internal.api.TestedVariant;
-import com.android.build.gradle.internal.publishing.AndroidArtifacts;
+import com.android.build.gradle.api.LibraryVariant;
 import com.android.builder.model.SourceProvider;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import org.gradle.api.DomainObjectCollection;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
+import org.gradle.api.artifacts.type.ArtifactTypeDefinition;
+import org.gradle.api.attributes.Attribute;
 import org.gradle.api.attributes.Usage;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.SourceSet;
 
 import javax.annotation.Nullable;
-import javax.naming.spi.ObjectFactory;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 public class LancetLoader implements Constants {
 
     private static final Logger LOGGER = Logging.getLogger(LancetLoader.class);
+    private static final Attribute<String> ARTIFACT_TYPE = Attribute.of("artifactType", String.class);
 
     private final BaseExtension extension;
     private final Project project;
@@ -80,7 +81,7 @@ public class LancetLoader implements Constants {
         this.runnerLoader = URLClassLoader.newInstance(runtimeUrls, lancetDependencies);
         this.runtimeLoader = URLClassLoader.newInstance(runtimeUrls, null);
 
-        //LOGGER.error(Arrays.toString(lancetDependencies.getURLs()));
+        LOGGER.error(Arrays.toString(lancetDependencies.getURLs()));
         //LOGGER.error(Arrays.toString(runtimeUrls));
     }
 
@@ -104,7 +105,8 @@ public class LancetLoader implements Constants {
 
         final Usage runtimeUsage = project.getObjects().named(Usage.class, Usage.JAVA_RUNTIME);
 
-        collection.all(v -> configure(runtimeUsage, ((TestedVariant) v).getTestVariant(),
+        collection.all(v -> configure(runtimeUsage,
+                (isApplication() ? ((ApplicationVariant) v).getTestVariant() : ((LibraryVariant) v).getTestVariant()),
                 configure(runtimeUsage, (BaseVariant) v, null))
         );
     }
@@ -130,7 +132,7 @@ public class LancetLoader implements Constants {
                 .forEach(cur::extendsFrom);
 
         cur.getAttributes()
-                .attribute(AndroidArtifacts.ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.JAR.getType())
+                .attribute(ARTIFACT_TYPE, ArtifactTypeDefinition.JAR_TYPE)
                 .attribute(BuildTypeAttr.ATTRIBUTE, project.getObjects().named(BuildTypeAttr.class, v.getBuildType().getName()))
                 .attribute(Usage.USAGE_ATTRIBUTE, runtime);
 
@@ -141,8 +143,8 @@ public class LancetLoader implements Constants {
         return runtimeLoader.loadClass(className);
     }
 
-    public <T> Class<? extends T> loadClass(String className) throws ClassNotFoundException {
-        return (Class<? extends T>) runnerLoader.loadClass(className);
+    public Class<?> loadClass(String className) throws ClassNotFoundException {
+        return runnerLoader.loadClass(className);
     }
 
     public Enumeration<URL> loadPluginOnLancet(String pluginName) throws IOException {
