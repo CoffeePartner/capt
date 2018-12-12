@@ -1,4 +1,4 @@
-package com.dieyidezui.lancet.core.graph;
+package com.dieyidezui.lancet.plugin.api.graph;
 
 
 

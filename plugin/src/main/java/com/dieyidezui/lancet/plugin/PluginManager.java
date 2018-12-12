@@ -1,6 +1,6 @@
 package com.dieyidezui.lancet.plugin;
 
-import com.dieyidezui.lancet.core.LancetPlugin;
+import com.dieyidezui.lancet.plugin.api.LancetPlugin;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.gradle.GradleLancetExtension;
 import com.dieyidezui.lancet.plugin.util.Constants;

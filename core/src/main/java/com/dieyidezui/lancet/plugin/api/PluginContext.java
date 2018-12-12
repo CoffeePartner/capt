@@ -1,7 +1,6 @@
-package com.dieyidezui.lancet.core;
+package com.dieyidezui.lancet.plugin.api;
 
 import java.io.File;
-import java.lang.annotation.Annotation;
 import java.util.Map;
 
 public interface PluginContext {

@@ -1,7 +1,7 @@
-package com.dieyidezui.lancet.core;
+package com.dieyidezui.lancet.plugin.api;
 
-import com.dieyidezui.lancet.core.annotations.Meta;
-import com.dieyidezui.lancet.core.graph.ClassInfo;
+import com.dieyidezui.lancet.plugin.api.annotations.Meta;
+import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
 
 import javax.annotation.Nullable;
 

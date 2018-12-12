@@ -43,11 +43,6 @@ public class LancetTransform extends Transform implements Constants {
     }
 
     @Override
-    public Set<? super QualifiedContent.Scope> getReferencedScopes() {
-        return ImmutableSet.of(QualifiedContent.Scope.TESTED_CODE, QualifiedContent.Scope.PROVIDED_ONLY);
-    }
-
-    @Override
     public Collection<File> getSecondaryDirectoryOutputs() {
         return Collections.emptyList();
     }

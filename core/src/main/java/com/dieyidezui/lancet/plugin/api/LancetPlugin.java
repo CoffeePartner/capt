@@ -1,6 +1,6 @@
-package com.dieyidezui.lancet.core;
+package com.dieyidezui.lancet.plugin.api;
 
-import com.dieyidezui.lancet.core.graph.ClassInfo;
+import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
 import org.objectweb.asm.ClassVisitor;
 
 /**

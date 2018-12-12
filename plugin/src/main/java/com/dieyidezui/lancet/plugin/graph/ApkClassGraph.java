@@ -1,7 +1,7 @@
 package com.dieyidezui.lancet.plugin.graph;
 
-import com.dieyidezui.lancet.core.graph.ClassGraph;
-import com.dieyidezui.lancet.core.graph.ClassInfo;
+import com.dieyidezui.lancet.plugin.api.graph.ClassGraph;
+import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
 
 public class ApkClassGraph implements ClassGraph {
 

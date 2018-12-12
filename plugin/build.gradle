@@ -7,7 +7,7 @@ dependencies {
     compile "com.google.code.gson:gson:2.8.5"
     compile "com.squareup.okio:okio:1.16.0"
     //compile project(':noop')
-    compile project(":core")
+    compile project(":api")
     testCompile gradleTestKit()
     testCompile 'junit:junit:4.12'
 }

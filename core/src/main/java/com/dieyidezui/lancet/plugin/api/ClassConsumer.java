@@ -1,4 +1,4 @@
-package com.dieyidezui.lancet.core;
+package com.dieyidezui.lancet.plugin.api;
 
 import org.objectweb.asm.tree.ClassNode;
 

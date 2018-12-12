@@ -3,7 +3,7 @@ apply plugin: 'java'
 dependencies {
     testCompile "junit:junit:4.12"
     testCompile 'com.squareup.okio:okio:1.11.0'
-    testCompile 'org.assertj:assertj-core:3.6.2'
+    testCompile 'org.assertj:assertj-api:3.6.2'
 
     compileClasspath "com.android.tools.build:gradle:$android_tools_version"
     compile project(":rt")

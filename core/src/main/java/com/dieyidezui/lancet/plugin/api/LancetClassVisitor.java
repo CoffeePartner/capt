@@ -1,22 +1,27 @@
-package com.dieyidezui.lancet.core;
+package com.dieyidezui.lancet.plugin.api;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.ModuleVisitor;
 import org.objectweb.asm.Opcodes;
 
-import javax.annotation.Nullable;
-
 public abstract class LancetClassVisitor extends ClassVisitor {
 
     private boolean skip = false;
+
+    protected ClassVisitor pre;
 
     public LancetClassVisitor() {
         super(Opcodes.ASM5, null);
     }
 
-    protected TransformContext getContext() {
 
+    void linkPre(ClassVisitor visitor) {
+        pre = visitor;
+    }
+
+    void linkNext(ClassVisitor visitor) {
+        cv = visitor;
     }
 
     @Override
@@ -26,20 +31,22 @@ public abstract class LancetClassVisitor extends ClassVisitor {
 
     @Override
     public final ModuleVisitor visitModule(String name, int access, String version) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public final void visitNestHost(String nestHost) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public final void visitNestMember(String nestMember) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public final void visitEnd() {
-        onEnd();
-        super.visitEnd();
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -47,7 +54,7 @@ public abstract class LancetClassVisitor extends ClassVisitor {
      *
      * @return true if changed the class
      */
-    protected boolean onEnd() {
+    public boolean onEnd() {
         return false;
     }
 }
