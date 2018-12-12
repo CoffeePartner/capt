@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.CLASS)
 @Target({ElementType.TYPE})
-@AutoRemoved
-public @interface AutoRemoved {
+@Remove
+public @interface Remove {
     String value() default "";
 }
