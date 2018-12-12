@@ -29,6 +29,4 @@ public @interface Def {
      * @return priority of your plugin, default 0.
      */
     int priority() default 0;
-
-    Class<? extends Annotation>[] interested();
 }

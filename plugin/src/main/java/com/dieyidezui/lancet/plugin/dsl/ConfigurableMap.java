@@ -13,7 +13,6 @@ public class ConfigurableMap extends GroovyObjectSupport {
 
     private Map<String, Object> properties = new HashMap<>();
 
-
     @Override
     public Object invokeMethod(String name, Object args) {
         int length = Array.getLength(args);

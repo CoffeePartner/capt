@@ -9,9 +9,14 @@ import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.util.LancetThreadFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.gradle.BuildListener;
+import org.gradle.BuildResult;
+import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.ProjectConfigurationException;
+import org.gradle.api.initialization.Settings;
+import org.gradle.api.invocation.Gradle;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
@@ -56,7 +61,6 @@ public class GradleLancetPlugin implements Plugin<Project> {
                 gson);
 
         // ClassGraph classGraph = new ClassGraph();
-
         LancetTransform lancetTransform = new LancetTransform(maker);
         baseExtension.registerTransform(lancetTransform);
     }

@@ -44,7 +44,7 @@ public class LancetTransform extends Transform implements Constants {
 
     @Override
     public Collection<File> getSecondaryDirectoryOutputs() {
-        return Collections.emptyList();
+        return ImmutableSet.of();
     }
 
     @Override
@@ -59,7 +59,7 @@ public class LancetTransform extends Transform implements Constants {
 
         invocation.getInputs()
                 .stream()
-                .flatMap(i-> Stream.<QualifiedContent>concat(i.getDirectoryInputs().stream(), i.getJarInputs().stream()))
+                .flatMap(i -> Stream.<QualifiedContent>concat(i.getDirectoryInputs().stream(), i.getJarInputs().stream()))
                 .forEach(i -> {
                     LOGGER.error(i.toString());
                 });
@@ -67,7 +67,7 @@ public class LancetTransform extends Transform implements Constants {
         LOGGER.error("------------------------");
         invocation.getReferencedInputs()
                 .stream()
-                .flatMap(i-> Stream.<QualifiedContent>concat(i.getDirectoryInputs().stream(), i.getJarInputs().stream()))
+                .flatMap(i -> Stream.<QualifiedContent>concat(i.getDirectoryInputs().stream(), i.getJarInputs().stream()))
                 .forEach(i -> {
                     LOGGER.error(i.toString());
                 });

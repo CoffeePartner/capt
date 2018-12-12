@@ -10,8 +10,6 @@ import javax.inject.Inject;
 public class GradleLancetExtension {
 
     private NamedDomainObjectContainer<LancetPluginExtension> plugins;
-    private boolean autoRemoveCore = true;
-    private boolean allowPluginInCompileClasspath = false;
 
     @Inject
     public GradleLancetExtension(NamedDomainObjectContainer<LancetPluginExtension> plugins) {
@@ -24,29 +22,5 @@ public class GradleLancetExtension {
 
     public NamedDomainObjectContainer<LancetPluginExtension> getPlugins() {
         return plugins;
-    }
-
-    public void autoRemoveCore(boolean autoRemoveCore) {
-        this.autoRemoveCore = autoRemoveCore;
-    }
-
-    public void setAutoRemoveCore(boolean autoRemoveCore) {
-        this.autoRemoveCore = autoRemoveCore;
-    }
-
-    public boolean isAutoRemoveCore() {
-        return autoRemoveCore;
-    }
-
-    public void setAllowPluginInCompileClasspath(boolean allow) {
-        this.allowPluginInCompileClasspath = allow;
-    }
-
-    public void allowPluginInCompileClasspath(boolean allow) {
-        setAllowPluginInCompileClasspath(allow);
-    }
-
-    public boolean allowPluginInCodeForAndroidTest() {
-        return allowPluginInCompileClasspath;
     }
 }

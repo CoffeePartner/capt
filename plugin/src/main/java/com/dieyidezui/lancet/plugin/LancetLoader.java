@@ -1,5 +1,6 @@
 package com.dieyidezui.lancet.plugin;
 
+import com.android.build.api.attributes.BuildTypeAttr;
 import com.android.build.api.transform.QualifiedContent;
 import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.AppExtension;
@@ -8,20 +9,25 @@ import com.android.build.gradle.LibraryExtension;
 import com.android.build.gradle.api.BaseVariant;
 import com.android.build.gradle.api.TestVariant;
 import com.android.build.gradle.internal.api.TestedVariant;
+import com.android.build.gradle.internal.publishing.AndroidArtifacts;
 import com.android.builder.model.SourceProvider;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import org.gradle.api.DomainObjectCollection;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
+import org.gradle.api.attributes.Usage;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.SourceSet;
 
+import javax.annotation.Nullable;
+import javax.naming.spi.ObjectFactory;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.stream.Stream;
 
@@ -86,7 +92,9 @@ public class LancetLoader implements Constants {
         ConfigurationContainer configurations = project.getConfigurations();
         extension.getSourceSets().all(androidSourceSet -> {
             if (!androidSourceSet.getName().startsWith(TEST)) { // don't support test
-                configurations.maybeCreate(computeConfigurationName(androidSourceSet.getName()));
+                Configuration configuration = configurations.maybeCreate(computeConfigurationName(androidSourceSet.getName()));
+                configuration.setVisible(false);
+                configuration.setCanBeConsumed(false);
             }
         });
 
@@ -94,30 +102,39 @@ public class LancetLoader implements Constants {
                 ((AppExtension) extension).getApplicationVariants()
                 : ((LibraryExtension) extension).getLibraryVariants();
 
-        collection.all(v -> {
-            BaseVariant base = (BaseVariant) v;
-            Configuration lancetVariant = configurations.getByName(computeConfigurationName(base.getName()));
-            base.getSourceSets().stream()
-                    .map(SourceProvider::getName)
-                    .map(LancetLoader::computeConfigurationName)
-                    .map(configurations::getByName)
-                    .filter(c -> c != lancetVariant)
-                    .forEach(lancetVariant::extendsFrom);
+        final Usage runtimeUsage = project.getObjects().named(Usage.class, Usage.JAVA_RUNTIME);
 
-            TestVariant t = ((TestedVariant) v).getTestVariant();
-            if (t != null) {
-                Configuration testLancetVariant = configurations.getByName(computeConfigurationName(androidTestVariantToSourceSetName(t.getName())));
+        collection.all(v -> configure(runtimeUsage, ((TestedVariant) v).getTestVariant(),
+                configure(runtimeUsage, (BaseVariant) v, null))
+        );
+    }
 
-                testLancetVariant.extendsFrom(lancetVariant);
+    /**
+     * pre is not null means TestVariant
+     */
+    private Configuration configure(Usage runtime, @Nullable BaseVariant v, @Nullable Configuration pre) {
+        if (v == null) {
+            return null;
+        }
+        ConfigurationContainer configurations = project.getConfigurations();
+        String name = pre == null ? v.getName() : androidTestVariantToSourceSetName(v.getName());
+        Configuration cur = project.getConfigurations().getByName(computeConfigurationName(name));
+        if (pre != null) {
+            cur.extendsFrom(pre);
+        }
+        v.getSourceSets().stream()
+                .map(SourceProvider::getName)
+                .map(LancetLoader::computeConfigurationName)
+                .map(configurations::getByName)
+                .filter(c -> c != cur)
+                .forEach(cur::extendsFrom);
 
-                t.getSourceSets().stream()
-                        .map(SourceProvider::getName)
-                        .map(LancetLoader::computeConfigurationName)
-                        .map(configurations::getByName)
-                        .filter(c -> c != testLancetVariant)
-                        .forEach(testLancetVariant::extendsFrom);
-            }
-        });
+        cur.getAttributes()
+                .attribute(AndroidArtifacts.ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.JAR.getType())
+                .attribute(BuildTypeAttr.ATTRIBUTE, project.getObjects().named(BuildTypeAttr.class, v.getBuildType().getName()))
+                .attribute(Usage.USAGE_ATTRIBUTE, runtime);
+
+        return cur;
     }
 
     public Class<?> loadApkClass(String className) throws ClassNotFoundException {

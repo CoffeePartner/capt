@@ -2,7 +2,7 @@ package com.dieyidezui.lancet.plugin.api;
 
 public interface TransformContext {
 
-    PluginContext getPluginContext();
+    Lancet getPluginContext();
 
     void chooseTo(Action action);
 
