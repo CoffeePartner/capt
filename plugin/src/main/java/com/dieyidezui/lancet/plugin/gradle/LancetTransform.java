@@ -7,6 +7,7 @@ import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.internal.pipeline.TransformManager;
 import com.dieyidezui.lancet.plugin.LancetLoader;
 import com.dieyidezui.lancet.plugin.util.Constants;
+import com.dieyidezui.lancet.plugin.variant.VariantManager;
 import com.google.common.collect.ImmutableSet;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -14,7 +15,6 @@ import org.gradle.api.logging.Logging;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -22,9 +22,11 @@ public class LancetTransform extends Transform implements Constants {
 
     private static final Logger LOGGER = Logging.getLogger(LancetTransform.class);
     private final LancetLoader maker;
+    private final VariantManager variantManager;
 
-    public LancetTransform(LancetLoader maker) {
+    public LancetTransform(LancetLoader maker, VariantManager variantManager) {
         this.maker = maker;
+        this.variantManager = variantManager;
     }
 
     @Override
@@ -39,7 +41,7 @@ public class LancetTransform extends Transform implements Constants {
 
     @Override
     public Set<? super QualifiedContent.Scope> getScopes() {
-        return maker.isApplication() ? TransformManager.SCOPE_FULL_PROJECT : TransformManager.PROJECT_ONLY;
+        return variantManager.isApplication() ? TransformManager.SCOPE_FULL_PROJECT : TransformManager.PROJECT_ONLY;
     }
 
     @Override
@@ -54,14 +56,13 @@ public class LancetTransform extends Transform implements Constants {
 
     @Override
     public void transform(TransformInvocation invocation) throws TransformException, InterruptedException, IOException {
-
-        maker.beforeTransform(invocation);
+        maker.beforeTransform(invocation, variantManager);
 
         invocation.getInputs()
                 .stream()
                 .flatMap(i -> Stream.<QualifiedContent>concat(i.getDirectoryInputs().stream(), i.getJarInputs().stream()))
                 .forEach(i -> {
-                    LOGGER.error(i.toString());
+                 //   LOGGER.error(i.toString());
                 });
 
         LOGGER.error("------------------------");
@@ -69,7 +70,7 @@ public class LancetTransform extends Transform implements Constants {
                 .stream()
                 .flatMap(i -> Stream.<QualifiedContent>concat(i.getDirectoryInputs().stream(), i.getJarInputs().stream()))
                 .forEach(i -> {
-                    LOGGER.error(i.toString());
+                   // LOGGER.error(i.toString());
                 });
         // full mode
         // parse

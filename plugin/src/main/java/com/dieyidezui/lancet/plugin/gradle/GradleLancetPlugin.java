@@ -7,6 +7,7 @@ import com.dieyidezui.lancet.plugin.LancetLoader;
 import com.dieyidezui.lancet.plugin.cache.DirJsonCache;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.util.LancetThreadFactory;
+import com.dieyidezui.lancet.plugin.variant.VariantManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.gradle.BuildListener;
@@ -47,9 +48,11 @@ public class GradleLancetPlugin implements Plugin<Project> {
 
         project.getExtensions().create(LancetTransform.NAME, GradleLancetExtension.class, project.container(LancetPluginExtension.class));
 
-        LancetLoader maker = new LancetLoader(baseExtension, project);
+
+        VariantManager variantManager = new VariantManager(baseExtension, project);
+        LancetLoader maker = new LancetLoader();
         // create configurations for separate variant
-        maker.createConfigurationForVariant();
+        variantManager.createConfigurationForVariant();
 
         int core = Runtime.getRuntime().availableProcessors();
 
@@ -68,16 +71,16 @@ public class GradleLancetPlugin implements Plugin<Project> {
                 gson);
 
         // ClassGraph classGraph = new ClassGraph();
-        LancetTransform lancetTransform = new LancetTransform(maker);
+        LancetTransform lancetTransform = new LancetTransform(maker, variantManager);
         baseExtension.registerTransform(lancetTransform);
         project.getGradle().getTaskGraph().addTaskExecutionListener(new TaskExecutionListener() {
             @Override
             public void beforeExecute(Task task) {
-                if(task.getName().startsWith("createFullJar")) {
-                    LOGGER.error(task.toString());
-                    task.getDependsOn().forEach(o -> {
-                        LOGGER.error("d: " + o.toString());
-                    });
+                if (task.getDependsOn()
+                        .stream().anyMatch(o -> o instanceof Task && ((Task) o).getName().contains("createFullJar"))) {
+                    LOGGER.error(task.toString() + " depends createFullJar");
+                }
+                if(task.getName().contains("createFullJar")) {
                 }
             }
 

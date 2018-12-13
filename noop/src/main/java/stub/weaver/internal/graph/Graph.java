@@ -11,7 +11,7 @@ import stub.weaver.internal.log.Log;
 
 /**
  * Created by gengwanpeng on 17/5/5.
- * Class dependency graph.
+ * Class variant graph.
  */
 public class Graph {
 

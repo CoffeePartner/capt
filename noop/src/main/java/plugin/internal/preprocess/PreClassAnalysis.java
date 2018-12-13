@@ -23,7 +23,7 @@ import stub.weaver.internal.log.Log;
  * When you see this class you may be as happy as me like this:
  * <a href="http://wx1.sinaimg.cn/large/415f82b9ly1fe9kqcoe2nj20k00k0dhy.jpg"></a>
  *
- * PreClassAnalysis mainly records the dependency graph of all classes,
+ * PreClassAnalysis mainly records the variant graph of all classes,
  * and record the hook classes to judge if incremental compile available in next time.
  *
  */
