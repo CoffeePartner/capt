@@ -1,6 +1,8 @@
 package com.dieyidezui.lancet.plugin.api;
 
 import com.dieyidezui.lancet.plugin.api.annotations.Meta;
+import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
+import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 
 /**
  * Lifecycle:
@@ -19,7 +21,7 @@ public interface Plugin {
     void apply(Lancet lancet);
 
     /**
-     * Do your time-consuming in this function
+     * Do your time-consuming tasks in this function
      */
     void postApply(Lancet lancet);
 }

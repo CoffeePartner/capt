@@ -55,6 +55,7 @@ public class VariantManager implements Constants {
         extension.getSourceSets().all(androidSourceSet -> {
             if (!androidSourceSet.getName().startsWith(TEST)) { // don't support unit test
                 Configuration configuration = configurations.maybeCreate(sourceSetToConfigurationName(androidSourceSet.getName()));
+                // internal use, will be extended by the actual variant configuration
                 configuration.setDescription("Classpath for the annotation processor for " + androidSourceSet.getName() + ".");
                 configuration.setVisible(false);
                 configuration.setCanBeConsumed(false);
@@ -101,7 +102,11 @@ public class VariantManager implements Constants {
         @Override
         public VariantDependencies create(BaseVariant v) {
             ConfigurationContainer configurations = project.getConfigurations();
+
+            // the actual configuration
             Configuration lancet = getByVariant(v.getName());
+
+            // attributes match
             AttributeContainer attributes = lancet.getAttributes();
             attributes
                     .attribute(ARTIFACT_TYPE, ArtifactTypeDefinition.JAR_TYPE)

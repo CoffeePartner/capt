@@ -1,4 +1,4 @@
-package com.dieyidezui.lancet.plugin.api;
+package com.dieyidezui.lancet.plugin.api.asm;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -50,9 +50,8 @@ public abstract class LancetClassVisitor extends ClassVisitor {
     }
 
     /**
-     * It will invoked at last, except someone {@link TransformContext#chooseTo} do something.
-     *
-     * @return true if changed the class
+     * It will be invoked at last always.
+     * @return true if changed anything on the class
      */
     public boolean onEnd() {
         return false;

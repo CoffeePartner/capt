@@ -1,5 +1,6 @@
-package com.dieyidezui.lancet.plugin.api;
+package com.dieyidezui.lancet.plugin.api.transform;
 
+import com.dieyidezui.lancet.plugin.api.asm.LancetClassVisitor;
 import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
 
 import javax.annotation.Nullable;

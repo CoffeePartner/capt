@@ -1,4 +1,4 @@
-package com.dieyidezui.lancet.plugin.api;
+package com.dieyidezui.lancet.plugin.api.process;
 
 import com.dieyidezui.lancet.plugin.api.annotations.Meta;
 import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
@@ -9,6 +9,14 @@ import javax.annotation.Nullable;
  * Only class contains plugin interested annotations will pass to MetaProcessor
  */
 public abstract class MetaProcessor {
+
+
+    /**
+     * @return true if every builds, you needs all @Meta class,
+     */
+    public boolean requestAllMetasInSpiteOfIncremental() {
+        return false;
+    }
 
     /**
      * Class changed, pre has {@link Meta}, but current removed.
@@ -64,6 +72,8 @@ public abstract class MetaProcessor {
 
     /**
      * Class not changed, both have {@link Meta}.
+     * If we not in incremental mode or {@link #requestAllMetasInSpiteOfIncremental} returns true,
+     * we will call this method only.
      *
      * @param basicInfo info
      * @return class consumer

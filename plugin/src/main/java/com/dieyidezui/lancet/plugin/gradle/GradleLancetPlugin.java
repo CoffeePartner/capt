@@ -7,29 +7,20 @@ import com.android.build.gradle.internal.pipeline.TransformTask;
 import com.dieyidezui.lancet.plugin.LancetLoader;
 import com.dieyidezui.lancet.plugin.cache.DirJsonCache;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
+import com.dieyidezui.lancet.plugin.util.Constants;
 import com.dieyidezui.lancet.plugin.util.LancetThreadFactory;
 import com.dieyidezui.lancet.plugin.variant.VariantManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.gradle.BuildListener;
-import org.gradle.BuildResult;
 import org.gradle.api.*;
-import org.gradle.api.execution.TaskExecutionGraph;
-import org.gradle.api.execution.TaskExecutionGraphListener;
-import org.gradle.api.execution.TaskExecutionListener;
-import org.gradle.api.initialization.Settings;
-import org.gradle.api.invocation.Gradle;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-import org.gradle.api.tasks.TaskState;
-import org.xml.sax.helpers.XMLFilterImpl;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
-public class GradleLancetPlugin implements Plugin<Project> {
+public class GradleLancetPlugin implements Plugin<Project> , Constants {
 
     private static final Logger LOGGER = Logging.getLogger(GradleLancetPlugin.class);
 
@@ -47,7 +38,7 @@ public class GradleLancetPlugin implements Plugin<Project> {
             throw new ProjectConfigurationException("Only application or library is supported by lancet", null);
         }
 
-        project.getExtensions().create(LancetTransform.NAME, GradleLancetExtension.class, project.container(LancetPluginExtension.class));
+        project.getExtensions().create(NAME, GradleLancetExtension.class, project.container(LancetPluginExtension.class));
 
 
         VariantManager variantManager = new VariantManager(baseExtension, project);
@@ -67,7 +58,7 @@ public class GradleLancetPlugin implements Plugin<Project> {
                 .create();
 
 
-        DirJsonCache dirCache = new DirJsonCache(new File(project.getBuildDir(), LancetTransform.NAME),
+        DirJsonCache dirCache = new DirJsonCache(new File(project.getBuildDir(), NAME),
                 lancetExecutor,
                 gson);
 
@@ -78,7 +69,7 @@ public class GradleLancetPlugin implements Plugin<Project> {
         // The fucking transform API doesn't provide evaluating time variant!
         project.afterEvaluate(p -> p.getTasks()
                 .withType(TransformTask.class, t -> {
-                    if (t.getTransform().getName().equals(LancetTransform.NAME)) {
+                    if (t.getTransform().getName().equals(NAME)) {
                         t.dependsOn(variantManager.getByVariant(t.getVariantName()));
                     }
                 }));

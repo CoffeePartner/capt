@@ -14,7 +14,7 @@ public class ClassInfo {
     public String superName;
     public List<String> interfaces;
 
-    // Remove field info because useless till now.
+    // RemoveAfterTransform field info because useless till now.
     //public List<FieldInfo> fields = new ArrayList<>();
 
     public List<MethodInfo> methods = new ArrayList<>();

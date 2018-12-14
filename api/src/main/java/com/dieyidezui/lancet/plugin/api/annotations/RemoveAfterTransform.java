@@ -9,7 +9,6 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.CLASS)
 @Target({ElementType.TYPE})
-@Remove
-public @interface Remove {
-    String value() default "";
+@RemoveAfterTransform
+public @interface RemoveAfterTransform {
 }

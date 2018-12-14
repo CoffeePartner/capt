@@ -1,18 +1,21 @@
 package com.dieyidezui.lancet.plugin.api;
 
-import java.io.File;
+import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
+import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
+
 import java.lang.annotation.Annotation;
-import java.util.Map;
 
 public interface Lancet {
 
-    boolean incremental();
+    boolean isIncremental();
+
+    Context getContext();
 
     Arguments getArgs();
 
     void registerMetaProcessor(MetaProcessor processor, Class<? extends Annotation>... interestedIn);
 
-    void addEventCallback();
-
     void registerClassTransformer(ClassTransformer transformer);
+
+    OutputProvider output();
 }
