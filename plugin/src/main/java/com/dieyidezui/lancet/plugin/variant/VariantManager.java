@@ -16,6 +16,7 @@ import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.ResolutionStrategy;
+import org.gradle.api.artifacts.type.ArtifactTypeDefinition;
 import org.gradle.api.attributes.Attribute;
 import org.gradle.api.attributes.AttributeContainer;
 import org.gradle.api.attributes.Usage;
@@ -30,9 +31,9 @@ import java.util.Map;
 public class VariantManager implements Constants {
 
     private static final Logger LOGGER = Logging.getLogger(VariantManager.class);
-    public static final Attribute<String> ARTIFACT_TYPE = Attribute.of("artifactType", String.class);
+    private static final Attribute<String> ARTIFACT_TYPE = Attribute.of("artifactType", String.class);
 
-    private Map<String, VariantDependencies> dependencies = new HashMap<>();
+    private final Map<String, VariantDependencies> dependencies = new HashMap<>();
     private VariantDependencies.Factory factory;
 
     private final BaseExtension extension;
@@ -52,7 +53,7 @@ public class VariantManager implements Constants {
     public void createConfigurationForVariant() {
         ConfigurationContainer configurations = project.getConfigurations();
         extension.getSourceSets().all(androidSourceSet -> {
-            if (!androidSourceSet.getName().startsWith(TEST)) { // don't support test
+            if (!androidSourceSet.getName().startsWith(TEST)) { // don't support unit test
                 Configuration configuration = configurations.maybeCreate(sourceSetToConfigurationName(androidSourceSet.getName()));
                 configuration.setDescription("Classpath for the annotation processor for " + androidSourceSet.getName() + ".");
                 configuration.setVisible(false);
@@ -84,7 +85,7 @@ public class VariantManager implements Constants {
     }
 
     public Configuration getByVariant(String name) {
-        return dependencies.get(name).getLancetConfiguration();
+        return project.getConfigurations().maybeCreate(name + "LancetClasspath");
     }
 
     private static String sourceSetToConfigurationName(String name) {
@@ -100,13 +101,14 @@ public class VariantManager implements Constants {
         @Override
         public VariantDependencies create(BaseVariant v) {
             ConfigurationContainer configurations = project.getConfigurations();
-            Configuration lancet = configurations.maybeCreate(v.getName() + "LancetClasspath");
+            Configuration lancet = getByVariant(v.getName());
             AttributeContainer attributes = lancet.getAttributes();
             attributes
+                    .attribute(ARTIFACT_TYPE, ArtifactTypeDefinition.JAR_TYPE)
                     .attribute(BuildTypeAttr.ATTRIBUTE, project.getObjects().named(BuildTypeAttr.class, v.getBuildType().getName()))
                     .attribute(Usage.USAGE_ATTRIBUTE, project.getObjects().named(Usage.class, Usage.JAVA_RUNTIME));
-            //v.getProductFlavors().forEach(p -> attributes.attribute(Attribute.of(p.getDimension(), ProductFlavorAttr.class),
-            //project.getObjects().named(ProductFlavorAttr.class, p.getName())));
+            v.getProductFlavors().forEach(p -> attributes.attribute(Attribute.of(p.getDimension(), ProductFlavorAttr.class),
+                    project.getObjects().named(ProductFlavorAttr.class, p.getName())));
 
             lancet.setDescription("Resolved configuration for lancet for variant: " + v.getName());
             lancet.setVisible(false);
@@ -126,6 +128,7 @@ public class VariantManager implements Constants {
         public VariantDependencies create(BaseVariant v, @Nullable VariantDependencies parent) {
             VariantDependencies child = create(v);
             if (parent != null) {
+                // TODO: should androidTest variant extendsFrom normal variant ?
                 child.getLancetConfiguration().extendsFrom(parent.getLancetConfiguration());
             }
             return child;

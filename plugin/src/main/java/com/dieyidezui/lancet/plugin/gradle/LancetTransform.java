@@ -55,6 +55,11 @@ public class LancetTransform extends Transform implements Constants {
     }
 
     @Override
+    public boolean isCacheable() {
+        return true;
+    }
+
+    @Override
     public void transform(TransformInvocation invocation) throws TransformException, InterruptedException, IOException {
         maker.beforeTransform(invocation, variantManager);
 

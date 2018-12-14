@@ -5,7 +5,7 @@ import com.android.build.api.transform.TransformInvocation;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import com.dieyidezui.lancet.plugin.variant.VariantManager;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.artifacts.type.ArtifactTypeDefinition;
+import org.gradle.api.file.FileCollection;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -31,34 +31,15 @@ public class LancetLoader implements Constants {
     public void beforeTransform(TransformInvocation invocation, VariantManager variantManager) {
         String variantName = invocation.getContext().getVariantName();
         Configuration target = variantManager.getByVariant(variantName);
-        target.getIncoming()
-                .afterResolve(s -> {
-                    s.getResolutionResult().allComponents(c -> {
-                        LOGGER.error("zz " + c.toString());
-                    });
-                });
         URLClassLoader lancetDependencies = URLClassLoader.newInstance(
-                target.getIncoming()
-                        .artifactView(a -> {
-                            a.attributes(c -> {
-                                c.attribute(VariantManager.ARTIFACT_TYPE, ArtifactTypeDefinition.JAR_TYPE);
-                            });
-                            a.componentFilter(i -> {
-                                LOGGER.error(i.toString());
-                                return true;
-                            });
-                        })
-                        .getFiles()
-                        .getFiles()
-                        .stream()
+                target.resolve().stream()
                         .map(f -> {
                             try {
                                 return f.toURI().toURL();
                             } catch (MalformedURLException e) {
                                 throw new AssertionError(e);
                             }
-                        })
-                        .toArray(URL[]::new), Thread.currentThread().getContextClassLoader());
+                        }).toArray(URL[]::new), Thread.currentThread().getContextClassLoader());
 
         URL[] runtimeUrls = invocation.getInputs().stream()
                 .flatMap(s -> Stream.concat(s.getDirectoryInputs().stream(), s.getJarInputs().stream()))

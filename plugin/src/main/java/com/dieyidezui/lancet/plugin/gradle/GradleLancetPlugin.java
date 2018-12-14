@@ -3,6 +3,7 @@ package com.dieyidezui.lancet.plugin.gradle;
 import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.BaseExtension;
 import com.android.build.gradle.LibraryExtension;
+import com.android.build.gradle.internal.pipeline.TransformTask;
 import com.dieyidezui.lancet.plugin.LancetLoader;
 import com.dieyidezui.lancet.plugin.cache.DirJsonCache;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
@@ -73,21 +74,13 @@ public class GradleLancetPlugin implements Plugin<Project> {
         // ClassGraph classGraph = new ClassGraph();
         LancetTransform lancetTransform = new LancetTransform(maker, variantManager);
         baseExtension.registerTransform(lancetTransform);
-        project.getGradle().getTaskGraph().addTaskExecutionListener(new TaskExecutionListener() {
-            @Override
-            public void beforeExecute(Task task) {
-                if (task.getDependsOn()
-                        .stream().anyMatch(o -> o instanceof Task && ((Task) o).getName().contains("createFullJar"))) {
-                    LOGGER.error(task.toString() + " depends createFullJar");
-                }
-                if(task.getName().contains("createFullJar")) {
-                }
-            }
 
-            @Override
-            public void afterExecute(Task task, TaskState state) {
-
-            }
-        });
+        // The fucking transform API doesn't provide evaluating time variant!
+        project.afterEvaluate(p -> p.getTasks()
+                .withType(TransformTask.class, t -> {
+                    if (t.getTransform().getName().equals(LancetTransform.NAME)) {
+                        t.dependsOn(variantManager.getByVariant(t.getVariantName()));
+                    }
+                }));
     }
 }
