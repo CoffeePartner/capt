@@ -5,10 +5,17 @@ import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
 
 import javax.annotation.Nullable;
 
-public abstract class ClassTransformer {
+public interface ClassTransformer {
+    /**
+     * After parse every meta class, tell lancet which classes require to transform.
+     *
+     * @return class request
+     */
+    ClassRequest beforeTransform();
 
     @Nullable
-    LancetClassVisitor newVisitor(ClassInfo info, boolean reracked) {
-        return null;
-    }
+    LancetClassVisitor onTransform(ClassInfo classInfo, boolean required);
+
+
+    void afterTransform();
 }

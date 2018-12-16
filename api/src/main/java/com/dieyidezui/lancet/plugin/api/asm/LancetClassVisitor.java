@@ -1,59 +1,63 @@
 package com.dieyidezui.lancet.plugin.api.asm;
 
+import com.dieyidezui.lancet.plugin.api.TransformContext;
 import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.ModuleVisitor;
 import org.objectweb.asm.Opcodes;
+
+import java.util.Objects;
 
 public abstract class LancetClassVisitor extends ClassVisitor {
 
-    private boolean skip = false;
-
-    protected ClassVisitor pre;
+    private TransformContext context;
+    private ClassVisitor next;
 
     public LancetClassVisitor() {
-        super(Opcodes.ASM5, null);
+        this(null);
     }
 
-
-    void linkPre(ClassVisitor visitor) {
-        pre = visitor;
+    public LancetClassVisitor(LancetClassVisitor next) {
+        super(Opcodes.ASM7, next);
+        this.next = next;
     }
 
-    void linkNext(ClassVisitor visitor) {
-        cv = visitor;
+    public final void linkNext(LancetClassVisitor next) {
+        if (cv != null) {
+            if (cv instanceof LancetClassVisitor) {
+                ((LancetClassVisitor) cv).linkNext(next);
+            } else {
+                throw new IllegalStateException("Require LancetClassVisitor or subclass, but is " + cv.getClass().getName());
+            }
+        } else {
+            cv = next;
+        }
     }
 
-    @Override
-    public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
-        return super.visitMethod(access, name, descriptor, signature, exceptions);
+    final void attach(TransformContext context) {
+        this.context = context;
     }
 
-    @Override
-    public final ModuleVisitor visitModule(String name, int access, String version) {
-        throw new UnsupportedOperationException();
+    final void detach() {
+        this.context = null;
     }
 
-    @Override
-    public final void visitNestHost(String nestHost) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public final void visitNestMember(String nestMember) {
-        throw new UnsupportedOperationException();
+    protected final TransformContext context() {
+        return Objects.requireNonNull(context, "use context() between attach & detach");
     }
 
     @Override
     public final void visitEnd() {
-        throw new UnsupportedOperationException();
+        if (next != null && next != cv) {
+            throw new IllegalStateException("Don't change this.cv by yourself!");
+        }
+        onVisitEnd();
     }
 
     /**
      * It will be invoked at last always.
+     *
      * @return true if changed anything on the class
      */
-    public boolean onEnd() {
+    public boolean onVisitEnd() {
         return false;
     }
 }

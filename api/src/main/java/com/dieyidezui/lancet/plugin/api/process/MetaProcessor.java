@@ -1,7 +1,9 @@
 package com.dieyidezui.lancet.plugin.api.process;
 
 import com.dieyidezui.lancet.plugin.api.annotations.Meta;
+import com.dieyidezui.lancet.plugin.api.asm.LancetClassVisitor;
 import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
+import org.objectweb.asm.MethodVisitor;
 
 import javax.annotation.Nullable;
 
@@ -9,15 +11,6 @@ import javax.annotation.Nullable;
  * Only class contains plugin interested annotations will pass to MetaProcessor
  */
 public abstract class MetaProcessor {
-
-
-    /**
-     * @return true if every builds, you needs all @Meta class,
-     */
-    public boolean requestAllMetasInSpiteOfIncremental() {
-        return false;
-    }
-
     /**
      * Class changed, pre has {@link Meta}, but current removed.
      *
@@ -72,8 +65,7 @@ public abstract class MetaProcessor {
 
     /**
      * Class not changed, both have {@link Meta}.
-     * If we not in incremental mode or {@link #requestAllMetasInSpiteOfIncremental} returns true,
-     * we will call this method only.
+     * If we not in incremental mode, we will call this method only.
      *
      * @param basicInfo info
      * @return class consumer
@@ -82,11 +74,4 @@ public abstract class MetaProcessor {
     public ClassConsumer onMetaClassNotChanged(ClassInfo basicInfo) {
         return null;
     }
-
-    /**
-     * After parse every meta class, tell lancet which classes require to transform.
-     *
-     * @return class request
-     */
-    public abstract ClassRequest onProcessEnd();
 }

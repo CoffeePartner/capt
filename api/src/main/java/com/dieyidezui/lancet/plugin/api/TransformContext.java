@@ -1,14 +1,11 @@
 package com.dieyidezui.lancet.plugin.api;
 
+import org.objectweb.asm.ClassVisitor;
+
+/**
+ * TODO: more API
+ */
 public interface TransformContext {
 
-    Lancet getPluginContext();
-
-    void chooseTo(Action action);
-
-    enum Action {
-        SKIP_THIS,
-        SKIP_ALL,
-        REMOVE_CLASS,
-    }
+    ClassVisitor getLastWriter();
 }
