@@ -23,7 +23,7 @@ public interface OutputProvider {
     File getTemporaryDir();
 
     /**
-     * Ensure the dir exists, the cache will reuse by next builds.
+     * Ensure the dir exists, the cache will be reused by next builds.
      * Any change in this dir after build will led next build to full mode.
      *
      * @return dir
