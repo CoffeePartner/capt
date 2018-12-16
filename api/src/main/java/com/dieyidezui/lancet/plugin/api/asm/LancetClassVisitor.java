@@ -20,7 +20,7 @@ public abstract class LancetClassVisitor extends ClassVisitor {
         this.next = next;
     }
 
-    public final void linkNext(LancetClassVisitor next) {
+    final void linkNext(LancetClassVisitor next) {
         if (cv != null) {
             if (cv instanceof LancetClassVisitor) {
                 ((LancetClassVisitor) cv).linkNext(next);
