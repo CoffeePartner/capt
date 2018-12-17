@@ -67,6 +67,6 @@ public class GradleLancetPlugin implements Plugin<Project>, Constants {
 
         File root = new File(project.getBuildDir(), NAME);
 
-        return new GlobalResource(root, executor, gson);
+        return new GlobalResource(root, executor, gson, (GradleLancetExtension) project.getExtensions().getByName(NAME));
     }
 }

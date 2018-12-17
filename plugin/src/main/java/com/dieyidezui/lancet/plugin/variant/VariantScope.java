@@ -55,6 +55,7 @@ public class VariantScope implements Constants {
 
         variantResource.prepare(invocation, getLancetConfiguration());
 
+
         PluginManager manager = new PluginManager();
     }
 
