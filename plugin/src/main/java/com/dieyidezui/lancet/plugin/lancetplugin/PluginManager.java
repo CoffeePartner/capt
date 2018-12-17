@@ -4,10 +4,8 @@ import com.dieyidezui.lancet.plugin.api.*;
 import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
-import com.dieyidezui.lancet.plugin.gradle.GradleLancetExtension;
-import com.dieyidezui.lancet.plugin.resource.ResourceManager;
+import com.dieyidezui.lancet.plugin.resource.VariantResource;
 import com.dieyidezui.lancet.plugin.util.Constants;
-import com.dieyidezui.lancet.plugin.variant.VariantManager;
 import com.google.common.io.Closeables;
 import okio.BufferedSource;
 import okio.Okio;
@@ -26,7 +24,7 @@ public class PluginManager implements Constants {
     public PluginManager() {
     }
 
-    public void findPlugins( VariantManager variantManager) throws IOException {
+    public void findPlugins(VariantResource variantResource) throws IOException {
         for (LancetPluginExtension e : extension.getPlugins()) {
             Class<? extends Plugin> clazz = findPluginInProperties(e.getName());
             if (clazz == null) {

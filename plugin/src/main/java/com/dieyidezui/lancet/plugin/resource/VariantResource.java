@@ -4,7 +4,6 @@ import com.android.build.api.transform.TransformInvocation;
 import com.dieyidezui.lancet.plugin.api.OutputProvider;
 import com.dieyidezui.lancet.plugin.cache.OutputProviderFactory;
 import com.dieyidezui.lancet.plugin.util.Constants;
-import com.google.gson.Gson;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -16,37 +15,25 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.concurrent.ExecutorService;
 
-public class ResourceManager implements Constants {
+public class VariantResource implements Constants {
 
     private static final Logger LOGGER = Logging.getLogger(Loader.class);
 
     private final Loader loader = new Loader();
     private final FileManager files;
     private final OutputProviderFactory factory;
-    private final ExecutorService executor;
-    private final Gson gson;
-    private TransformInvocation invocation;
 
-    public ResourceManager(FileManager files, OutputProviderFactory factory, ExecutorService executor, Gson gson) {
+    public VariantResource(FileManager files, OutputProviderFactory factory) {
         this.files = files;
         this.factory = factory;
-        this.executor = executor;
-        this.gson = gson;
     }
-
 
     public File getLancetRoot() {
-        return files.lancetRoot();
-    }
-
-    public GlobalResource global() {
-        return global;
+        return files.root();
     }
 
     public void prepare(TransformInvocation invocation, Configuration target) throws IOException {
-        this.invocation = invocation;
         this.loader.initClassLoader(target);
         this.files.attachContext(invocation);
     }

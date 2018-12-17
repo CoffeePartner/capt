@@ -2,7 +2,6 @@ package com.dieyidezui.lancet.plugin.variant;
 
 import com.android.build.api.attributes.BuildTypeAttr;
 import com.android.build.api.attributes.ProductFlavorAttr;
-import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.BaseExtension;
 import com.android.build.gradle.LibraryExtension;
@@ -12,8 +11,8 @@ import com.android.build.gradle.api.LibraryVariant;
 import com.android.build.gradle.api.TestVariant;
 import com.android.build.gradle.internal.pipeline.TransformTask;
 import com.android.builder.model.SourceProvider;
-import com.dieyidezui.lancet.plugin.api.Lancet;
-import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
+import com.dieyidezui.lancet.plugin.gradle.LancetTransform;
+import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import org.gradle.api.DomainObjectCollection;
 import org.gradle.api.Project;
@@ -31,19 +30,25 @@ import org.gradle.api.tasks.SourceSet;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
+/**
+ * Cross multi variant tasks
+ */
 public class VariantManager implements Constants {
 
     private static final Logger LOGGER = Logging.getLogger(VariantManager.class);
     private static final Attribute<String> ARTIFACT_TYPE = Attribute.of("artifactType", String.class);
 
-    private final Map<String, VariantDependencies> dependencies = new HashMap<>();
-    private VariantDependencies.Factory factory;
+    private final Map<String, VariantScope> dependencies = new HashMap<>();
+    private VariantScope.Factory factory;
 
+    private final GlobalResource global;
     private final BaseExtension extension;
     private final Project project;
 
-    public VariantManager(BaseExtension extension, Project project) {
+    public VariantManager(GlobalResource global, BaseExtension extension, Project project) {
+        this.global = global;
         this.extension = extension;
         this.project = project;
         this.factory = new VariantDependenciesFactory();
@@ -52,7 +57,6 @@ public class VariantManager implements Constants {
     public boolean isApplication() {
         return extension instanceof AppExtension;
     }
-
 
     public void createConfigurationForVariant() {
         ConfigurationContainer configurations = project.getConfigurations();
@@ -72,7 +76,7 @@ public class VariantManager implements Constants {
                 : ((LibraryExtension) extension).getLibraryVariants();
 
         collection.all(v -> {
-            VariantDependencies variant = factory.create(v);
+            VariantScope variant = factory.create(v);
             dependencies.put(v.getName(), variant);
 
             TestVariant t;
@@ -83,7 +87,7 @@ public class VariantManager implements Constants {
             }
 
             if (t != null) {
-                VariantDependencies testVariant = factory.create(t, variant);
+                VariantScope testVariant = factory.create(t, variant);
                 dependencies.put(t.getName(), testVariant);
             }
         });
@@ -93,13 +97,21 @@ public class VariantManager implements Constants {
         project.afterEvaluate(p -> p.getTasks()
                 .withType(TransformTask.class, t -> {
                     if (t.getTransform().getName().equals(NAME)) {
+                        LancetTransform transform = (LancetTransform) t.getTransform();
                         t.dependsOn(getByVariant(t.getVariantName()));
+
+                        // register output
+                        t.getOutputs().dir(getVariantScope(t.getVariantName()).getRoot());
                     }
                 }));
     }
 
-    public Configuration getByVariant(String name) {
+    private Configuration getByVariant(String name) {
         return project.getConfigurations().maybeCreate(name + "LancetClasspath");
+    }
+
+    public VariantScope getVariantScope(String name) {
+        return Objects.requireNonNull(dependencies.get(name));
     }
 
     private static String sourceSetToConfigurationName(String name) {
@@ -109,11 +121,11 @@ public class VariantManager implements Constants {
         return name + CAPITALIZED_NAME;
     }
 
-    private class VariantDependenciesFactory implements VariantDependencies.Factory {
+    private class VariantDependenciesFactory implements VariantScope.Factory {
 
 
         @Override
-        public VariantDependencies create(BaseVariant v) {
+        public VariantScope create(BaseVariant v) {
             ConfigurationContainer configurations = project.getConfigurations();
 
             // the actual configuration
@@ -139,12 +151,12 @@ public class VariantManager implements Constants {
                     .map(configurations::getByName)
                     .forEach(lancet::extendsFrom);
 
-            return new VariantDependencies(lancet);
+            return new VariantScope(v.getName(), lancet, global);
         }
 
         @Override
-        public VariantDependencies create(BaseVariant v, @Nullable VariantDependencies parent) {
-            VariantDependencies child = create(v);
+        public VariantScope create(BaseVariant v, @Nullable VariantScope parent) {
+            VariantScope child = create(v);
             if (parent != null) {
                 // TODO: should androidTest variant extendsFrom normal variant ?
                 child.getLancetConfiguration().extendsFrom(parent.getLancetConfiguration());

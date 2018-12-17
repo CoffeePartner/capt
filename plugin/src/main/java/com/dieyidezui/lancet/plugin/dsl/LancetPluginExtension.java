@@ -7,8 +7,12 @@ import java.util.Map;
 
 public class LancetPluginExtension extends GroovyObjectSupport implements Named {
 
+    public static final int ANDROID_TEST = 1;
+    public static final int ASSEMBLE = 2;
+
     private final String name;
     private Integer priority = null;
+    private int scope = ANDROID_TEST | ASSEMBLE;
     private ConfigurableMap configurableMap = new ConfigurableMap();
 
     public LancetPluginExtension(String name) {
@@ -40,6 +44,18 @@ public class LancetPluginExtension extends GroovyObjectSupport implements Named 
 
     public void priority(int priority) {
         setPriority(priority);
+    }
+
+    public void scope(int scope) {
+        this.scope = scope;
+    }
+
+    public void setScope(int scope) {
+        this.scope = scope;
+    }
+
+    public int getScope() {
+        return scope;
     }
 
     public Map<String, Object> getPluginProperties() {

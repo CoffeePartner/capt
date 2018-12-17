@@ -39,7 +39,7 @@ public class FileManager {
         };
     }
 
-    public File lancetRoot() {
+    public File root() {
         return lancetRoot;
     }
 

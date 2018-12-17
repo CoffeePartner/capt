@@ -4,14 +4,8 @@ import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.BaseExtension;
 import com.android.build.gradle.LibraryExtension;
 import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
-import com.dieyidezui.lancet.plugin.cache.OutputProviderFactory;
-import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactory;
-import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactoryImpl;
-import com.dieyidezui.lancet.plugin.lancetplugin.PluginManager;
-import com.dieyidezui.lancet.plugin.resource.DirJsonCache;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
-import com.dieyidezui.lancet.plugin.resource.FileManager;
-import com.dieyidezui.lancet.plugin.resource.ResourceManager;
+import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import com.dieyidezui.lancet.plugin.util.LancetThreadFactory;
 import com.dieyidezui.lancet.plugin.variant.VariantManager;
@@ -49,12 +43,17 @@ public class GradleLancetPlugin implements Plugin<Project>, Constants {
 
         project.getExtensions().create(NAME, GradleLancetExtension.class, project.container(LancetPluginExtension.class));
 
-        FileManager files = new FileManager(new File(project.getBuildDir(), NAME));
 
-        RelativeDirectoryProviderFactory singleFactory = new RelativeDirectoryProviderFactoryImpl();
+        VariantManager variantManager = new VariantManager(createGlobalResource(project),
+                baseExtension, project);
+        // create configurations for separate variant
+        variantManager.createConfigurationForVariant();
 
-        OutputProviderFactory factory = new OutputProviderFactory(singleFactory, files.asSelector());
+        LancetTransform lancetTransform = new LancetTransform(variantManager);
+        baseExtension.registerTransform(lancetTransform);
+    }
 
+    private static GlobalResource createGlobalResource(Project project) {
         int core = Runtime.getRuntime().availableProcessors();
         ExecutorService executor = Executors.newFixedThreadPool(core, new LancetThreadFactory());
 
@@ -66,22 +65,8 @@ public class GradleLancetPlugin implements Plugin<Project>, Constants {
                 }.getType(), (InstanceCreator) select -> new ArrayList<ClassInfo>(Constants.OPT_SIZE))
                 .create();
 
-        ResourceManager resourceManager = new ResourceManager(
-                files, factory, executor, gson);
+        File root = new File(project.getBuildDir(), NAME);
 
-        VariantManager variantManager = new VariantManager(baseExtension, project);
-        // create configurations for separate variant
-        variantManager.createConfigurationForVariant();
-
-
-        PluginManager pluginManager = new PluginManager();
-
-        DirJsonCache dirCache = new DirJsonCache(new File(project.getBuildDir(), NAME),
-                lancetExecutor,
-                gson);
-
-        // ClassGraph classGraph = new ClassGraph();
-        LancetTransform lancetTransform = new LancetTransform(resourceManager, variantManager, pluginManager);
-        baseExtension.registerTransform(lancetTransform);
+        return new GlobalResource(root, executor, gson);
     }
 }
