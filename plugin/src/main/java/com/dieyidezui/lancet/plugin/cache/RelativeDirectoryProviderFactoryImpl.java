@@ -25,7 +25,7 @@ public class RelativeDirectoryProviderFactoryImpl implements RelativeDirectoryPr
         }
 
         @Override
-        public File getRoot() throws IOException {
+        public File root() throws IOException {
             root.mkdirs();
             if (!root.isDirectory()) {
                 throw new IOException("Unable to create directories of " + root);
@@ -54,7 +54,7 @@ public class RelativeDirectoryProviderFactoryImpl implements RelativeDirectoryPr
 
         @Override
         public void deleteAll() throws IOException {
-            FileUtils.cleanDirectory(getRoot());
+            FileUtils.cleanDirectory(root());
         }
     }
 }
