@@ -1,6 +1,6 @@
 package com.dieyidezui.lancet.plugin.api.asm;
 
-import com.dieyidezui.lancet.plugin.api.TransformContext;
+import com.dieyidezui.lancet.plugin.api.transform.TransformContext;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -17,10 +17,10 @@ public abstract class LancetClassVisitor extends ClassVisitor {
 
     public LancetClassVisitor(LancetClassVisitor next) {
         super(Opcodes.ASM7, next);
-        this.next = next;
+        this.next = cv;
     }
 
-    final void linkNext(LancetClassVisitor next) {
+    final void linkNext(ClassVisitor next) {
         if (cv != null) {
             if (cv instanceof LancetClassVisitor) {
                 ((LancetClassVisitor) cv).linkNext(next);
@@ -30,6 +30,7 @@ public abstract class LancetClassVisitor extends ClassVisitor {
         } else {
             cv = next;
         }
+        this.next = cv;
     }
 
     final void attach(TransformContext context) {
@@ -41,23 +42,16 @@ public abstract class LancetClassVisitor extends ClassVisitor {
     }
 
     protected final TransformContext context() {
-        return Objects.requireNonNull(context, "use context() between attach & detach");
+        return Objects.requireNonNull(context, "Don't use context() outside visit lifecycle.");
     }
 
     @Override
     public final void visitEnd() {
-        if (next != null && next != cv) {
+        if (next != cv) {
             throw new IllegalStateException("Don't change this.cv by yourself!");
         }
         onVisitEnd();
     }
 
-    /**
-     * It will be invoked at last always.
-     *
-     * @return true if changed anything on the class
-     */
-    public boolean onVisitEnd() {
-        return false;
-    }
+    protected abstract void onVisitEnd();
 }

@@ -17,5 +17,5 @@ public interface Lancet {
 
     void registerClassTransformer(ClassTransformer transformer);
 
-    OutputProvider output();
+    OutputProvider outputs();
 }

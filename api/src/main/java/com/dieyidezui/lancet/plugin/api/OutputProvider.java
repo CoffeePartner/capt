@@ -1,6 +1,8 @@
 package com.dieyidezui.lancet.plugin.api;
 
-import java.io.File;
+import com.dieyidezui.lancet.plugin.api.util.RelativeDirectoryProvider;
+
+import java.io.IOException;
 
 public interface OutputProvider {
 
@@ -12,7 +14,7 @@ public interface OutputProvider {
      *
      * @return dir
      */
-    File getOutputClassRootDir();
+    RelativeDirectoryProvider getClassProvider();
 
     /**
      * Ensure the dir exists, just temporary dir.
@@ -20,7 +22,7 @@ public interface OutputProvider {
      *
      * @return dir
      */
-    File getTemporaryDir();
+    RelativeDirectoryProvider getTemporaryProvider();
 
     /**
      * Ensure the dir exists, the cache will be reused by next builds.
@@ -28,5 +30,12 @@ public interface OutputProvider {
      *
      * @return dir
      */
-    File getCacheDir();
+    RelativeDirectoryProvider getCacheProvider();
+
+    /**
+     * Remove all content of this plugin.
+     *
+     * @throws IOException if deleting failed.
+     */
+    void deleteAll() throws IOException;
 }

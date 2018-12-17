@@ -2,6 +2,7 @@ package com.dieyidezui.lancet.plugin.api;
 
 import com.dieyidezui.lancet.plugin.api.annotations.Meta;
 import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
+import com.dieyidezui.lancet.plugin.api.transform.ClassRequest;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 
 /**
@@ -17,18 +18,21 @@ public interface Plugin {
     /**
      * Apply the plugin, don't do too much work(such as read / write file) in this function.
      *
-     * @param lancet
+     * @param lancet Plugin context
      */
     void beforeCreate(Lancet lancet);
 
     /**
      * Do your time-consuming tasks in this function
+     *
+     * @param lancet Plugin context
      */
     void onCreate(Lancet lancet);
 
-    void beforeTransform();
-
-    void onTransform();
-
+    /**
+     * The last time to do your stuff.
+     *
+     * @param lancet Plugin context
+     */
     void onDestroy(Lancet lancet);
 }

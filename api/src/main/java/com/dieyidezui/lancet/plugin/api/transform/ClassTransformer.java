@@ -13,9 +13,16 @@ public interface ClassTransformer {
      */
     ClassRequest beforeTransform();
 
+    /**
+     * @param classInfo the basic info of class
+     * @param required  true if the class your ClassRequest
+     * @return the class visitor to participate in class transform.
+     */
     @Nullable
     LancetClassVisitor onTransform(ClassInfo classInfo, boolean required);
 
-
+    /**
+     * Invoked after all class transform done.
+     */
     void afterTransform();
 }
