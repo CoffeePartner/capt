@@ -9,6 +9,7 @@ import com.android.build.gradle.api.ApplicationVariant;
 import com.android.build.gradle.api.BaseVariant;
 import com.android.build.gradle.api.LibraryVariant;
 import com.android.build.gradle.api.TestVariant;
+import com.android.build.gradle.internal.pipeline.TransformTask;
 import com.android.builder.model.SourceProvider;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import org.gradle.api.DomainObjectCollection;
@@ -56,7 +57,7 @@ public class VariantManager implements Constants {
             if (!androidSourceSet.getName().startsWith(TEST)) { // don't support unit test
                 Configuration configuration = configurations.maybeCreate(sourceSetToConfigurationName(androidSourceSet.getName()));
                 // internal use, will be extended by the actual variant configuration
-                configuration.setDescription("Classpath for the annotation processor for " + androidSourceSet.getName() + ".");
+                configuration.setDescription("Classpath for the lancet plugin for " + androidSourceSet.getName() + ".");
                 configuration.setVisible(false);
                 configuration.setCanBeConsumed(false);
                 configuration.setCanBeResolved(false);
@@ -83,6 +84,15 @@ public class VariantManager implements Constants {
                 dependencies.put(t.getName(), testVariant);
             }
         });
+
+
+        // The fucking transform API doesn't provide evaluating time variant!
+        project.afterEvaluate(p -> p.getTasks()
+                .withType(TransformTask.class, t -> {
+                    if (t.getTransform().getName().equals(NAME)) {
+                        t.dependsOn(getByVariant(t.getVariantName()));
+                    }
+                }));
     }
 
     public Configuration getByVariant(String name) {

@@ -15,7 +15,7 @@ public abstract class LancetClassVisitor extends ClassVisitor {
         this(null);
     }
 
-    public LancetClassVisitor(LancetClassVisitor next) {
+    protected LancetClassVisitor(LancetClassVisitor next) {
         super(Opcodes.ASM7, next);
         this.next = cv;
     }

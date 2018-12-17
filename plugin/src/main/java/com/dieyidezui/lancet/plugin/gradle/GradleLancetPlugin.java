@@ -65,13 +65,5 @@ public class GradleLancetPlugin implements Plugin<Project> , Constants {
         // ClassGraph classGraph = new ClassGraph();
         LancetTransform lancetTransform = new LancetTransform(maker, variantManager);
         baseExtension.registerTransform(lancetTransform);
-
-        // The fucking transform API doesn't provide evaluating time variant!
-        project.afterEvaluate(p -> p.getTasks()
-                .withType(TransformTask.class, t -> {
-                    if (t.getTransform().getName().equals(NAME)) {
-                        t.dependsOn(variantManager.getByVariant(t.getVariantName()));
-                    }
-                }));
     }
 }
