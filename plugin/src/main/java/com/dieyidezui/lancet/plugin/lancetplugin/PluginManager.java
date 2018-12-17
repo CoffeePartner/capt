@@ -1,6 +1,7 @@
 package com.dieyidezui.lancet.plugin.lancetplugin;
 
 import com.dieyidezui.lancet.plugin.api.*;
+import com.dieyidezui.lancet.plugin.api.graph.ClassGraph;
 import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
@@ -18,13 +19,15 @@ import java.util.*;
 
 public class PluginManager implements Constants {
 
+    private final VariantResource resource;
     Map<String, Plugin> plugins = new HashMap<>();
     Set<String> definedInApk = new HashSet<>();
 
-    public PluginManager() {
+    public PluginManager(VariantResource resource) {
+        this.resource = resource;
     }
 
-    public void findPlugins(VariantResource variantResource) throws IOException {
+    public void findPlugins() throws IOException {
         for (LancetPluginExtension e : extension.getPlugins()) {
             Class<? extends Plugin> clazz = findPluginInProperties(e.getName());
             if (clazz == null) {
@@ -42,10 +45,8 @@ public class PluginManager implements Constants {
         }
     }
 
-    public void buildLancetForEachPlugin()
-
     private Class<? extends Plugin> findPluginInProperties(String id) throws IOException {
-        Enumeration<URL> urls = loader.loadPluginOnLancet(id);
+        Enumeration<URL> urls = resource.loadPluginOnLancet(id);
         if (urls.hasMoreElements()) {
             BufferedSource bs = Okio.buffer(Okio.source(urls.nextElement().openStream()));
             Properties properties = new Properties();
@@ -70,7 +71,7 @@ public class PluginManager implements Constants {
 
     private Class<? extends Plugin> loadPluginClass(String id, String className) {
         try {
-            return loader.loadClass(className).asSubclass(Plugin.class);
+            return resource.loadClass(className).asSubclass(Plugin.class);
         } catch (ClassNotFoundException e) {
             throw pluginNotFound(id, className, e);
         }
@@ -103,6 +104,11 @@ public class PluginManager implements Constants {
 
         @Override
         public Context getContext() {
+            return null;
+        }
+
+        @Override
+        public ClassGraph classGraph() {
             return null;
         }
 

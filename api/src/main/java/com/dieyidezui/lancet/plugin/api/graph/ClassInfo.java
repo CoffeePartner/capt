@@ -13,6 +13,12 @@ public interface ClassInfo {
     Status status();
 
     /**
+     * Alias for: status != REMOVED && status != NOT_EXISTS
+     * @return true if exists in APK.
+     */
+    boolean exists();
+
+    /**
      * class access with deprecated flag, {@see Opcodes.ACC_DEPRECATED}
      *
      * @return class access.
@@ -47,12 +53,17 @@ public interface ClassInfo {
     ClassInfo parent();
 
     /**
+     * @return The methods it own.
+     */
+    List<? extends MethodInfo> methods();
+
+    /**
      * If this is a interface, returns this extends interfaces.
      * Otherwise, returns this implements interfaces.
      *
      * @return interfaces.
      */
-    List<ClassInfo> interfaces();
+    List<? extends ClassInfo> interfaces();
 
     /**
      * If this is not a interface, returns classes extends this.
@@ -60,7 +71,7 @@ public interface ClassInfo {
      *
      * @return classes extends this.
      */
-    List<ClassInfo> classChildren();
+    List<? extends ClassInfo> classChildren();
 
     /**
      * If this is interface, returns interfaces extends this.
@@ -68,7 +79,7 @@ public interface ClassInfo {
      *
      * @return interfaces extends this.
      */
-    List<ClassInfo> interfaceChildren();
+    List<? extends ClassInfo> interfaceChildren();
 
     /**
      * If this is interface, returns classes implements this "directly".
@@ -76,5 +87,6 @@ public interface ClassInfo {
      *
      * @return classes implements this.
      */
-    List<ClassInfo> implementedClasses();
+    List<? extends ClassInfo> implementedClasses();
+
 }

@@ -3,9 +3,11 @@ package com.dieyidezui.lancet.plugin.variant;
 import com.android.build.api.transform.TransformException;
 import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.api.BaseVariant;
+import com.dieyidezui.lancet.plugin.cache.InternalCache;
 import com.dieyidezui.lancet.plugin.cache.OutputProviderFactory;
 import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactory;
 import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactoryImpl;
+import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
 import com.dieyidezui.lancet.plugin.lancetplugin.PluginManager;
 import com.dieyidezui.lancet.plugin.resource.FileManager;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
@@ -37,7 +39,7 @@ public class VariantScope implements Constants {
     }
 
     public File getRoot() {
-        return files.root();
+        return files.variantRoot();
     }
 
     public String getVariant() {
@@ -52,11 +54,21 @@ public class VariantScope implements Constants {
 
         VariantResource variantResource = new VariantResource(
                 files, factory);
-
         variantResource.prepare(invocation, getLancetConfiguration());
 
+        InternalCache internalCache = new InternalCache(singleFactory.newProvider(new File(files.variantRoot(), "self_cache"))
+                , global);
 
-        PluginManager manager = new PluginManager();
+        PluginManager manager = new PluginManager(variantResource);
+
+        ApkClassGraph graph = new ApkClassGraph();
+
+        if (invocation.isIncremental()) {
+            internalCache.loadAsync(graph.asConsumer());
+            //internalCache.loadAsync(manager.asConsumer());
+
+            internalCache.await();
+        }
     }
 
     public interface Factory {

@@ -11,11 +11,11 @@ import java.io.IOException;
 import java.util.Collections;
 
 public class FileManager {
-    private final File lancetRoot;
+    private final File variantRoot;
     private TransformInvocation invocation;
 
-    public FileManager(File lancetRoot) {
-        this.lancetRoot = lancetRoot;
+    public FileManager(File variantRoot) {
+        this.variantRoot = variantRoot;
     }
 
     public void attachContext(TransformInvocation invocation) throws IOException {
@@ -39,8 +39,8 @@ public class FileManager {
         };
     }
 
-    public File root() {
-        return lancetRoot;
+    public File variantRoot() {
+        return variantRoot;
     }
 
     private File classRootFor(String id) {
@@ -56,13 +56,13 @@ public class FileManager {
 
 
     private File cacheRootFor(String id) {
-        return new File(lancetRoot, "plugin_cache" + File.separator + id);
+        return new File(variantRoot, "plugin_cache" + File.separator + id);
     }
 
     private void clearForFullMode() throws IOException {
         invocation.getOutputProvider().deleteAll();
-        if (!lancetRoot.exists()) {
-            FileUtils.cleanDirectory(lancetRoot);
+        if (!variantRoot.exists()) {
+            FileUtils.cleanDirectory(variantRoot);
         }
     }
 }

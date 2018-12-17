@@ -1,10 +1,10 @@
 package com.dieyidezui.lancet.plugin.api;
 
-public enum  Status {
+public enum Status {
     /**
      * The file was not changed since the last build.
      */
-    NOTCHANGED,
+    NOT_CHANGED,
     /**
      * The file was added since the last build.
      */
@@ -16,5 +16,10 @@ public enum  Status {
     /**
      * The file was removed since the last build.
      */
-    REMOVED;
+    REMOVED,
+
+    /**
+     * The file is not exists in APK.
+     */
+    NOT_EXISTS
 }

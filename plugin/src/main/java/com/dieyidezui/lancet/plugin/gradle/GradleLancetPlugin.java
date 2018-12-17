@@ -5,6 +5,8 @@ import com.android.build.gradle.BaseExtension;
 import com.android.build.gradle.LibraryExtension;
 import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
+import com.dieyidezui.lancet.plugin.graph.ApkClassInfo;
+import com.dieyidezui.lancet.plugin.graph.ClassBean;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import com.dieyidezui.lancet.plugin.util.LancetThreadFactory;
@@ -60,8 +62,8 @@ public class GradleLancetPlugin implements Plugin<Project>, Constants {
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .disableHtmlEscaping()
-                // optimize for List<ClassInfo>, reduce array copy
-                .registerTypeAdapter(new TypeToken<List<ClassInfo>>() {
+                // optimize for List<ClassBean>, reduce array copy
+                .registerTypeAdapter(new TypeToken<List<ClassBean>>() {
                 }.getType(), (InstanceCreator) select -> new ArrayList<ClassInfo>(Constants.OPT_SIZE))
                 .create();
 

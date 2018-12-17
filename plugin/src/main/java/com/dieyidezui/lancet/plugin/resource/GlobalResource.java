@@ -9,20 +9,20 @@ import java.util.concurrent.ExecutorService;
 public class GlobalResource {
 
     private final File root;
-    private final ExecutorService service;
+    private final ExecutorService executor;
     private final Gson gson;
 
     private final GradleLancetExtension gradleLancetExtension;
 
-    public GlobalResource(File root, ExecutorService service, Gson gson, GradleLancetExtension gradleLancetExtension) {
+    public GlobalResource(File root, ExecutorService executor, Gson gson, GradleLancetExtension gradleLancetExtension) {
         this.root = root;
-        this.service = service;
+        this.executor = executor;
         this.gson = gson;
         this.gradleLancetExtension = gradleLancetExtension;
     }
 
-    public ExecutorService service() {
-        return service;
+    public ExecutorService executor() {
+        return executor;
     }
 
     public Gson gson() {

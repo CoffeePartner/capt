@@ -1,5 +1,6 @@
 package com.dieyidezui.lancet.plugin.resource;
 
+import com.android.build.api.transform.QualifiedContent;
 import com.android.build.api.transform.TransformInvocation;
 import com.dieyidezui.lancet.plugin.api.OutputProvider;
 import com.dieyidezui.lancet.plugin.cache.OutputProviderFactory;
@@ -15,6 +16,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.stream.Stream;
 
 public class VariantResource implements Constants {
 
@@ -29,12 +31,8 @@ public class VariantResource implements Constants {
         this.factory = factory;
     }
 
-    public File getLancetRoot() {
-        return files.root();
-    }
-
     public void prepare(TransformInvocation invocation, Configuration target) throws IOException {
-        this.loader.initClassLoader(target);
+        this.loader.initClassLoader(invocation, target);
         this.files.attachContext(invocation);
     }
 
@@ -53,10 +51,8 @@ public class VariantResource implements Constants {
     static class Loader {
 
         private URLClassLoader runnerLoader;
-        //private URLClassLoader runtimeLoader;
 
-        void initClassLoader(Configuration target) {
-            //String variantName = invocation.getContext().getVariantName();
+        void initClassLoader(TransformInvocation invocation, Configuration target) {
             URLClassLoader lancetDependencies = URLClassLoader.newInstance(
                     target.resolve().stream()
                             .map(f -> {
@@ -67,28 +63,22 @@ public class VariantResource implements Constants {
                                 }
                             }).toArray(URL[]::new), Thread.currentThread().getContextClassLoader());
 
-//            URL[] runtimeUrls = invocation.getInputs().stream()
-//                    .flatMap(s -> Stream.concat(s.getDirectoryInputs().stream(), s.getJarInputs().stream()))
-//                    .map(QualifiedContent::getFile)
-//                    .map(f -> {
-//                        try {
-//                            return f.toURI().toURL();
-//                        } catch (MalformedURLException e) {
-//                            throw new AssertionError(e);
-//                        }
-//                    })
-//                    .toArray(URL[]::new);
+            URL[] runtimeUrls = invocation.getInputs().stream()
+                    .flatMap(s -> Stream.concat(s.getDirectoryInputs().stream(), s.getJarInputs().stream()))
+                    .map(QualifiedContent::getFile)
+                    .map(f -> {
+                        try {
+                            return f.toURI().toURL();
+                        } catch (MalformedURLException e) {
+                            throw new AssertionError(e);
+                        }
+                    })
+                    .toArray(URL[]::new);
 
-            this.runnerLoader = lancetDependencies;
-            //this.runtimeLoader = URLClassLoader.newInstance(runtimeUrls, null);
+            this.runnerLoader = URLClassLoader.newInstance(runtimeUrls, lancetDependencies);
 
             LOGGER.error(Arrays.toString(lancetDependencies.getURLs()));
-            //LOGGER.error(Arrays.toString(runtimeUrls));
         }
-
-//        public Class<?> loadApkClass(String className) throws ClassNotFoundException {
-//            return runtimeLoader.loadClass(className);
-//        }
 
         public Class<?> loadClass(String className) throws ClassNotFoundException {
             return runnerLoader.loadClass(className);

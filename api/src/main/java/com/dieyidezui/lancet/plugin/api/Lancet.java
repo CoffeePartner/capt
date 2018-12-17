@@ -1,5 +1,6 @@
 package com.dieyidezui.lancet.plugin.api;
 
+import com.dieyidezui.lancet.plugin.api.graph.ClassGraph;
 import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 
@@ -10,6 +11,8 @@ public interface Lancet {
     boolean isIncremental();
 
     Context getContext();
+
+    ClassGraph classGraph();
 
     Arguments getArgs();
 

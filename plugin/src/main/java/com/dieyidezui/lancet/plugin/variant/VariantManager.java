@@ -11,7 +11,6 @@ import com.android.build.gradle.api.LibraryVariant;
 import com.android.build.gradle.api.TestVariant;
 import com.android.build.gradle.internal.pipeline.TransformTask;
 import com.android.builder.model.SourceProvider;
-import com.dieyidezui.lancet.plugin.gradle.LancetTransform;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import org.gradle.api.DomainObjectCollection;
@@ -97,7 +96,6 @@ public class VariantManager implements Constants {
         project.afterEvaluate(p -> p.getTasks()
                 .withType(TransformTask.class, t -> {
                     if (t.getTransform().getName().equals(NAME)) {
-                        LancetTransform transform = (LancetTransform) t.getTransform();
                         t.dependsOn(getByVariant(t.getVariantName()));
 
                         // register output
