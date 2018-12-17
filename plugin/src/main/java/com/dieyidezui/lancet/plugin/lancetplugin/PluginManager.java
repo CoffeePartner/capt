@@ -1,15 +1,20 @@
-package com.dieyidezui.lancet.plugin;
+package com.dieyidezui.lancet.plugin.lancetplugin;
 
-import com.dieyidezui.lancet.plugin.api.Plugin;
+import com.dieyidezui.lancet.plugin.api.*;
+import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
+import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.gradle.GradleLancetExtension;
+import com.dieyidezui.lancet.plugin.resource.ResourceManager;
 import com.dieyidezui.lancet.plugin.util.Constants;
+import com.dieyidezui.lancet.plugin.variant.VariantManager;
 import com.google.common.io.Closeables;
 import okio.BufferedSource;
 import okio.Okio;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.util.*;
 
@@ -17,9 +22,11 @@ public class PluginManager implements Constants {
 
     Map<String, Plugin> plugins = new HashMap<>();
     Set<String> definedInApk = new HashSet<>();
-    private LancetLoader loader;
 
-    public void findPlugins(GradleLancetExtension extension) throws IOException {
+    public PluginManager() {
+    }
+
+    public void findPlugins( VariantManager variantManager) throws IOException {
         for (LancetPluginExtension e : extension.getPlugins()) {
             Class<? extends Plugin> clazz = findPluginInProperties(e.getName());
             if (clazz == null) {
@@ -30,12 +37,14 @@ public class PluginManager implements Constants {
             }
 
             try {
-                clazz.newInstance();
+                Plugin plugin = clazz.newInstance();
             } catch (IllegalAccessException | InstantiationException ex) {
                 throw pluginNotFound(e.getName(), clazz.getName(), ex);
             }
         }
     }
+
+    public void buildLancetForEachPlugin()
 
     private Class<? extends Plugin> findPluginInProperties(String id) throws IOException {
         Enumeration<URL> urls = loader.loadPluginOnLancet(id);
@@ -77,5 +86,46 @@ public class PluginManager implements Constants {
         }
         sb.append("not found");
         return new IllegalStateException(sb.toString(), sup);
+    }
+
+
+    private static class PluginWrapper implements Lancet {
+        private final String id;
+        private final Plugin plugin;
+
+        public PluginWrapper(String id, Plugin plugin) {
+            this.id = id;
+            this.plugin = plugin;
+        }
+
+        @Override
+        public boolean isIncremental() {
+            return false;
+        }
+
+        @Override
+        public Context getContext() {
+            return null;
+        }
+
+        @Override
+        public Arguments getArgs() {
+            return null;
+        }
+
+        @Override
+        public void registerMetaProcessor(MetaProcessor processor, Class<? extends Annotation>... interestedIn) {
+
+        }
+
+        @Override
+        public void registerClassTransformer(ClassTransformer transformer) {
+
+        }
+
+        @Override
+        public OutputProvider outputs() {
+            return null;
+        }
     }
 }

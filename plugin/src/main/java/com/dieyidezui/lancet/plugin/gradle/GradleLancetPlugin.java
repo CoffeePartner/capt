@@ -3,24 +3,33 @@ package com.dieyidezui.lancet.plugin.gradle;
 import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.BaseExtension;
 import com.android.build.gradle.LibraryExtension;
-import com.android.build.gradle.internal.pipeline.TransformTask;
-import com.dieyidezui.lancet.plugin.LancetLoader;
-import com.dieyidezui.lancet.plugin.cache.DirJsonCache;
+import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
+import com.dieyidezui.lancet.plugin.cache.OutputProviderFactory;
+import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactory;
+import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactoryImpl;
+import com.dieyidezui.lancet.plugin.lancetplugin.PluginManager;
+import com.dieyidezui.lancet.plugin.resource.DirJsonCache;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
+import com.dieyidezui.lancet.plugin.resource.FileManager;
+import com.dieyidezui.lancet.plugin.resource.ResourceManager;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import com.dieyidezui.lancet.plugin.util.LancetThreadFactory;
 import com.dieyidezui.lancet.plugin.variant.VariantManager;
+import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.InstanceCreator;
 import org.gradle.api.*;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class GradleLancetPlugin implements Plugin<Project> , Constants {
+public class GradleLancetPlugin implements Plugin<Project>, Constants {
 
     private static final Logger LOGGER = Logging.getLogger(GradleLancetPlugin.class);
 
@@ -40,30 +49,39 @@ public class GradleLancetPlugin implements Plugin<Project> , Constants {
 
         project.getExtensions().create(NAME, GradleLancetExtension.class, project.container(LancetPluginExtension.class));
 
+        FileManager files = new FileManager(new File(project.getBuildDir(), NAME));
 
-        VariantManager variantManager = new VariantManager(baseExtension, project);
-        LancetLoader maker = new LancetLoader();
-        // create configurations for separate variant
-        variantManager.createConfigurationForVariant();
+        RelativeDirectoryProviderFactory singleFactory = new RelativeDirectoryProviderFactoryImpl();
+
+        OutputProviderFactory factory = new OutputProviderFactory(singleFactory, files.asSelector());
 
         int core = Runtime.getRuntime().availableProcessors();
+        ExecutorService executor = Executors.newFixedThreadPool(core, new LancetThreadFactory());
 
-        ExecutorService lancetExecutor = Executors.newFixedThreadPool(core, new LancetThreadFactory());
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .disableHtmlEscaping()
                 // optimize for List<ClassInfo>, reduce array copy
-                //.registerTypeAdapter(new TypeToken<List<ClassInfo>>() {
-                //}.getType(), (InstanceCreator) type -> new ArrayList<ClassInfo>(Constants.OPT_SIZE))
+                .registerTypeAdapter(new TypeToken<List<ClassInfo>>() {
+                }.getType(), (InstanceCreator) select -> new ArrayList<ClassInfo>(Constants.OPT_SIZE))
                 .create();
 
+        ResourceManager resourceManager = new ResourceManager(
+                files, factory, executor, gson);
+
+        VariantManager variantManager = new VariantManager(baseExtension, project);
+        // create configurations for separate variant
+        variantManager.createConfigurationForVariant();
+
+
+        PluginManager pluginManager = new PluginManager();
 
         DirJsonCache dirCache = new DirJsonCache(new File(project.getBuildDir(), NAME),
                 lancetExecutor,
                 gson);
 
         // ClassGraph classGraph = new ClassGraph();
-        LancetTransform lancetTransform = new LancetTransform(maker, variantManager);
+        LancetTransform lancetTransform = new LancetTransform(resourceManager, variantManager, pluginManager);
         baseExtension.registerTransform(lancetTransform);
     }
 }

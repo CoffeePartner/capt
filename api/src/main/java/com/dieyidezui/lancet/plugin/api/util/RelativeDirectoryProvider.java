@@ -14,7 +14,7 @@ public interface RelativeDirectoryProvider {
     /**
      * @return get the root directory, ensure exists
      */
-    File getRoot();
+    File getRoot() throws IOException;
 
     /**
      * @param path the relative path

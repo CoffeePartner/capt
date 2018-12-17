@@ -2,6 +2,7 @@ package com.dieyidezui.lancet.plugin.variant;
 
 import com.android.build.api.attributes.BuildTypeAttr;
 import com.android.build.api.attributes.ProductFlavorAttr;
+import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.BaseExtension;
 import com.android.build.gradle.LibraryExtension;
@@ -11,6 +12,8 @@ import com.android.build.gradle.api.LibraryVariant;
 import com.android.build.gradle.api.TestVariant;
 import com.android.build.gradle.internal.pipeline.TransformTask;
 import com.android.builder.model.SourceProvider;
+import com.dieyidezui.lancet.plugin.api.Lancet;
+import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import org.gradle.api.DomainObjectCollection;
 import org.gradle.api.Project;

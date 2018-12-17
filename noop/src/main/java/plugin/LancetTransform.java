@@ -129,7 +129,7 @@ class LancetTransform extends Transform {
         Log.i("now: " + System.currentTimeMillis());
 
         cache.saveToLocal();
-        Log.i("cache saved");
+        Log.i("resource saved");
         Log.i("now: " + System.currentTimeMillis());
     }
 

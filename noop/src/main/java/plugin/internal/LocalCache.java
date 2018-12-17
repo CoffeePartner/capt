@@ -43,7 +43,7 @@ public class LocalCache {
                 throw new RuntimeException(e);
             } catch (JsonParseException e) {
                 if (!localCache.delete()) {
-                    throw new RuntimeException("cache file has been modified, but can't delete.", e);
+                    throw new RuntimeException("resource file has been modified, but can't delete.", e);
                 }
             }
         }
@@ -92,7 +92,7 @@ public class LocalCache {
 
     public void clear() throws IOException {
         if (localCache.exists() && localCache.isFile() && !localCache.delete()) {
-            throw new IOException("can't delete cache file");
+            throw new IOException("can't delete resource file");
         }
     }
 

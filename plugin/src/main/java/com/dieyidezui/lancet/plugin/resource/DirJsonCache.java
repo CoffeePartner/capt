@@ -1,4 +1,4 @@
-package com.dieyidezui.lancet.plugin.cache;
+package com.dieyidezui.lancet.plugin.resource;
 
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
