@@ -1,10 +1,11 @@
-package com.dieyidezui.lancet.plugin.lancetplugin;
+package com.dieyidezui.lancet.plugin.process;
 
 import com.dieyidezui.lancet.plugin.api.*;
 import com.dieyidezui.lancet.plugin.api.graph.ClassGraph;
 import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
+import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import com.google.common.io.Closeables;
@@ -27,7 +28,9 @@ public class PluginManager implements Constants {
         this.resource = resource;
     }
 
-    public void findPlugins() throws IOException {
+    public void initPlugins(CommonArgs args) throws IOException {
+        args.
+
         for (LancetPluginExtension e : extension.getPlugins()) {
             Class<? extends Plugin> clazz = findPluginInProperties(e.getName());
             if (clazz == null) {
@@ -85,51 +88,5 @@ public class PluginManager implements Constants {
         }
         sb.append("not found");
         return new IllegalStateException(sb.toString(), sup);
-    }
-
-
-    private static class PluginWrapper implements Lancet {
-        private final String id;
-        private final Plugin plugin;
-
-        public PluginWrapper(String id, Plugin plugin) {
-            this.id = id;
-            this.plugin = plugin;
-        }
-
-        @Override
-        public boolean isIncremental() {
-            return false;
-        }
-
-        @Override
-        public Context getContext() {
-            return null;
-        }
-
-        @Override
-        public ClassGraph classGraph() {
-            return null;
-        }
-
-        @Override
-        public Arguments getArgs() {
-            return null;
-        }
-
-        @Override
-        public void registerMetaProcessor(MetaProcessor processor, Class<? extends Annotation>... interestedIn) {
-
-        }
-
-        @Override
-        public void registerClassTransformer(ClassTransformer transformer) {
-
-        }
-
-        @Override
-        public OutputProvider outputs() {
-            return null;
-        }
     }
 }

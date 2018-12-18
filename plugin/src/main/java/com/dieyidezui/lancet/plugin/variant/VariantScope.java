@@ -8,7 +8,7 @@ import com.dieyidezui.lancet.plugin.cache.OutputProviderFactory;
 import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactory;
 import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactoryImpl;
 import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
-import com.dieyidezui.lancet.plugin.lancetplugin.PluginManager;
+import com.dieyidezui.lancet.plugin.process.PluginManager;
 import com.dieyidezui.lancet.plugin.resource.FileManager;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;

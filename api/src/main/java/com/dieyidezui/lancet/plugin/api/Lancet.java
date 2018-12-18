@@ -6,6 +6,7 @@ import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 import org.gradle.internal.HasInternalProtocol;
 
 import java.lang.annotation.Annotation;
+import java.util.Set;
 
 @HasInternalProtocol
 public interface Lancet {
@@ -18,7 +19,7 @@ public interface Lancet {
 
     Arguments getArgs();
 
-    void registerMetaProcessor(MetaProcessor processor, Class<? extends Annotation>... interestedIn);
+    void registerMetaProcessor(MetaProcessor processor, Set<Class<? extends Annotation>> interestedIn);
 
     void registerClassTransformer(ClassTransformer transformer);
 

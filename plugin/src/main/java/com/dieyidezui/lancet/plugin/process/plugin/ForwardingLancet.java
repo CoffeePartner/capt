@@ -1,4 +1,4 @@
-package com.dieyidezui.lancet.plugin.lancetplugin;
+package com.dieyidezui.lancet.plugin.process.plugin;
 
 import com.android.build.gradle.BaseExtension;
 import com.dieyidezui.lancet.plugin.api.Arguments;
@@ -12,6 +12,7 @@ import org.gradle.api.Project;
 
 import java.lang.annotation.Annotation;
 import java.net.URLClassLoader;
+import java.util.Set;
 
 public class ForwardingLancet implements LancetInternal {
 
@@ -57,7 +58,7 @@ public class ForwardingLancet implements LancetInternal {
     }
 
     @Override
-    public void registerMetaProcessor(MetaProcessor processor, Class<? extends Annotation>... interestedIn) {
+    public void registerMetaProcessor(MetaProcessor processor, Set<Class<? extends Annotation>> interestedIn) {
         delegate.registerMetaProcessor(processor, interestedIn);
     }
 
