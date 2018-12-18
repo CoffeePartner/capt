@@ -52,7 +52,7 @@ public class VariantScope implements Constants {
 
         OutputProviderFactory factory = new OutputProviderFactory(singleFactory, files.asSelector());
 
-        VariantResource variantResource = new VariantResource(
+        VariantResource variantResource = new VariantResource(getVariant(),
                 files, factory);
         variantResource.prepare(invocation, getLancetConfiguration());
 

@@ -6,6 +6,7 @@ import com.dieyidezui.lancet.plugin.api.OutputProvider;
 import com.dieyidezui.lancet.plugin.cache.OutputProviderFactory;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.file.FileCollection;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -23,12 +24,18 @@ public class VariantResource implements Constants {
     private static final Logger LOGGER = Logging.getLogger(Loader.class);
 
     private final Loader loader = new Loader();
+    private final String variant;
     private final FileManager files;
     private final OutputProviderFactory factory;
 
-    public VariantResource(FileManager files, OutputProviderFactory factory) {
+    public VariantResource(String variant, FileManager files, OutputProviderFactory factory) {
+        this.variant = variant;
         this.files = files;
         this.factory = factory;
+    }
+
+    public String variant() {
+        return variant;
     }
 
     public void prepare(TransformInvocation invocation, Configuration target) throws IOException {
@@ -46,6 +53,10 @@ public class VariantResource implements Constants {
 
     public OutputProvider provider(String id) {
         return factory.newProvider(id);
+    }
+
+    public URLClassLoader loader() {
+        return loader.runnerLoader;
     }
 
     static class Loader {

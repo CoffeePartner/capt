@@ -46,7 +46,7 @@ public class GradleLancetPlugin implements Plugin<Project>, Constants {
         project.getExtensions().create(NAME, GradleLancetExtension.class, project.container(LancetPluginExtension.class));
 
 
-        VariantManager variantManager = new VariantManager(createGlobalResource(project),
+        VariantManager variantManager = new VariantManager(createGlobalResource(project, baseExtension),
                 baseExtension, project);
         // create configurations for separate variant
         variantManager.createConfigurationForVariant();
@@ -55,7 +55,7 @@ public class GradleLancetPlugin implements Plugin<Project>, Constants {
         baseExtension.registerTransform(lancetTransform);
     }
 
-    private static GlobalResource createGlobalResource(Project project) {
+    private static GlobalResource createGlobalResource(Project project, BaseExtension baseExtension) {
         int core = Runtime.getRuntime().availableProcessors();
         ExecutorService executor = Executors.newFixedThreadPool(core, new LancetThreadFactory());
 
@@ -69,6 +69,6 @@ public class GradleLancetPlugin implements Plugin<Project>, Constants {
 
         File root = new File(project.getBuildDir(), NAME);
 
-        return new GlobalResource(root, executor, gson, (GradleLancetExtension) project.getExtensions().getByName(NAME));
+        return new GlobalResource(project, root, executor, gson, (GradleLancetExtension) project.getExtensions().getByName(NAME), baseExtension);
     }
 }

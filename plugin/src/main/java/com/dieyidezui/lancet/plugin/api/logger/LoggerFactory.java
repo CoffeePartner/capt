@@ -6,7 +6,7 @@ import org.gradle.api.logging.Logging;
 
 public class LoggerFactory {
 
-    public Logger getLogger(Class<?> clazz) {
+    public static Logger getLogger(Class<?> clazz) {
         return new LoggerImpl(Logging.getLogger(clazz));
     }
 
