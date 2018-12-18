@@ -7,7 +7,7 @@ import java.io.IOException;
 public interface OutputProvider {
 
     /**
-     * Ensure the dir exists
+     * Ensure the directory exists, unique for every plugin.
      *
      * @return dir
      */

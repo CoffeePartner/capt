@@ -7,6 +7,8 @@ dependencies {
     compile "com.squareup.okio:okio:1.16.0"
     compile "org.ow2.asm:asm:7.0"
     compile 'org.ow2.asm:asm-tree:7.0'
+    compileOnly gradleApi()
+    compileOnly "com.android.tools.build:gradle:$android_tools_version"
 }
 
 sourceCompatibility = "1.7"

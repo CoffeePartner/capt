@@ -13,26 +13,26 @@ import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
  * 4. Transform every class from inputs by {@link ClassTransformer}
  * 5. onDestroy concurrently
  */
-public interface Plugin {
+public interface Plugin<T> {
 
     /**
      * Apply the plugin, don't do too much work(such as read / write file) in this function.
      *
      * @param lancet Plugin context
      */
-    void beforeCreate(Lancet lancet);
+    void beforeCreate(T lancet);
 
     /**
      * Do your time-consuming tasks in this function
      *
      * @param lancet Plugin context
      */
-    void onCreate(Lancet lancet);
+    void onCreate(T lancet);
 
     /**
      * The last time to do your stuff.
      *
      * @param lancet Plugin context
      */
-    void onDestroy(Lancet lancet);
+    void onDestroy(T lancet);
 }

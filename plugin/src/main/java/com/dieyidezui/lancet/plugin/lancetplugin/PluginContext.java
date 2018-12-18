@@ -1,12 +1,15 @@
 package com.dieyidezui.lancet.plugin.lancetplugin;
 
+import com.android.build.gradle.BaseExtension;
 import com.dieyidezui.lancet.plugin.api.*;
+import com.dieyidezui.lancet.plugin.api.graph.ClassGraph;
 import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
+import org.gradle.api.Project;
 
 import java.lang.annotation.Annotation;
 
-public class PluginContext implements Lancet {
+public class PluginContext implements LancetInternal {
 
     String pluginId;
 
@@ -28,6 +31,11 @@ public class PluginContext implements Lancet {
     }
 
     @Override
+    public ClassGraph classGraph() {
+        return null;
+    }
+
+    @Override
     public Arguments getArgs() {
         return null;
     }
@@ -44,6 +52,16 @@ public class PluginContext implements Lancet {
 
     @Override
     public OutputProvider outputs() {
+        return null;
+    }
+
+    @Override
+    public Project getProject() {
+        return null;
+    }
+
+    @Override
+    public BaseExtension getAndroid() {
         return null;
     }
 
