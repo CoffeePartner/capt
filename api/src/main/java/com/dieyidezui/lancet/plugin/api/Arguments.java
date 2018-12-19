@@ -10,6 +10,9 @@ public interface Arguments {
 
     interface PluginArguments {
 
+        /**
+         * @return priority of plugi
+         */
         int priority();
 
         /**
