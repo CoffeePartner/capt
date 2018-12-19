@@ -18,5 +18,64 @@ public class LoggerFactory {
             this.logger = logger;
         }
 
+        @Override
+        public void debug(String message) {
+            logger.debug(message);
+        }
+
+        @Override
+        public void debug(String message, Object... objects) {
+            logger.debug(message, objects);
+        }
+
+        @Override
+        public void debug(String message, Throwable throwable) {
+            logger.debug(message, throwable);
+        }
+
+        @Override
+        public void info(String message) {
+            logger.info(message);
+        }
+
+        @Override
+        public void info(String message, Object... objects) {
+            logger.info(message, objects);
+        }
+
+        @Override
+        public void info(String message, Throwable throwable) {
+            logger.info(message, throwable);
+        }
+
+        @Override
+        public void warn(String message) {
+            logger.warn(message);
+        }
+
+        @Override
+        public void warn(String message, Object... objects) {
+            logger.warn(message, objects);
+        }
+
+        @Override
+        public void warn(String message, Throwable throwable) {
+            logger.warn(message, throwable);
+        }
+
+        @Override
+        public void error(String message) {
+            logger.error(message);
+        }
+
+        @Override
+        public void error(String message, Object... objects) {
+            logger.error(message, objects);
+        }
+
+        @Override
+        public void error(String message, Throwable throwable) {
+            logger.error(message, throwable);
+        }
     }
 }

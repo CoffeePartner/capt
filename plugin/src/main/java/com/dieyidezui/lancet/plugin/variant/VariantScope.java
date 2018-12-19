@@ -7,8 +7,11 @@ import com.dieyidezui.lancet.plugin.cache.InternalCache;
 import com.dieyidezui.lancet.plugin.cache.OutputProviderFactory;
 import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactory;
 import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactoryImpl;
+import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
+import com.dieyidezui.lancet.plugin.process.CommonArgs;
 import com.dieyidezui.lancet.plugin.process.PluginManager;
+import com.dieyidezui.lancet.plugin.process.plugin.GlobalLancet;
 import com.dieyidezui.lancet.plugin.resource.FileManager;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
@@ -59,16 +62,25 @@ public class VariantScope implements Constants {
         InternalCache internalCache = new InternalCache(singleFactory.newProvider(new File(files.variantRoot(), "self_cache"))
                 , global);
 
-        PluginManager manager = new PluginManager(variantResource);
-
         ApkClassGraph graph = new ApkClassGraph();
+
+        GlobalLancet lancet = new GlobalLancet(graph, global, variantResource);
+
+        PluginManager manager = new PluginManager(global, variantResource, invocation);
 
         if (invocation.isIncremental()) {
             internalCache.loadAsync(graph.asConsumer());
-            //internalCache.loadAsync(manager.asConsumer());
+            internalCache.loadAsync(manager.asConsumer());
 
             internalCache.await();
         }
+
+        manager.initPlugins(createArgs(), lancet);
+    }
+
+
+    private CommonArgs createArgs() {
+        return CommonArgs.createFromExtension(global.gradleLancetExtension(), variant.endsWith(ANDROID_TEST) ? LancetPluginExtension.ANDROID_TEST : LancetPluginExtension.ASSEMBLE);
     }
 
     public interface Factory {

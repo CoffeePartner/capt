@@ -2,8 +2,6 @@ apply plugin: 'java'
 
 dependencies {
     testCompile "junit:junit:4.12"
-    testCompile 'com.squareup.okio:okio:1.11.0'
-    testCompile 'org.assertj:assertj-api:3.6.2'
 
     compileClasspath "com.android.tools.build:gradle:$android_tools_version"
     compile project(":rt")
@@ -11,10 +9,6 @@ dependencies {
     compileClasspath "com.google.guava:guava:$guava_version"
     compile "org.ow2.asm:asm:7.0"
     compile 'org.ow2.asm:asm-tree:7.0'
-    compile 'org.ow2.asm:asm-util:7.0'
-    compile 'org.ow2.asm:asm-commons:7.0'
-    compile 'org.ow2.asm:asm-analysis:7.0'
-    compile 'org.ow2.asm:asm-test:7.0'
 }
 
 sourceCompatibility = "1.8"

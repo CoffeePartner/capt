@@ -6,11 +6,9 @@ import com.dieyidezui.lancet.plugin.api.OutputProvider;
 import com.dieyidezui.lancet.plugin.cache.OutputProviderFactory;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.file.FileCollection;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;

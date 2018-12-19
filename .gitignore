@@ -11,10 +11,9 @@ out
 lib
 target
 pom.xml.*
-release.properties
 # Idea
 .idea
 obj
 #MacOS
 .DS_Store
-local.properties
+gradle.properties

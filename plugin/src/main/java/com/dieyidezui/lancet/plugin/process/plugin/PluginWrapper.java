@@ -4,6 +4,7 @@ import com.dieyidezui.lancet.plugin.api.Arguments;
 import com.dieyidezui.lancet.plugin.api.LancetInternal;
 import com.dieyidezui.lancet.plugin.api.OutputProvider;
 import com.dieyidezui.lancet.plugin.api.Plugin;
+import com.dieyidezui.lancet.plugin.process.PluginBean;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
 
 @SuppressWarnings("unchecked")
@@ -55,5 +56,9 @@ public abstract class PluginWrapper extends ForwardingLancet {
     @Override
     public OutputProvider outputs() {
         return resource.provider(id);
+    }
+
+    public PluginBean toBean() {
+        return new PluginBean(id);
     }
 }

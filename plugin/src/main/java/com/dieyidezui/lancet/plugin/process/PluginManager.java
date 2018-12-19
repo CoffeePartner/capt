@@ -1,10 +1,11 @@
 package com.dieyidezui.lancet.plugin.process;
 
+import com.android.build.api.transform.TransformInvocation;
 import com.dieyidezui.lancet.plugin.api.*;
-import com.dieyidezui.lancet.plugin.api.graph.ClassGraph;
 import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
-import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
+import com.dieyidezui.lancet.plugin.process.plugin.GlobalLancet;
+import com.dieyidezui.lancet.plugin.process.plugin.PluginWrapper;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
 import com.dieyidezui.lancet.plugin.util.Constants;
@@ -17,35 +18,61 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class PluginManager implements Constants {
 
     private final VariantResource resource;
-    Map<String, Plugin> plugins = new HashMap<>();
-    Set<String> definedInApk = new HashSet<>();
+    private final TransformInvocation invocation;
+    private Map<String, PluginBean> prePlugins = Collections.emptyMap();
+    private final List<PluginWrapper> plugins = new ArrayList<>();
 
-    public PluginManager(VariantResource resource) {
+    public PluginManager(GlobalResource global, VariantResource resource, TransformInvocation invocation) {
         this.resource = resource;
+        this.invocation = invocation;
     }
 
-    public void initPlugins(CommonArgs args) throws IOException {
-        args.
+    public Consumer<List<PluginBean>> asConsumer() {
+        return l -> prePlugins = l.stream().collect(Collectors.toMap(PluginBean::getId, Function.identity()));
+    }
 
-        for (LancetPluginExtension e : extension.getPlugins()) {
-            Class<? extends Plugin> clazz = findPluginInProperties(e.getName());
+    public Supplier<List<PluginBean>> asSupplier() {
+        return () -> plugins.stream().map(PluginWrapper::toBean).collect(Collectors.toList());
+    }
+
+    public void initPlugins(CommonArgs args, GlobalLancet globalLancet) throws IOException {
+        for (String id : args.plugins()) {
+            Class<? extends Plugin> clazz = findPluginInProperties(id);
             if (clazz == null) {
-                clazz = findPluginInApkGraph(e.getName());
+                clazz = findPluginInApkGraph(id);
             }
             if (clazz == null) {
-                throw pluginNotFound(e.getName(), null, null);
+                throw pluginNotFound(id, null, null);
             }
-
             try {
                 Plugin plugin = clazz.newInstance();
+
+                PluginWrapper wrapper = new PluginWrapper(invocation.isIncremental() && prePlugins.containsKey(id),
+                        plugin,
+                        args.asArgumentsFor(id),
+                        id,
+                        resource,
+                        globalLancet) {
+                };
+                plugins.add(wrapper);
             } catch (IllegalAccessException | InstantiationException ex) {
-                throw pluginNotFound(e.getName(), clazz.getName(), ex);
+                throw pluginNotFound(id, clazz.getName(), ex);
             }
         }
+
+        // priority order
+        plugins.sort(Comparator.comparingInt(l -> l.getArgs().getMyArguments().priority()));
+
+        // call before create
+        plugins.forEach(PluginWrapper::callBeforeCreate);
     }
 
     private Class<? extends Plugin> findPluginInProperties(String id) throws IOException {
@@ -89,4 +116,5 @@ public class PluginManager implements Constants {
         sb.append("not found");
         return new IllegalStateException(sb.toString(), sup);
     }
+
 }
