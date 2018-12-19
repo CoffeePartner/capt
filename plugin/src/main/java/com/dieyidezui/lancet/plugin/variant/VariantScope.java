@@ -75,16 +75,8 @@ public class VariantScope implements Constants {
             internalCache.await();
         }
 
-        manager.initPlugins(createArgs(), lancet);
-
-
-
-        internalCache.storeAsync();
-    }
-
-
-    private CommonArgs createArgs() {
-        return CommonArgs.createFromExtension(global.gradleLancetExtension(), variant.endsWith(ANDROID_TEST) ? LancetPluginExtension.ANDROID_TEST : LancetPluginExtension.ASSEMBLE);
+        int scope = variant.endsWith(ANDROID_TEST) ? LancetPluginExtension.ANDROID_TEST : LancetPluginExtension.ASSEMBLE;
+        manager.initPlugins(global.gradleLancetExtension(), scope, lancet);
     }
 
     public interface Factory {

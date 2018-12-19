@@ -1,8 +1,7 @@
 package com.dieyidezui.lancet.plugin.graph;
 
-import com.dieyidezui.lancet.plugin.api.Status;
+import com.dieyidezui.lancet.plugin.api.graph.Status;
 import com.dieyidezui.lancet.plugin.api.graph.ClassGraph;
-import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import org.objectweb.asm.Opcodes;
 

@@ -1,8 +1,7 @@
 package com.dieyidezui.lancet.plugin.process;
 
 
-import com.dieyidezui.lancet.plugin.api.Status;
-import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
+import com.dieyidezui.lancet.plugin.api.graph.Status;
 import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
 import com.dieyidezui.lancet.plugin.graph.ApkClassInfo;
 
@@ -41,7 +40,6 @@ public class ClassGraphHelper {
     }
 
     public void dispatchMetas() {
-        MetaProcessor
     }
 
     public void collectRemovedClasses() {

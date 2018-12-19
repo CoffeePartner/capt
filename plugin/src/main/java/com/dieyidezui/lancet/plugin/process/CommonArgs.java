@@ -1,11 +1,11 @@
 package com.dieyidezui.lancet.plugin.process;
 
 import com.dieyidezui.lancet.plugin.api.Arguments;
+import com.dieyidezui.lancet.plugin.api.Plugin;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.gradle.GradleLancetExtension;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -17,16 +17,12 @@ public class CommonArgs {
         this.map = map;
     }
 
-    public static CommonArgs createFromExtension(GradleLancetExtension extension, int scope) {
+    public static CommonArgs createBy(GradleLancetExtension extension, int scope, Map<String, Plugin> plugins) {
         return new CommonArgs(extension.getPlugins().stream()
-                .map(SimpleArgs::new)
+                .map(e -> new SimpleArgs(e, plugins.get(e.getName()).defaultPriority()))
                 .filter(a -> a.allow(scope))
                 .collect(Collectors.toMap(SimpleArgs::name, Function.identity()))
         );
-    }
-
-    public Set<String> plugins() {
-        return map.keySet();
     }
 
     public Arguments asArgumentsFor(String pluginId) {
@@ -52,10 +48,10 @@ public class CommonArgs {
         private final String name;
         private final int scope;
 
-        SimpleArgs(LancetPluginExtension extension) {
+        SimpleArgs(LancetPluginExtension extension, int defaultPriority) {
             this.scope = extension.getScope();
             this.name = extension.getName();
-            this.priority = extension.getPriority();
+            this.priority = (extension.getPriority() == null ? defaultPriority : extension.getPriority());
             this.map = extension.getPluginProperties();
         }
 

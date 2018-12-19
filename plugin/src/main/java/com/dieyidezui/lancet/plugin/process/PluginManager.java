@@ -2,6 +2,8 @@ package com.dieyidezui.lancet.plugin.process;
 
 import com.android.build.api.transform.TransformInvocation;
 import com.dieyidezui.lancet.plugin.api.*;
+import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
+import com.dieyidezui.lancet.plugin.gradle.GradleLancetExtension;
 import com.dieyidezui.lancet.plugin.process.plugin.GlobalLancet;
 import com.dieyidezui.lancet.plugin.process.plugin.PluginWrapper;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
@@ -25,7 +27,8 @@ public class PluginManager implements Constants {
     private final VariantResource resource;
     private final TransformInvocation invocation;
     private Map<String, PluginBean> prePlugins = Collections.emptyMap();
-    private final List<PluginWrapper> plugins = new ArrayList<>();
+    private final Map<String, Plugin> plugins = new HashMap<>();
+    private final List<PluginWrapper> wrappers = new ArrayList<>();
 
     public PluginManager(GlobalResource global, VariantResource resource, TransformInvocation invocation) {
         this.resource = resource;
@@ -37,38 +40,42 @@ public class PluginManager implements Constants {
     }
 
     public Supplier<List<PluginBean>> asSupplier() {
-        return () -> plugins.stream().map(PluginWrapper::toBean).collect(Collectors.toList());
+        return () -> wrappers.stream().map(PluginWrapper::toBean).collect(Collectors.toList());
     }
 
-    public void initPlugins(CommonArgs args, GlobalLancet globalLancet) throws IOException {
-        for (String id : args.plugins()) {
-            Class<? extends Plugin> clazz = findPluginInProperties(id);
+    public void initPlugins(GradleLancetExtension extension, int scope, GlobalLancet globalLancet) throws IOException {
+        for (LancetPluginExtension e : extension.getPlugins()) {
+            Class<? extends Plugin> clazz = findPluginInProperties(e.getName());
             if (clazz == null) {
-                clazz = findPluginInApkGraph(id);
+                clazz = findPluginInApkGraph(e.getName());
             }
             if (clazz == null) {
-                throw pluginNotFound(id, null, null);
+                throw pluginNotFound(e.getName(), null, null);
             }
             try {
-                Plugin plugin = clazz.newInstance();
-
-                PluginWrapper wrapper = new PluginWrapper(invocation.isIncremental() && prePlugins.containsKey(id),
-                        plugin,
-                        args.asArgumentsFor(id),
-                        id,
-                        resource,
-                        globalLancet);
-                plugins.add(wrapper);
+                plugins.put(e.getName(), clazz.newInstance());
             } catch (IllegalAccessException | InstantiationException ex) {
-                throw pluginNotFound(id, clazz.getName(), ex);
+                throw pluginNotFound(e.getName(), clazz.getName(), ex);
             }
         }
 
+        CommonArgs args = CommonArgs.createBy(extension, scope, plugins);
+
+        for (Map.Entry<String, Plugin> entry : plugins.entrySet()) {
+            PluginWrapper wrapper = new PluginWrapper(invocation.isIncremental() && prePlugins.containsKey(entry.getKey()),
+                    entry.getValue(),
+                    args.asArgumentsFor(entry.getKey()),
+                    entry.getKey(),
+                    resource,
+                    globalLancet);
+            wrappers.add(wrapper);
+        }
+
         // priority order
-        plugins.sort(Comparator.comparingInt(l -> l.getArgs().getMyArguments().priority()));
+        wrappers.sort(Comparator.comparingInt(l -> l.getArgs().getMyArguments().priority()));
 
         // call before create
-        plugins.forEach(PluginWrapper::callBeforeCreate);
+        wrappers.forEach(PluginWrapper::callBeforeCreate);
     }
 
     private Class<? extends Plugin> findPluginInProperties(String id) throws IOException {

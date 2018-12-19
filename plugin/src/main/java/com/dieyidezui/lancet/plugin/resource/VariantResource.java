@@ -94,6 +94,7 @@ public class VariantResource implements Constants {
         }
 
         public Enumeration<URL> loadPluginOnLancet(String pluginName) throws IOException {
+            // getParent() means apk resources are useless
             return runnerLoader.getParent().getResources(PLUGIN_PATH + pluginName + ".properties");
         }
     }

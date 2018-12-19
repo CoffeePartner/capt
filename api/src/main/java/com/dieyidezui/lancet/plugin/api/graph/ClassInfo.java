@@ -1,7 +1,5 @@
 package com.dieyidezui.lancet.plugin.api.graph;
 
-import com.dieyidezui.lancet.plugin.api.Status;
-
 import javax.annotation.Nullable;
 import java.util.List;
 

@@ -1,11 +1,10 @@
 package com.dieyidezui.lancet.plugin.graph;
 
-import com.dieyidezui.lancet.plugin.api.Status;
+import com.dieyidezui.lancet.plugin.api.graph.Status;
 import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
 import com.dieyidezui.lancet.plugin.api.graph.MethodInfo;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-import org.gradle.internal.nativeintegration.filesystem.Stat;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -20,7 +19,7 @@ public class ApkClassInfo implements ClassInfo {
     public ClassBean clazz;
 
     /**
-     * null means removed or is {@link Object}
+     * null means removed or not exists
      */
     @Nullable
     public ApkClassInfo parent;
