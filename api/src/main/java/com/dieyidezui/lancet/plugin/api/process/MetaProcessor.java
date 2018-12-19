@@ -5,40 +5,46 @@ import com.dieyidezui.lancet.plugin.api.asm.LancetClassVisitor;
 import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
 import com.dieyidezui.lancet.plugin.api.hint.Thread;
 import com.dieyidezui.lancet.plugin.api.hint.Type;
+import com.dieyidezui.lancet.plugin.api.transform.ClassRequest;
 import org.objectweb.asm.MethodVisitor;
 
 import javax.annotation.Nullable;
+import javax.annotation.processing.SupportedAnnotationTypes;
+import java.lang.annotation.Annotation;
+import java.util.Set;
 
 /**
  * Only class contains plugin interested annotations will pass to MetaProcessor
  */
 public abstract class MetaProcessor {
     /**
-     * Class changed, pre has {@link Meta}, but current removed.
+     * Class changed, pre matched, but current mismatched, due to one of the following:
+     * 1.  @Meta removed from class
+     * 2.  No matched annotation in @Def.
      *
      * @param basicInfo info
      * @return class consumer
      */
     @Thread(Type.COMPUTATION)
     @Nullable
-    public ClassConsumer onMetaRemoved(ClassInfo basicInfo) {
+    public ClassConsumer onMetaMismatched(ClassInfo basicInfo) {
         return null;
     }
 
     /**
-     * Class changed, pre doesn't have {@link Meta}, but current got.
+     * Class changed, pre doesn't match, but current does.
      *
      * @param basicInfo info
      * @return class consumer
      */
     @Thread(Type.COMPUTATION)
     @Nullable
-    public ClassConsumer onMetaAdded(ClassInfo basicInfo) {
+    public ClassConsumer onMetaMatched(ClassInfo basicInfo) {
         return null;
     }
 
     /**
-     * Class changed, both have {@link Meta}
+     * Class changed, both matched.
      *
      * @param basicInfo info
      * @return class consumer
@@ -81,5 +87,9 @@ public abstract class MetaProcessor {
     @Nullable
     public ClassConsumer onMetaClassNotChanged(ClassInfo basicInfo) {
         return null;
+    }
+
+    @Thread(Type.IO)
+    public void onProcessEnd() {
     }
 }

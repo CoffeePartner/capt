@@ -68,16 +68,6 @@ public class GlobalLancet implements LancetInternal, Context {
     }
 
     @Override
-    public void registerMetaProcessor(MetaProcessor processor, Set<Class<? extends Annotation>> interestedIn) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void registerClassTransformer(ClassTransformer transformer) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public OutputProvider outputs() {
         throw new UnsupportedOperationException();
     }

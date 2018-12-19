@@ -40,8 +40,9 @@ public class ApkClassInfo implements ClassInfo {
         this.status = new AtomicReference<>(Status.NOT_EXISTS);
     }
 
-    void markRemoved() {
+    public void markRemoved() {
         status.set(Status.REMOVED);
+        parent = null;
         interfaces = classChildren = interfaceChildren = implementedClasses = Collections.emptyList();
     }
 
@@ -66,7 +67,7 @@ public class ApkClassInfo implements ClassInfo {
 
     @Override
     public Status status() {
-        return status;
+        return status.get();
     }
 
     @Override
@@ -124,6 +125,7 @@ public class ApkClassInfo implements ClassInfo {
 
     @Override
     public boolean exists() {
-        return status != Status.NOT_EXISTS && status != Status.REMOVED;
+        Status s = status.get();
+        return s != Status.NOT_EXISTS && s != Status.REMOVED;
     }
 }

@@ -24,16 +24,20 @@ public class ApkClassGraph implements ClassGraph {
         this.throwIfDuplicated = throwIfDuplicated;
     }
 
-    public Consumer<List<ClassBean>> asConsumer() {
-        return list -> list.parallelStream()
+    public Map<String, ApkClassInfo> getAll() {
+        return classes;
+    }
+
+    public Consumer<Classes> readClasses() {
+        return classes -> classes.classes.parallelStream()
                 .forEach(c -> add(c, Status.NOT_CHANGED));
     }
 
-    public Supplier<List<ClassBean>> asSupplier() {
-        return () -> classes.values().stream()
+    public Supplier<Classes> writeClasses() {
+        return () -> new Classes(classes.values().stream()
                 .filter(ApkClassInfo::exists)
                 .map(n -> n.clazz)
-                .collect(Collectors.toCollection(() -> new ArrayList<>(classes.size())));
+                .collect(Collectors.toCollection(() -> new ArrayList<>(classes.size()))));
     }
 
     public void add(ClassBean clazz, Status status) {
@@ -55,7 +59,17 @@ public class ApkClassGraph implements ClassGraph {
 
     @Nullable
     @Override
-    public ClassInfo get(String name) {
+    public ApkClassInfo get(String name) {
         return classes.get(name);
+    }
+
+
+
+    public static class Classes {
+        List<ClassBean> classes;
+
+        public Classes(List<ClassBean> classes) {
+            this.classes = classes;
+        }
     }
 }

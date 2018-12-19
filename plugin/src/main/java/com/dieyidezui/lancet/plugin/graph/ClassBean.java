@@ -10,6 +10,8 @@ import java.util.List;
 
 public class ClassBean {
 
+    public String belongsTo;
+
     public int access;
     public String name;
     @Nullable
@@ -21,11 +23,11 @@ public class ClassBean {
     // remove field because useless till now.
     //public List<FieldBean> fields = new ArrayList<>();
 
-    public List<MethodBean> methods = new ArrayList<>();
+    public List<MethodBean> methods = Collections.emptyList();
 
 
     public ClassBean(String name, boolean isInterface) {
-        this(isInterface ? Opcodes.ACC_INTERFACE | Opcodes.ACC_ABSTRACT, name, null, null);
+        this(isInterface ? Opcodes.ACC_INTERFACE | Opcodes.ACC_ABSTRACT : 0, name, null, null);
     }
 
 

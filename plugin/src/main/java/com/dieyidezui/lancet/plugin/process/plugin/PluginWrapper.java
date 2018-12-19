@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
-public abstract class PluginWrapper extends ForwardingLancet {
+public class PluginWrapper extends ForwardingLancet {
 
     private final boolean incremental;
     private final Plugin plugin;

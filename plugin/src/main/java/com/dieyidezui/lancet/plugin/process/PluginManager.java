@@ -57,8 +57,7 @@ public class PluginManager implements Constants {
                         args.asArgumentsFor(id),
                         id,
                         resource,
-                        globalLancet) {
-                };
+                        globalLancet);
                 plugins.add(wrapper);
             } catch (IllegalAccessException | InstantiationException ex) {
                 throw pluginNotFound(id, clazz.getName(), ex);

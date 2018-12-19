@@ -62,20 +62,24 @@ public class VariantScope implements Constants {
         InternalCache internalCache = new InternalCache(singleFactory.newProvider(new File(files.variantRoot(), "self_cache"))
                 , global);
 
-        ApkClassGraph graph = new ApkClassGraph();
+        ApkClassGraph graph = new ApkClassGraph(global.gradleLancetExtension().getThrowIfDuplicated());
 
         GlobalLancet lancet = new GlobalLancet(graph, global, variantResource);
 
         PluginManager manager = new PluginManager(global, variantResource, invocation);
 
         if (invocation.isIncremental()) {
-            internalCache.loadAsync(graph.asConsumer());
+            internalCache.loadAsync(graph.readClasses());
             internalCache.loadAsync(manager.asConsumer());
 
             internalCache.await();
         }
 
         manager.initPlugins(createArgs(), lancet);
+
+
+
+        internalCache.storeAsync();
     }
 
 

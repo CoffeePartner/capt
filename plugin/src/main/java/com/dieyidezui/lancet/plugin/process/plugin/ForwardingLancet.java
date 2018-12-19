@@ -58,16 +58,6 @@ public class ForwardingLancet implements LancetInternal {
     }
 
     @Override
-    public void registerMetaProcessor(MetaProcessor processor, Set<Class<? extends Annotation>> interestedIn) {
-        delegate.registerMetaProcessor(processor, interestedIn);
-    }
-
-    @Override
-    public void registerClassTransformer(ClassTransformer transformer) {
-        delegate.registerClassTransformer(transformer);
-    }
-
-    @Override
     public OutputProvider outputs() {
         return delegate.outputs();
     }
