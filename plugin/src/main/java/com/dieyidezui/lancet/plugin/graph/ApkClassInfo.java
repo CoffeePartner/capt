@@ -3,14 +3,20 @@ package com.dieyidezui.lancet.plugin.graph;
 import com.dieyidezui.lancet.plugin.api.Status;
 import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
 import com.dieyidezui.lancet.plugin.api.graph.MethodInfo;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
+import org.gradle.internal.nativeintegration.filesystem.Stat;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ApkClassInfo implements ClassInfo {
 
-    public Status status;
+    private static final Logger LOGGER = Logging.getLogger(ApkClassInfo.class);
+
+    private AtomicReference<Status> status;
     public ClassBean clazz;
 
     /**
@@ -25,14 +31,38 @@ public class ApkClassInfo implements ClassInfo {
     public List<ApkClassInfo> interfaceChildren = Collections.emptyList();
     public List<ApkClassInfo> implementedClasses = Collections.emptyList();
 
-    public static ApkClassInfo createStub(String name) {
-        return new ApkClassInfo(new ClassBean(name));
+    public static ApkClassInfo createStub(String name, boolean isInterface) {
+        return new ApkClassInfo(new ClassBean(name, isInterface));
     }
 
     private ApkClassInfo(ClassBean clazz) {
         this.clazz = clazz;
-        this.status = Status.NOT_EXISTS;
+        this.status = new AtomicReference<>(Status.NOT_EXISTS);
     }
+
+    void markRemoved() {
+        status.set(Status.REMOVED);
+        interfaces = classChildren = interfaceChildren = implementedClasses = Collections.emptyList();
+    }
+
+    void updateStatus(Status newStatus, boolean throwIfDuplicated) {
+        Status old = this.status.getAndSet(newStatus);
+        if (old != Status.NOT_EXISTS) {
+            // remove && add ==  changed
+            if (old == Status.ADDED && newStatus == Status.REMOVED
+                    || old == Status.REMOVED && newStatus == Status.ADDED) {
+                Status pre = this.status.getAndSet(Status.CHANGED);
+                if (pre == newStatus) {
+                    return;
+                }
+            }
+            if (throwIfDuplicated) {
+                throw new IllegalStateException("Duplicated class: " + clazz.name);
+            }
+            LOGGER.error("Duplicated class: " + clazz.name);
+        }
+    }
+
 
     @Override
     public Status status() {

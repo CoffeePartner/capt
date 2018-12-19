@@ -35,11 +35,11 @@ public class InternalCache {
     }
 
     public <T> void loadAsync(Consumer<T> consumer) {
-        futures.add(global.executor().submit(new SingleReadTask<>(consumer)));
+        futures.add(global.io().submit(new SingleReadTask<>(consumer)));
     }
 
     public <T> void storeAsync(Supplier<T> supplier) {
-        futures.add(global.executor().submit(new SingleWriteTask<>(supplier)));
+        futures.add(global.io().submit(new SingleWriteTask<>(supplier)));
     }
 
     public void await() throws IOException, InterruptedException, TransformException {

@@ -2,6 +2,8 @@ package com.dieyidezui.lancet.plugin.api.transform;
 
 import com.dieyidezui.lancet.plugin.api.asm.LancetClassVisitor;
 import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
+import com.dieyidezui.lancet.plugin.api.hint.Thread;
+import com.dieyidezui.lancet.plugin.api.hint.Type;
 
 import javax.annotation.Nullable;
 
@@ -11,6 +13,7 @@ public interface ClassTransformer {
      *
      * @return class request
      */
+    @Thread(Type.IO)
     ClassRequest beforeTransform();
 
     /**
@@ -18,11 +21,13 @@ public interface ClassTransformer {
      * @param required  true if the class your ClassRequest
      * @return the class visitor to participate in class transform.
      */
+    @Thread(Type.COMPUTATION)
     @Nullable
     LancetClassVisitor onTransform(ClassInfo classInfo, boolean required);
 
     /**
      * Invoked after all class transform done.
      */
+    @Thread(Type.IO)
     void afterTransform();
 }

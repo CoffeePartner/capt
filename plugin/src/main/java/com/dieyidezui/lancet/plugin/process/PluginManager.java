@@ -2,8 +2,6 @@ package com.dieyidezui.lancet.plugin.process;
 
 import com.android.build.api.transform.TransformInvocation;
 import com.dieyidezui.lancet.plugin.api.*;
-import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
-import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 import com.dieyidezui.lancet.plugin.process.plugin.GlobalLancet;
 import com.dieyidezui.lancet.plugin.process.plugin.PluginWrapper;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
@@ -15,7 +13,6 @@ import okio.Okio;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.util.*;
 import java.util.function.Consumer;

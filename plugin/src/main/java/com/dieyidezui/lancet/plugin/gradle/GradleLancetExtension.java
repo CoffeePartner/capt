@@ -11,6 +11,8 @@ public class GradleLancetExtension {
 
     private NamedDomainObjectContainer<LancetPluginExtension> plugins;
 
+    private boolean throwIfDuplicated = true;
+
     @Inject
     public GradleLancetExtension(NamedDomainObjectContainer<LancetPluginExtension> plugins) {
         this.plugins = plugins;
@@ -22,5 +24,17 @@ public class GradleLancetExtension {
 
     public NamedDomainObjectContainer<LancetPluginExtension> getPlugins() {
         return plugins;
+    }
+
+    public void setThrowIfDuplicated(boolean throwIfDuplicated) {
+        this.throwIfDuplicated = throwIfDuplicated;
+    }
+
+    public void throwIfDuplicated(boolean throwIfDuplicated) {
+        setThrowIfDuplicated(throwIfDuplicated);
+    }
+
+    public boolean getThrowIfDuplicated() {
+        return throwIfDuplicated;
     }
 }

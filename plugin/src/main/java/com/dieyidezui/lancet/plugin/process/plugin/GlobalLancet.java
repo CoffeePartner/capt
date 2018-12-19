@@ -17,6 +17,8 @@ import org.gradle.api.Project;
 import java.lang.annotation.Annotation;
 import java.net.URLClassLoader;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
 
 public class GlobalLancet implements LancetInternal, Context {
 
@@ -88,5 +90,15 @@ public class GlobalLancet implements LancetInternal, Context {
     @Override
     public Logger getLogger(Class<?> clazz) {
         return LoggerFactory.getLogger(clazz);
+    }
+
+    @Override
+    public ForkJoinPool computation() {
+        return global.computation();
+    }
+
+    @Override
+    public ExecutorService io() {
+        return global.io();
     }
 }

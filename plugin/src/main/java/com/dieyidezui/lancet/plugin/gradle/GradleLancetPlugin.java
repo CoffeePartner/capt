@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class GradleLancetPlugin implements Plugin<Project>, Constants {
 
@@ -56,8 +58,9 @@ public class GradleLancetPlugin implements Plugin<Project>, Constants {
     }
 
     private static GlobalResource createGlobalResource(Project project, BaseExtension baseExtension) {
-        int core = Runtime.getRuntime().availableProcessors();
-        ExecutorService executor = Executors.newFixedThreadPool(core, new LancetThreadFactory());
+        ExecutorService io = Executors.newCachedThreadPool(new LancetThreadFactory());
+
+        ForkJoinPool computation = ForkJoinPool.commonPool();
 
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
@@ -69,6 +72,6 @@ public class GradleLancetPlugin implements Plugin<Project>, Constants {
 
         File root = new File(project.getBuildDir(), NAME);
 
-        return new GlobalResource(project, root, executor, gson, (GradleLancetExtension) project.getExtensions().getByName(NAME), baseExtension);
+        return new GlobalResource(project, root, computation, io, gson, (GradleLancetExtension) project.getExtensions().getByName(NAME), baseExtension);
     }
 }

@@ -1,8 +1,9 @@
 package com.dieyidezui.lancet.plugin.api;
 
 import com.dieyidezui.lancet.plugin.api.annotations.Meta;
+import com.dieyidezui.lancet.plugin.api.hint.Thread;
+import com.dieyidezui.lancet.plugin.api.hint.Type;
 import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
-import com.dieyidezui.lancet.plugin.api.transform.ClassRequest;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 
 /**
@@ -20,6 +21,7 @@ public interface Plugin<T> {
      *
      * @param lancet Plugin context
      */
+    @Thread(Type.SINGLE)
     void beforeCreate(T lancet);
 
     /**
@@ -27,6 +29,7 @@ public interface Plugin<T> {
      *
      * @param lancet Plugin context
      */
+    @Thread(Type.IO)
     void onCreate(T lancet);
 
     /**
@@ -34,5 +37,6 @@ public interface Plugin<T> {
      *
      * @param lancet Plugin context
      */
+    @Thread(Type.IO)
     void onDestroy(T lancet);
 }

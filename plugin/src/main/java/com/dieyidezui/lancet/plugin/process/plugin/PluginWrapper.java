@@ -4,8 +4,12 @@ import com.dieyidezui.lancet.plugin.api.Arguments;
 import com.dieyidezui.lancet.plugin.api.LancetInternal;
 import com.dieyidezui.lancet.plugin.api.OutputProvider;
 import com.dieyidezui.lancet.plugin.api.Plugin;
+import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 import com.dieyidezui.lancet.plugin.process.PluginBean;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings("unchecked")
 public abstract class PluginWrapper extends ForwardingLancet {
@@ -15,6 +19,8 @@ public abstract class PluginWrapper extends ForwardingLancet {
     private final Arguments args;
     private final String id;
     private final VariantResource resource;
+
+    private List<ClassTransformer> classTransformerList = new ArrayList<>();
 
     public PluginWrapper(boolean incremental, Plugin plugin,
                          Arguments args,

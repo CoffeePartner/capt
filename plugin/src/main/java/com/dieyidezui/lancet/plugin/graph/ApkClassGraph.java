@@ -4,6 +4,7 @@ import com.dieyidezui.lancet.plugin.api.Status;
 import com.dieyidezui.lancet.plugin.api.graph.ClassGraph;
 import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
 import com.dieyidezui.lancet.plugin.util.Constants;
+import org.objectweb.asm.Opcodes;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -17,9 +18,10 @@ import java.util.stream.Collectors;
 public class ApkClassGraph implements ClassGraph {
 
     private final Map<String, ApkClassInfo> classes = new ConcurrentHashMap<>(Constants.OPT_SIZE);
+    private final boolean throwIfDuplicated;
 
-    public ApkClassGraph() {
-
+    public ApkClassGraph(boolean throwIfDuplicated) {
+        this.throwIfDuplicated = throwIfDuplicated;
     }
 
     public Consumer<List<ClassBean>> asConsumer() {
@@ -35,22 +37,21 @@ public class ApkClassGraph implements ClassGraph {
     }
 
     public void add(ClassBean clazz, Status status) {
-        ApkClassInfo node = getOrCreate(clazz.name);
-        node.status = status;
+        ApkClassInfo node = getOrCreate(clazz.name, (clazz.access & Opcodes.ACC_INTERFACE) != 0);
         node.clazz = clazz;
+        node.updateStatus(status, throwIfDuplicated);
         if (clazz.superName != null) {
-            node.parent = getOrCreate(clazz.superName);
+            node.parent = getOrCreate(clazz.superName, false);
 
         }
         if (!clazz.interfaces.isEmpty()) {
-            node.interfaces = clazz.interfaces.stream().map(this::getOrCreate).collect(Collectors.toList());
+            node.interfaces = clazz.interfaces.stream().map(n -> getOrCreate(n, true)).collect(Collectors.toList());
         }
     }
 
-    private ApkClassInfo getOrCreate(String name) {
-        return classes.computeIfAbsent(name, ApkClassInfo::createStub);
+    private ApkClassInfo getOrCreate(String name, boolean isInterface) {
+        return classes.computeIfAbsent(name, n -> ApkClassInfo.createStub(name, isInterface));
     }
-
 
     @Nullable
     @Override

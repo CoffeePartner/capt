@@ -1,6 +1,8 @@
 package com.dieyidezui.lancet.plugin.graph;
 
 
+import org.objectweb.asm.Opcodes;
+
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,8 +24,8 @@ public class ClassBean {
     public List<MethodBean> methods = new ArrayList<>();
 
 
-    public ClassBean(String name) {
-        this(0, name, null, null);
+    public ClassBean(String name, boolean isInterface) {
+        this(isInterface ? Opcodes.ACC_INTERFACE | Opcodes.ACC_ABSTRACT, name, null, null);
     }
 
 

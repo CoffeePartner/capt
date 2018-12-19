@@ -3,6 +3,8 @@ package com.dieyidezui.lancet.plugin.api.process;
 import com.dieyidezui.lancet.plugin.api.annotations.Meta;
 import com.dieyidezui.lancet.plugin.api.asm.LancetClassVisitor;
 import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
+import com.dieyidezui.lancet.plugin.api.hint.Thread;
+import com.dieyidezui.lancet.plugin.api.hint.Type;
 import org.objectweb.asm.MethodVisitor;
 
 import javax.annotation.Nullable;
@@ -17,6 +19,7 @@ public abstract class MetaProcessor {
      * @param basicInfo info
      * @return class consumer
      */
+    @Thread(Type.COMPUTATION)
     @Nullable
     public ClassConsumer onMetaRemoved(ClassInfo basicInfo) {
         return null;
@@ -28,6 +31,7 @@ public abstract class MetaProcessor {
      * @param basicInfo info
      * @return class consumer
      */
+    @Thread(Type.COMPUTATION)
     @Nullable
     public ClassConsumer onMetaAdded(ClassInfo basicInfo) {
         return null;
@@ -39,6 +43,7 @@ public abstract class MetaProcessor {
      * @param basicInfo info
      * @return class consumer
      */
+    @Thread(Type.COMPUTATION)
     @Nullable
     public ClassConsumer onMetaChanged(ClassInfo basicInfo) {
         return null;
@@ -49,6 +54,7 @@ public abstract class MetaProcessor {
      *
      * @param basicInfo last info
      */
+    @Thread(Type.COMPUTATION)
     public void onMetaClassRemoved(ClassInfo basicInfo) {
     }
 
@@ -58,6 +64,7 @@ public abstract class MetaProcessor {
      * @param basicInfo
      * @return class consumer
      */
+    @Thread(Type.COMPUTATION)
     @Nullable
     public ClassConsumer onMetaClassAdded(ClassInfo basicInfo) {
         return null;
@@ -70,6 +77,7 @@ public abstract class MetaProcessor {
      * @param basicInfo info
      * @return class consumer
      */
+    @Thread(Type.COMPUTATION)
     @Nullable
     public ClassConsumer onMetaClassNotChanged(ClassInfo basicInfo) {
         return null;
