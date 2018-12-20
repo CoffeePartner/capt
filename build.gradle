@@ -61,11 +61,6 @@ subprojects { pro ->
                                 name '耿万鹏'
                                 email 'dieyidezui@gmail.com'
                             }
-                            developer {
-                                id 'jude95'
-                                name '朱晨曦'
-                                email '973829691@qq.com'
-                            }
 
                             developer {
                                 id 'bxbxbai'
