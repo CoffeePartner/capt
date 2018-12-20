@@ -16,5 +16,5 @@ public @interface Def {
     /**
      * @return supported Annotation types
      */
-    String[] supportedAnnotationTypes();
+    String[] supportedAnnotationTypes() default {};
 }

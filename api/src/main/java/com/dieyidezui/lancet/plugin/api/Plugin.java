@@ -7,10 +7,7 @@ import com.dieyidezui.lancet.plugin.api.hint.Type;
 import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Lifecycle:
@@ -23,11 +20,15 @@ import java.util.Set;
 public abstract class Plugin<T> {
 
     public final Set<String> getSupportedAnnotations() {
-        return arrayToSet(getClass().getAnnotation(Def.class).supportedAnnotationTypes());
+        return arrayToSet(getDef().supportedAnnotationTypes());
+    }
+
+    private Def getDef() {
+        return Objects.requireNonNull(getClass().getAnnotation(Def.class), "Require @Def on " + getClass().getName());
     }
 
     public final int defaultPriority() {
-        return getClass().getAnnotation(Def.class).defaultPriority();
+        return getDef().defaultPriority();
     }
 
     /**

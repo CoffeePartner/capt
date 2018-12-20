@@ -3,6 +3,7 @@ package com.dieyidezui.lancet.plugin.resource;
 import com.android.build.api.transform.QualifiedContent;
 import com.android.build.api.transform.TransformInvocation;
 import com.dieyidezui.lancet.plugin.api.OutputProvider;
+import com.dieyidezui.lancet.plugin.api.Plugin;
 import com.dieyidezui.lancet.plugin.cache.OutputProviderFactory;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import org.gradle.api.artifacts.Configuration;
@@ -70,7 +71,7 @@ public class VariantResource implements Constants {
                                 } catch (MalformedURLException e) {
                                     throw new AssertionError(e);
                                 }
-                            }).toArray(URL[]::new), Thread.currentThread().getContextClassLoader());
+                            }).toArray(URL[]::new), Plugin.class.getClassLoader());
 
             URL[] runtimeUrls = invocation.getInputs().stream()
                     .flatMap(s -> Stream.concat(s.getDirectoryInputs().stream(), s.getJarInputs().stream()))
