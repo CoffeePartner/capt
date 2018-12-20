@@ -94,3 +94,14 @@ subprojects { pro ->
     }
 }
 
+evaluationDependsOnChildren()
+
+task jarToTest(type: Copy) {
+    Jar p = project(":plugin").tasks.jar
+    Jar a = project(":api").tasks.jar
+
+    from p.destinationDir, a.destinationDir
+    into '/Users/luoye/projects/AndroidStudioProjects/test'
+    dependsOn p, a
+}
+

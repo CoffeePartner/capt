@@ -51,6 +51,8 @@ public class LancetTransform extends Transform implements Constants {
 
     @Override
     public void transform(TransformInvocation invocation) throws TransformException, InterruptedException, IOException {
+        long startMs = System.currentTimeMillis();
+        LOGGER.lifecycle("Start lancet transform for '{}', incremental: {}", invocation.getContext().getVariantName(), invocation.isIncremental());
         variantManager.getVariantScope(invocation.getContext().getVariantName())
                 .doTransform(invocation);
 
@@ -76,6 +78,7 @@ public class LancetTransform extends Transform implements Constants {
 
 
         // weave
+        LOGGER.lifecycle("End lancet transform, cost: {}ms", (System.currentTimeMillis() - startMs));
     }
 
 }

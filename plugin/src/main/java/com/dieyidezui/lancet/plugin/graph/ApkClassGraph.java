@@ -3,6 +3,8 @@ package com.dieyidezui.lancet.plugin.graph;
 import com.dieyidezui.lancet.plugin.api.graph.Status;
 import com.dieyidezui.lancet.plugin.api.graph.ClassGraph;
 import com.dieyidezui.lancet.plugin.util.Constants;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import org.objectweb.asm.Opcodes;
 
 import javax.annotation.Nullable;
@@ -16,11 +18,14 @@ import java.util.stream.Collectors;
 
 public class ApkClassGraph implements ClassGraph {
 
+    private static final Logger LOGGER = Logging.getLogger(ApkClassGraph.class);
+
     private final Map<String, ApkClassInfo> classes = new ConcurrentHashMap<>(Constants.OPT_SIZE);
     private final boolean throwIfDuplicated;
 
     public ApkClassGraph(boolean throwIfDuplicated) {
         this.throwIfDuplicated = throwIfDuplicated;
+        add(new ClassBean("test", true), Status.ADDED);
     }
 
     public Map<String, ApkClassInfo> getAll() {
@@ -28,15 +33,28 @@ public class ApkClassGraph implements ClassGraph {
     }
 
     public Consumer<Classes> readClasses() {
-        return classes -> classes.classes.parallelStream()
-                .forEach(c -> add(c, Status.NOT_CHANGED));
+        // Don't use lambda here, or you will lose generic info
+        //noinspection Convert2Lambda
+        return new Consumer<Classes>() {
+            @Override
+            public void accept(Classes classes) {
+                classes.classes.parallelStream()
+                        .forEach(c -> ApkClassGraph.this.add(c, Status.NOT_CHANGED));
+            }
+        };
     }
 
     public Supplier<Classes> writeClasses() {
-        return () -> new Classes(classes.values().stream()
-                .filter(ApkClassInfo::exists)
-                .map(n -> n.clazz)
-                .collect(Collectors.toCollection(() -> new ArrayList<>(classes.size()))));
+        //noinspection Convert2Lambda
+        return new Supplier<Classes>() {
+            @Override
+            public Classes get() {
+                return new Classes(classes.values().stream()
+                        .filter(ApkClassInfo::exists)
+                        .map(n -> n.clazz)
+                        .collect(Collectors.toCollection(() -> new ArrayList<>(classes.size() / 2))));
+            }
+        };
     }
 
     public void add(ClassBean clazz, Status status) {
@@ -61,7 +79,6 @@ public class ApkClassGraph implements ClassGraph {
     public ApkClassInfo get(String name) {
         return classes.get(name);
     }
-
 
 
     public static class Classes {

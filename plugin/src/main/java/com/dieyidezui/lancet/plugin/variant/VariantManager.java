@@ -127,10 +127,10 @@ public class VariantManager implements Constants {
             ConfigurationContainer configurations = project.getConfigurations();
 
             // the actual configuration
-            Configuration lancet = getByVariant(v.getName());
+            Configuration configuration = getByVariant(v.getName());
 
             // attributes match
-            AttributeContainer attributes = lancet.getAttributes();
+            AttributeContainer attributes = configuration.getAttributes();
             attributes
                     .attribute(ARTIFACT_TYPE, ArtifactTypeDefinition.JAR_TYPE)
                     .attribute(BuildTypeAttr.ATTRIBUTE, project.getObjects().named(BuildTypeAttr.class, v.getBuildType().getName()))
@@ -138,18 +138,18 @@ public class VariantManager implements Constants {
             v.getProductFlavors().forEach(p -> attributes.attribute(Attribute.of(p.getDimension(), ProductFlavorAttr.class),
                     project.getObjects().named(ProductFlavorAttr.class, p.getName())));
 
-            lancet.setDescription("Resolved configuration for lancet for variant: " + v.getName());
-            lancet.setVisible(false);
-            lancet.setCanBeConsumed(false);
-            lancet.getResolutionStrategy().sortArtifacts(ResolutionStrategy.SortOrder.CONSUMER_FIRST);
+            configuration.setDescription("Resolved configuration for lancet for variant: " + v.getName());
+            configuration.setVisible(false);
+            configuration.setCanBeConsumed(false);
+            configuration.getResolutionStrategy().sortArtifacts(ResolutionStrategy.SortOrder.CONSUMER_FIRST);
 
             v.getSourceSets().stream()
                     .map(SourceProvider::getName)
                     .map(VariantManager::sourceSetToConfigurationName)
                     .map(configurations::getByName)
-                    .forEach(lancet::extendsFrom);
+                    .forEach(configuration::extendsFrom);
 
-            return new VariantScope(v.getName(), lancet, global);
+            return new VariantScope(v.getName(), configuration, global);
         }
 
         @Override

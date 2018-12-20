@@ -27,7 +27,7 @@ public abstract class MetaProcessor {
      */
     @Thread(Type.COMPUTATION)
     @Nullable
-    public ClassConsumer onMetaMismatched(ClassInfo basicInfo) {
+    public ClassConsumer onMetaMismatch(ClassInfo basicInfo) {
         return null;
     }
 

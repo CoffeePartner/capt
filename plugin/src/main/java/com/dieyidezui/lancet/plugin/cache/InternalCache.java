@@ -5,6 +5,7 @@ import com.dieyidezui.lancet.plugin.api.util.RelativeDirectoryProvider;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import com.google.common.io.Closeables;
+import okio.Buffer;
 import okio.BufferedSink;
 import okio.BufferedSource;
 import org.slf4j.Logger;
@@ -12,7 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -101,7 +104,9 @@ public class InternalCache {
             BufferedSink bs = null;
             try {
                 bs = provider.asSink(fileName);
-                global.gson().toJson(supplier.get(), new OutputStreamWriter(bs.outputStream(), Constants.UTF8));
+                OutputStreamWriter os = new OutputStreamWriter(bs.outputStream(), Constants.UTF8);
+                global.gson().toJson(supplier.get(), os);
+                os.flush();
             } catch (IOException | RuntimeException e) {
                 LOGGER.error("Write failed for {}" + fileName);
                 throw e;

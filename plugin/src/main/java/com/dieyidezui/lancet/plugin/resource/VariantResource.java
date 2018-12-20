@@ -83,10 +83,7 @@ public class VariantResource implements Constants {
                         }
                     })
                     .toArray(URL[]::new);
-
             this.runnerLoader = URLClassLoader.newInstance(runtimeUrls, lancetDependencies);
-
-            LOGGER.error(Arrays.toString(lancetDependencies.getURLs()));
         }
 
         public Class<?> loadClass(String className) throws ClassNotFoundException {

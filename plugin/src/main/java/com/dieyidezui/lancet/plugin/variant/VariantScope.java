@@ -17,6 +17,8 @@ import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -24,6 +26,7 @@ import java.io.IOException;
 
 
 public class VariantScope implements Constants {
+    private static Logger LOGGER = Logging.getLogger(VariantScope.class);
 
     private final String variant;
     private Configuration lancetConfiguration;
@@ -70,13 +73,17 @@ public class VariantScope implements Constants {
 
         if (invocation.isIncremental()) {
             internalCache.loadAsync(graph.readClasses());
-            internalCache.loadAsync(manager.asConsumer());
+            //internalCache.loadAsync(manager.asConsumer());
 
             internalCache.await();
         }
 
         int scope = variant.endsWith(ANDROID_TEST) ? LancetPluginExtension.ANDROID_TEST : LancetPluginExtension.ASSEMBLE;
         manager.initPlugins(global.gradleLancetExtension(), scope, lancet);
+
+
+        internalCache.storeAsync(graph.writeClasses());
+        internalCache.await();
     }
 
     public interface Factory {
