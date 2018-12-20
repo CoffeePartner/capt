@@ -15,7 +15,6 @@ buildscript {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }
 }
-
 subprojects { pro ->
 
     repositories {
@@ -80,8 +79,8 @@ subprojects { pro ->
         }
     }
     bintray {
-        //user = BINTRAY_USER
-        //key = BINTRAY_KEY
+        user = BINTRAY_USER
+        key = BINTRAY_KEY
         configurations = ['archives']
         pkg {
             repo = "maven"
@@ -101,7 +100,7 @@ task jarToTest(type: Copy) {
     Jar a = project(":api").tasks.jar
 
     from p.destinationDir, a.destinationDir
-    into '/Users/luoye/projects/AndroidStudioProjects/test'
+    into TEST_DIR
     dependsOn p, a
 }
 
