@@ -33,7 +33,7 @@ public class FileManager {
                 case TEMP:
                     return tempRootFor(id);
                 case CACHE:
-                    cacheRootFor(id);
+                    return cacheRootFor(id);
             }
             throw new AssertionError();
         };
@@ -44,7 +44,7 @@ public class FileManager {
     }
 
     private File classRootFor(String id) {
-        return invocation.getOutputProvider().getContentLocation("lancet:" + id,
+        return invocation.getOutputProvider().getContentLocation("lancet-generated-by:" + id,
                 Collections.singleton(QualifiedContent.DefaultContentType.CLASSES),
                 Collections.singleton(QualifiedContent.Scope.EXTERNAL_LIBRARIES),
                 Format.DIRECTORY);
@@ -56,7 +56,7 @@ public class FileManager {
 
 
     private File cacheRootFor(String id) {
-        return new File(variantRoot, "plugin_cache" + File.separator + id);
+        return new File(variantRoot, "plugins" + File.separator + id);
     }
 
     private void clearForFullMode() throws IOException {

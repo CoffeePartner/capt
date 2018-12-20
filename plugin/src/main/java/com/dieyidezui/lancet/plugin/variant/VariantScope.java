@@ -62,7 +62,7 @@ public class VariantScope implements Constants {
                 files, factory);
         variantResource.prepare(invocation, getLancetConfiguration());
 
-        InternalCache internalCache = new InternalCache(singleFactory.newProvider(new File(files.variantRoot(), "self_cache"))
+        InternalCache internalCache = new InternalCache(singleFactory.newProvider(new File(files.variantRoot(), "core"))
                 , global);
 
         ApkClassGraph graph = new ApkClassGraph(global.gradleLancetExtension().getThrowIfDuplicated());
