@@ -16,6 +16,7 @@ import okio.Okio;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -35,12 +36,24 @@ public class PluginManager implements Constants {
         this.invocation = invocation;
     }
 
+    @SuppressWarnings("Convert2Lambda")
     public Consumer<List<PluginBean>> asConsumer() {
-        return l -> prePlugins = l.stream().collect(Collectors.toMap(PluginBean::getId, Function.identity()));
+        return new Consumer<List<PluginBean>>() {
+            @Override
+            public void accept(List<PluginBean> l) {
+                prePlugins = l.stream().collect(Collectors.toMap(PluginBean::getId, Function.identity()));
+            }
+        };
     }
 
+    @SuppressWarnings("Convert2Lambda")
     public Supplier<List<PluginBean>> asSupplier() {
-        return () -> wrappers.stream().map(PluginWrapper::toBean).collect(Collectors.toList());
+        return new Supplier<List<PluginBean>>() {
+            @Override
+            public List<PluginBean> get() {
+                return wrappers.stream().map(PluginWrapper::toBean).collect(Collectors.toList());
+            }
+        };
     }
 
     public void initPlugins(GradleLancetExtension extension, int scope, GlobalLancet globalLancet) throws IOException {
@@ -79,17 +92,15 @@ public class PluginManager implements Constants {
     }
 
     private Class<? extends Plugin> findPluginInProperties(String id) throws IOException {
-        Enumeration<URL> urls = resource.loadPluginOnLancet(id);
-        if (urls.hasMoreElements()) {
-            BufferedSource bs = Okio.buffer(Okio.source(urls.nextElement().openStream()));
+        URL url = resource.loadPluginOnLancet(id);
+        if (url != null) {
+            URLConnection connection = url.openConnection();
+            connection.setUseCaches(false);
+            BufferedSource bs = Okio.buffer(Okio.source(connection.getInputStream()));
             Properties properties = new Properties();
             properties.load(bs.inputStream());
 
             String className = properties.getProperty(PLUGIN_KEY);
-
-            if (urls.hasMoreElements()) {
-                throw new IllegalStateException("More than one plugin with id '" + id + "'");
-            }
 
             Closeables.close(bs, true);
             return loadPluginClass(id, className);

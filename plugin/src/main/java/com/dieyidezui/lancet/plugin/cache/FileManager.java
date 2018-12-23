@@ -1,4 +1,4 @@
-package com.dieyidezui.lancet.plugin.resource;
+package com.dieyidezui.lancet.plugin.cache;
 
 import com.android.build.api.transform.Format;
 import com.android.build.api.transform.QualifiedContent;

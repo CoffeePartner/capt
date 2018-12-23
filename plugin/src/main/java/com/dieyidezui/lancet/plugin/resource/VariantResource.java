@@ -4,6 +4,7 @@ import com.android.build.api.transform.QualifiedContent;
 import com.android.build.api.transform.TransformInvocation;
 import com.dieyidezui.lancet.plugin.api.OutputProvider;
 import com.dieyidezui.lancet.plugin.api.Plugin;
+import com.dieyidezui.lancet.plugin.cache.FileManager;
 import com.dieyidezui.lancet.plugin.cache.OutputProviderFactory;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import org.gradle.api.artifacts.Configuration;
@@ -14,7 +15,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.stream.Stream;
 
@@ -46,7 +46,7 @@ public class VariantResource implements Constants {
         return loader.loadClass(className);
     }
 
-    public Enumeration<URL> loadPluginOnLancet(String pluginName) throws IOException {
+    public URL loadPluginOnLancet(String pluginName) {
         return loader.loadPluginOnLancet(pluginName);
     }
 
@@ -91,9 +91,9 @@ public class VariantResource implements Constants {
             return runnerLoader.loadClass(className);
         }
 
-        public Enumeration<URL> loadPluginOnLancet(String pluginName) throws IOException {
+        public URL loadPluginOnLancet(String pluginName) {
             // getParent() means apk resources are useless
-            return runnerLoader.getParent().getResources(PLUGIN_PATH + pluginName + ".properties");
+            return runnerLoader.getParent().getResource(PLUGIN_PATH + pluginName + ".properties");
         }
     }
 

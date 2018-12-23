@@ -25,16 +25,15 @@ public class ApkClassGraph implements ClassGraph {
 
     public ApkClassGraph(boolean throwIfDuplicated) {
         this.throwIfDuplicated = throwIfDuplicated;
-        add(new ClassBean("test", true), Status.ADDED);
     }
 
     public Map<String, ApkClassInfo> getAll() {
         return classes;
     }
 
+    @SuppressWarnings("Convert2Lambda")
     public Consumer<Classes> readClasses() {
         // Don't use lambda here, or you will lose generic info
-        //noinspection Convert2Lambda
         return new Consumer<Classes>() {
             @Override
             public void accept(Classes classes) {
@@ -44,12 +43,12 @@ public class ApkClassGraph implements ClassGraph {
         };
     }
 
+    @SuppressWarnings("Convert2Lambda")
     public Supplier<Classes> writeClasses() {
-        //noinspection Convert2Lambda
         return new Supplier<Classes>() {
             @Override
             public Classes get() {
-                return new Classes(classes.values().stream()
+                return new Classes(classes.values().parallelStream()
                         .filter(ApkClassInfo::exists)
                         .map(n -> n.clazz)
                         .collect(Collectors.toCollection(() -> new ArrayList<>(classes.size() / 2))));
@@ -82,7 +81,7 @@ public class ApkClassGraph implements ClassGraph {
 
 
     public static class Classes {
-        List<ClassBean> classes;
+        public List<ClassBean> classes;
 
         public Classes(List<ClassBean> classes) {
             this.classes = classes;

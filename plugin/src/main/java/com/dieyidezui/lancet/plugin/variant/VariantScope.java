@@ -9,10 +9,9 @@ import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactory;
 import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactoryImpl;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
-import com.dieyidezui.lancet.plugin.process.CommonArgs;
 import com.dieyidezui.lancet.plugin.process.PluginManager;
 import com.dieyidezui.lancet.plugin.process.plugin.GlobalLancet;
-import com.dieyidezui.lancet.plugin.resource.FileManager;
+import com.dieyidezui.lancet.plugin.cache.FileManager;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
 import com.dieyidezui.lancet.plugin.util.Constants;
@@ -73,7 +72,7 @@ public class VariantScope implements Constants {
 
         if (invocation.isIncremental()) {
             internalCache.loadAsync(graph.readClasses());
-            //internalCache.loadAsync(manager.asConsumer());
+            internalCache.loadAsync(manager.asConsumer());
 
             internalCache.await();
         }
