@@ -4,12 +4,17 @@ import com.dieyidezui.lancet.plugin.api.Arguments;
 import com.dieyidezui.lancet.plugin.api.LancetInternal;
 import com.dieyidezui.lancet.plugin.api.OutputProvider;
 import com.dieyidezui.lancet.plugin.api.Plugin;
+import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 import com.dieyidezui.lancet.plugin.process.PluginBean;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
+import com.dieyidezui.lancet.plugin.util.Functions;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
 
 @SuppressWarnings("unchecked")
 public class PluginWrapper extends ForwardingLancet {
@@ -19,8 +24,8 @@ public class PluginWrapper extends ForwardingLancet {
     private final Arguments args;
     private final String id;
     private final VariantResource resource;
-
-    private List<ClassTransformer> classTransformerList = new ArrayList<>();
+    private Supplier<MetaProcessor> processor;
+    private Supplier<ClassTransformer> transformer;
 
     public PluginWrapper(boolean incremental, Plugin plugin,
                          Arguments args,
@@ -31,6 +36,9 @@ public class PluginWrapper extends ForwardingLancet {
         this.args = args;
         this.id = id;
         this.resource = resource;
+
+        this.processor = Functions.cache(plugin::onProcessAnnotations);
+        this.transformer = Functions.cache(plugin::onTransformClass);
     }
 
     public String id() {
@@ -49,6 +57,19 @@ public class PluginWrapper extends ForwardingLancet {
         plugin.onDestroy(this);
     }
 
+    public Set<String> getSupportedAnnotations() {
+        return plugin.getSupportedAnnotations();
+    }
+
+    public MetaProcessor getProcessor() {
+        return
+    }
+
+    @Nullable
+    public ClassTransformer getClassTransformer() {
+        return plugin.onTransformClass();
+    }
+
     @Override
     public boolean isIncremental() {
         return incremental;
@@ -65,6 +86,6 @@ public class PluginWrapper extends ForwardingLancet {
     }
 
     public PluginBean toBean() {
-        return new PluginBean(id);
+        return new PluginBean(id,);
     }
 }

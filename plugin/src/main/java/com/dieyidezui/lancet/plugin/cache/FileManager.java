@@ -18,9 +18,9 @@ public class FileManager {
         this.variantRoot = variantRoot;
     }
 
-    public void attachContext(TransformInvocation invocation) throws IOException {
+    public void attachContext(boolean isIncremental, TransformInvocation invocation) throws IOException {
         this.invocation = invocation;
-        if (!invocation.isIncremental()) {
+        if (!isIncremental) {
             clearForFullMode();
         }
     }

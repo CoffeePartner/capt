@@ -26,6 +26,7 @@ public class VariantResource implements Constants {
     private final String variant;
     private final FileManager files;
     private final OutputProviderFactory factory;
+    private boolean incremental;
 
     public VariantResource(String variant, FileManager files, OutputProviderFactory factory) {
         this.variant = variant;
@@ -37,9 +38,10 @@ public class VariantResource implements Constants {
         return variant;
     }
 
-    public void prepare(TransformInvocation invocation, Configuration target) throws IOException {
+    public void init(boolean incremental, TransformInvocation invocation, Configuration target) throws IOException {
+        this.incremental = incremental;
         this.loader.initClassLoader(invocation, target);
-        this.files.attachContext(invocation);
+        this.files.attachContext(incremental, invocation);
     }
 
     public Class<?> loadClass(String className) throws ClassNotFoundException {
@@ -48,6 +50,10 @@ public class VariantResource implements Constants {
 
     public URL loadPluginOnLancet(String pluginName) {
         return loader.loadPluginOnLancet(pluginName);
+    }
+
+    public boolean isIncremental() {
+        return incremental;
     }
 
     public OutputProvider provider(String id) {

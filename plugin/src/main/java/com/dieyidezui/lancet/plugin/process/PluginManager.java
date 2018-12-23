@@ -1,7 +1,9 @@
 package com.dieyidezui.lancet.plugin.process;
 
+import com.android.build.api.transform.TransformException;
 import com.android.build.api.transform.TransformInvocation;
 import com.dieyidezui.lancet.plugin.api.*;
+import com.dieyidezui.lancet.plugin.process.dispatch.ClassDispatcher;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.gradle.GradleLancetExtension;
 import com.dieyidezui.lancet.plugin.process.plugin.GlobalLancet;
@@ -9,9 +11,12 @@ import com.dieyidezui.lancet.plugin.process.plugin.PluginWrapper;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
 import com.dieyidezui.lancet.plugin.util.Constants;
+import com.dieyidezui.lancet.plugin.util.WaitableTasks;
 import com.google.common.io.Closeables;
 import okio.BufferedSource;
 import okio.Okio;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -25,38 +30,43 @@ import java.util.stream.Collectors;
 
 public class PluginManager implements Constants {
 
+    private static final Logger LOGGER = Logging.getLogger(PluginManager.class);
+    private final GlobalResource global;
     private final VariantResource resource;
     private final TransformInvocation invocation;
+    private final ClassDispatcher dispatcher;
     private Map<String, PluginBean> prePlugins = Collections.emptyMap();
     private final Map<String, Plugin> plugins = new HashMap<>();
     private final List<PluginWrapper> wrappers = new ArrayList<>();
 
-    public PluginManager(GlobalResource global, VariantResource resource, TransformInvocation invocation) {
+    public PluginManager(ClassDispatcher dispatcher, GlobalResource global, VariantResource resource, TransformInvocation invocation) {
+        this.dispatcher = dispatcher;
+        this.global = global;
         this.resource = resource;
         this.invocation = invocation;
     }
 
     @SuppressWarnings("Convert2Lambda")
-    public Consumer<List<PluginBean>> asConsumer() {
-        return new Consumer<List<PluginBean>>() {
+    public Consumer<LastPlugins> asConsumer() {
+        return new Consumer<LastPlugins>() {
             @Override
-            public void accept(List<PluginBean> l) {
-                prePlugins = l.stream().collect(Collectors.toMap(PluginBean::getId, Function.identity()));
+            public void accept(LastPlugins l) {
+                prePlugins = l.plugins.stream().collect(Collectors.toMap(PluginBean::getId, Function.identity()));
             }
         };
     }
 
     @SuppressWarnings("Convert2Lambda")
-    public Supplier<List<PluginBean>> asSupplier() {
-        return new Supplier<List<PluginBean>>() {
+    public Supplier<LastPlugins> asSupplier() {
+        return new Supplier<LastPlugins>() {
             @Override
-            public List<PluginBean> get() {
-                return wrappers.stream().map(PluginWrapper::toBean).collect(Collectors.toList());
+            public LastPlugins get() {
+                return new LastPlugins(wrappers.stream().map(PluginWrapper::toBean).collect(Collectors.toList()));
             }
         };
     }
 
-    public void initPlugins(GradleLancetExtension extension, int scope, GlobalLancet globalLancet) throws IOException {
+    public boolean initPlugins(GradleLancetExtension extension, int scope, GlobalLancet globalLancet) throws IOException {
         for (LancetPluginExtension e : extension.getPlugins()) {
             Class<? extends Plugin> clazz = findPluginInProperties(e.getName());
             if (clazz == null) {
@@ -72,10 +82,20 @@ public class PluginManager implements Constants {
             }
         }
 
+        boolean incremental = invocation.isIncremental() && prePlugins.keySet().containsAll(plugins.keySet());
+        if (incremental != invocation.isIncremental()) {
+            LOGGER.lifecycle("Found new plugin applied, turn into full mode");
+        }
+
+        if (incremental) {
+            collectRemovedPluginsClasses();
+        }
+
         CommonArgs args = CommonArgs.createBy(extension, scope, plugins);
 
         for (Map.Entry<String, Plugin> entry : plugins.entrySet()) {
-            PluginWrapper wrapper = new PluginWrapper(invocation.isIncremental() && prePlugins.containsKey(entry.getKey()),
+            PluginWrapper wrapper = new PluginWrapper(
+                    incremental,
                     entry.getValue(),
                     args.asArgumentsFor(entry.getKey()),
                     entry.getKey(),
@@ -86,10 +106,21 @@ public class PluginManager implements Constants {
 
         // priority order
         wrappers.sort(Comparator.comparingInt(l -> l.getArgs().getMyArguments().priority()));
-
-        // call before create
-        wrappers.forEach(PluginWrapper::callBeforeCreate);
+        return incremental;
     }
+
+    /**
+     * Rerack classes for removed plugin
+     */
+    private void collectRemovedPluginsClasses() {
+        List<String> classes = prePlugins.entrySet().parallelStream()
+                .filter(e -> !plugins.containsKey(e.getKey()))
+                .map(Map.Entry::getValue)
+                .flatMap(b -> b.getAffectedClasses().stream())
+                .collect(Collectors.toList());
+        dispatcher.rerack(classes);
+    }
+
 
     private Class<? extends Plugin> findPluginInProperties(String id) throws IOException {
         URL url = resource.loadPluginOnLancet(id);
@@ -131,4 +162,24 @@ public class PluginManager implements Constants {
         return new IllegalStateException(sb.toString(), sup);
     }
 
+    public void callCreate() throws IOException, InterruptedException, TransformException {
+
+        // before callCreate
+        wrappers.forEach(PluginWrapper::callBeforeCreate);
+
+
+        // on callCreate
+        WaitableTasks waitable = WaitableTasks.get(global.io());
+        wrappers.forEach(p -> waitable.execute(p::callOnCreate));
+        waitable.await();
+    }
+
+
+    public static class LastPlugins {
+        public List<PluginBean> plugins;
+
+        public LastPlugins(List<PluginBean> plugins) {
+            this.plugins = plugins;
+        }
+    }
 }

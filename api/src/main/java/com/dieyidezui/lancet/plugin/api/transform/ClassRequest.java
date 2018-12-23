@@ -1,8 +1,8 @@
 package com.dieyidezui.lancet.plugin.api.transform;
 
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 public abstract class ClassRequest {
 
@@ -14,8 +14,8 @@ public abstract class ClassRequest {
      * Regardless of scope(), extra specified classes
      * @return extra specified classes
      */
-    public Collection<String> extraSpecified() {
-        return Collections.emptyList();
+    public Set<String> extraSpecified() {
+        return Collections.emptySet();
     }
 
     enum Scope {

@@ -2,6 +2,7 @@ package com.dieyidezui.lancet.plugin.graph;
 
 import com.dieyidezui.lancet.plugin.api.graph.Status;
 import com.dieyidezui.lancet.plugin.api.graph.ClassGraph;
+import com.dieyidezui.lancet.plugin.resource.VariantResource;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -21,9 +22,12 @@ public class ApkClassGraph implements ClassGraph {
     private static final Logger LOGGER = Logging.getLogger(ApkClassGraph.class);
 
     private final Map<String, ApkClassInfo> classes = new ConcurrentHashMap<>(Constants.OPT_SIZE);
+    private final VariantResource variantResource;
     private final boolean throwIfDuplicated;
+    private boolean incremental;
 
-    public ApkClassGraph(boolean throwIfDuplicated) {
+    public ApkClassGraph(VariantResource variantResource, boolean throwIfDuplicated) {
+        this.variantResource = variantResource;
         this.throwIfDuplicated = throwIfDuplicated;
     }
 
@@ -70,7 +74,7 @@ public class ApkClassGraph implements ClassGraph {
     }
 
     private ApkClassInfo getOrCreate(String name, boolean isInterface) {
-        return classes.computeIfAbsent(name, n -> ApkClassInfo.createStub(name, isInterface));
+        return classes.computeIfAbsent(name, n -> ApkClassInfo.createStub(variantResource, name, isInterface));
     }
 
     @Nullable

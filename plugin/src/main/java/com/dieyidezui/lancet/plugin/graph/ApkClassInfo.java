@@ -3,6 +3,7 @@ package com.dieyidezui.lancet.plugin.graph;
 import com.dieyidezui.lancet.plugin.api.graph.Status;
 import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
 import com.dieyidezui.lancet.plugin.api.graph.MethodInfo;
+import com.dieyidezui.lancet.plugin.resource.VariantResource;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -30,11 +31,14 @@ public class ApkClassInfo implements ClassInfo {
     public List<ApkClassInfo> interfaceChildren = Collections.emptyList();
     public List<ApkClassInfo> implementedClasses = Collections.emptyList();
 
-    public static ApkClassInfo createStub(String name, boolean isInterface) {
-        return new ApkClassInfo(new ClassBean(name, isInterface));
+    private final VariantResource resource;
+
+    public static ApkClassInfo createStub(VariantResource resource, String name, boolean isInterface) {
+        return new ApkClassInfo(resource, new ClassBean(name, isInterface));
     }
 
-    private ApkClassInfo(ClassBean clazz) {
+    private ApkClassInfo(VariantResource resource, ClassBean clazz) {
+        this.resource = resource;
         this.clazz = clazz;
         this.status = new AtomicReference<>(Status.NOT_EXISTS);
     }
@@ -66,7 +70,11 @@ public class ApkClassInfo implements ClassInfo {
 
     @Override
     public Status status() {
-        return status.get();
+        Status res = status.get();
+        if (res != Status.NOT_EXISTS && !resource.isIncremental()) {
+            return Status.NOT_CHANGED;
+        }
+        return res;
     }
 
     @Override
@@ -80,9 +88,8 @@ public class ApkClassInfo implements ClassInfo {
     }
 
     @Override
-    public Class<?> loadClass() {
-        // TODO
-        return null;
+    public Class<?> loadClass() throws ClassNotFoundException {
+        return resource.loadClass(name());
     }
 
     @Nullable

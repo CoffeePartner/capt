@@ -18,7 +18,7 @@ public interface ClassTransformer {
 
     /**
      * @param classInfo the basic info of class
-     * @param required  true if the class your ClassRequest
+     * @param required  true if the class  in your ClassRequest
      * @return the class visitor to participate in class transform.
      */
     @Thread(Type.COMPUTATION)

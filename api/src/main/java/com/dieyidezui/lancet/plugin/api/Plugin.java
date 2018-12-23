@@ -7,6 +7,7 @@ import com.dieyidezui.lancet.plugin.api.hint.Type;
 import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -50,10 +51,16 @@ public abstract class Plugin<T> {
 
     /**
      *
-     * @return
+     * @return meta processor
      */
+    @Nullable
     public abstract MetaProcessor onProcessAnnotations();
 
+    /**
+     *
+     * @return
+     */
+    @Nullable
     public abstract ClassTransformer onTransformClass();
 
     /**

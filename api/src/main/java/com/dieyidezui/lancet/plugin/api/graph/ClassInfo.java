@@ -33,7 +33,7 @@ public interface ClassInfo {
      *
      * @return class of this.
      */
-    Class<?> loadClass();
+    Class<?> loadClass() throws ClassNotFoundException;
 
     /**
      * @return the signature of this class. May be {@literal null} if the class is not a

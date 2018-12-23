@@ -4,6 +4,7 @@ import com.android.build.api.transform.TransformException;
 import com.dieyidezui.lancet.plugin.api.util.RelativeDirectoryProvider;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.util.Constants;
+import com.dieyidezui.lancet.plugin.util.WaitableTasks;
 import com.google.common.io.Closeables;
 import okio.Buffer;
 import okio.BufferedSink;
@@ -28,35 +29,26 @@ public class InternalCache {
 
     private static Logger LOGGER = LoggerFactory.getLogger(InternalCache.class);
 
-    private final List<Future<?>> futures = new ArrayList<>();
     private final GlobalResource global;
     private final RelativeDirectoryProvider provider;
+    private final WaitableTasks waitableTasks;
 
     public InternalCache(RelativeDirectoryProvider provider, GlobalResource global) {
         this.provider = provider;
         this.global = global;
+        this.waitableTasks = WaitableTasks.get(global.io());
     }
 
     public <T> void loadAsync(Consumer<T> consumer) {
-        futures.add(global.io().submit(new SingleReadTask<>(consumer)));
+        waitableTasks.submit(new SingleReadTask<>(consumer));
     }
 
     public <T> void storeAsync(Supplier<T> supplier) {
-        futures.add(global.io().submit(new SingleWriteTask<>(supplier)));
+        waitableTasks.submit(new SingleWriteTask<>(supplier));
     }
 
     public void await() throws IOException, InterruptedException, TransformException {
-        for (Future<?> future : futures) {
-            try {
-                future.get();
-            } catch (ExecutionException e) {
-                if (e.getCause() instanceof IOException) {
-                    throw (IOException) e.getCause();
-                }
-                throw new TransformException(e.getCause());
-            }
-        }
-        futures.clear();
+        waitableTasks.await();
     }
 
     @SuppressWarnings("unchecked")

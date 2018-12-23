@@ -50,7 +50,7 @@ public class GradleLancetPlugin implements Plugin<Project>, Constants {
 
         VariantManager variantManager = new VariantManager(createGlobalResource(project, baseExtension),
                 baseExtension, project);
-        // create configurations for separate variant
+        // callCreate configurations for separate variant
         variantManager.createConfigurationForVariant();
 
         LancetTransform lancetTransform = new LancetTransform(variantManager);

@@ -10,6 +10,7 @@ import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactoryImpl;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
 import com.dieyidezui.lancet.plugin.process.PluginManager;
+import com.dieyidezui.lancet.plugin.process.dispatch.ClassDispatcher;
 import com.dieyidezui.lancet.plugin.process.plugin.GlobalLancet;
 import com.dieyidezui.lancet.plugin.cache.FileManager;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
@@ -53,21 +54,17 @@ public class VariantScope implements Constants {
 
     public void doTransform(TransformInvocation invocation) throws IOException, TransformException, InterruptedException {
 
+        // load and prepare
         RelativeDirectoryProviderFactory singleFactory = new RelativeDirectoryProviderFactoryImpl();
-
         OutputProviderFactory factory = new OutputProviderFactory(singleFactory, files.asSelector());
-
         VariantResource variantResource = new VariantResource(getVariant(),
                 files, factory);
-        variantResource.prepare(invocation, getLancetConfiguration());
-
         InternalCache internalCache = new InternalCache(singleFactory.newProvider(new File(files.variantRoot(), "core"))
                 , global);
-
-        ApkClassGraph graph = new ApkClassGraph(global.gradleLancetExtension().getThrowIfDuplicated());
-
+        ApkClassGraph graph = new ApkClassGraph(variantResource, global.gradleLancetExtension().getThrowIfDuplicated());
         GlobalLancet lancet = new GlobalLancet(graph, global, variantResource);
 
+        ClassDispatcher dispatcher = new ClassDispatcher(invocation, global);
         PluginManager manager = new PluginManager(global, variantResource, invocation);
 
         if (invocation.isIncremental()) {
@@ -78,9 +75,16 @@ public class VariantScope implements Constants {
         }
 
         int scope = variant.endsWith(ANDROID_TEST) ? LancetPluginExtension.ANDROID_TEST : LancetPluginExtension.ASSEMBLE;
-        manager.initPlugins(global.gradleLancetExtension(), scope, lancet);
+        boolean incremental = manager.initPlugins(global.gradleLancetExtension(), scope, lancet);
+
+        variantResource.init(incremental, invocation, getLancetConfiguration());
 
 
+        // everything ready, start plugin logic
+        manager.callCreate();
+
+
+        internalCache.storeAsync(manager.asSupplier());
         internalCache.storeAsync(graph.writeClasses());
         internalCache.await();
     }
