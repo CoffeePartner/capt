@@ -62,8 +62,7 @@ public class ApkClassGraph implements ClassGraph {
 
     public void add(ClassBean clazz, Status status) {
         ApkClassInfo node = getOrCreate(clazz.name, (clazz.access & Opcodes.ACC_INTERFACE) != 0);
-        node.clazz = clazz;
-        node.updateStatus(status, throwIfDuplicated);
+        node.update(clazz, status, throwIfDuplicated);
         if (clazz.superName != null) {
             node.parent = getOrCreate(clazz.superName, false);
 

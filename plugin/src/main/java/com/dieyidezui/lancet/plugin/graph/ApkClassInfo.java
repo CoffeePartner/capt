@@ -49,22 +49,25 @@ public class ApkClassInfo implements ClassInfo {
         interfaces = classChildren = interfaceChildren = implementedClasses = Collections.emptyList();
     }
 
-    void updateStatus(Status newStatus, boolean throwIfDuplicated) {
-        Status old = this.status.getAndSet(newStatus);
-        if (old != Status.NOT_EXISTS) {
+    void update(ClassBean bean, Status newStatus, boolean throwIfDuplicated) {
+        ClassBean oldBean = clazz;
+        Status oldStatus = this.status.getAndSet(newStatus);
+        if (oldStatus != Status.NOT_EXISTS) {
             // remove && add ==  changed
-            if (old == Status.ADDED && newStatus == Status.REMOVED
-                    || old == Status.REMOVED && newStatus == Status.ADDED) {
+            if (oldStatus == Status.ADDED && newStatus == Status.REMOVED
+                    || oldStatus == Status.REMOVED && newStatus == Status.ADDED) {
                 Status pre = this.status.getAndSet(Status.CHANGED);
                 if (pre == newStatus) {
+                    this.clazz = bean;
                     return;
                 }
             }
             if (throwIfDuplicated) {
-                throw new IllegalStateException("Duplicated class: " + clazz.name);
+                throw new IllegalStateException("Found duplicated class: " + oldBean.name + "in '" + clazz.belongsTo + "' and ''");
             }
-            LOGGER.error("Duplicated class: " + clazz.name);
+            LOGGER.error("Found duplicated class: {} in '{}' and '{}'", oldBean.name, oldBean.belongsTo, bean.belongsTo);
         }
+        this.clazz = bean;
     }
 
 
