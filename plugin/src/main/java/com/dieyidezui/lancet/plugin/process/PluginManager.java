@@ -113,11 +113,11 @@ public class PluginManager implements Constants {
      * Rerack classes for removed plugin
      */
     private void collectRemovedPluginsClasses() {
-        List<String> classes = prePlugins.entrySet().parallelStream()
+        Set<String> classes = prePlugins.entrySet().parallelStream()
                 .filter(e -> !plugins.containsKey(e.getKey()))
                 .map(Map.Entry::getValue)
                 .flatMap(b -> b.getAffectedClasses().stream())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
         dispatcher.rerack(classes);
     }
 

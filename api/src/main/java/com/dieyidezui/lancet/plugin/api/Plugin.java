@@ -53,6 +53,7 @@ public abstract class Plugin<T> {
      *
      * @return meta processor
      */
+    @Thread(Type.SINGLE)
     @Nullable
     public abstract MetaProcessor onProcessAnnotations();
 
@@ -60,6 +61,7 @@ public abstract class Plugin<T> {
      *
      * @return
      */
+    @Thread(Type.SINGLE)
     @Nullable
     public abstract ClassTransformer onTransformClass();
 

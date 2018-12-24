@@ -12,6 +12,7 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -27,6 +28,7 @@ public class VariantResource implements Constants {
     private final FileManager files;
     private final OutputProviderFactory factory;
     private boolean incremental;
+    private TransformInvocation invocation;
 
     public VariantResource(String variant, FileManager files, OutputProviderFactory factory) {
         this.variant = variant;
@@ -42,6 +44,14 @@ public class VariantResource implements Constants {
         this.incremental = incremental;
         this.loader.initClassLoader(invocation, target);
         this.files.attachContext(incremental, invocation);
+    }
+
+    public InputStream openStream(String className) throws IOException {
+        InputStream is = loader.runtimeLoader.getResourceAsStream(className + ".class");
+        if (is == null) {
+            throw new IOException("open class failed: " + className);
+        }
+        return is;
     }
 
     public Class<?> loadClass(String className) throws ClassNotFoundException {
@@ -67,6 +77,7 @@ public class VariantResource implements Constants {
     static class Loader {
 
         private URLClassLoader runnerLoader;
+        private URLClassLoader runtimeLoader;
 
         void initClassLoader(TransformInvocation invocation, Configuration target) {
             URLClassLoader lancetDependencies = URLClassLoader.newInstance(
@@ -91,6 +102,7 @@ public class VariantResource implements Constants {
                     })
                     .toArray(URL[]::new);
             this.runnerLoader = URLClassLoader.newInstance(runtimeUrls, lancetDependencies);
+            this.runtimeLoader = URLClassLoader.newInstance(runtimeUrls, null);
         }
 
         public Class<?> loadClass(String className) throws ClassNotFoundException {

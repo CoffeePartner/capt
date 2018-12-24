@@ -11,8 +11,6 @@ import com.dieyidezui.lancet.plugin.resource.VariantResource;
 import com.dieyidezui.lancet.plugin.util.Functions;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -24,8 +22,6 @@ public class PluginWrapper extends ForwardingLancet {
     private final Arguments args;
     private final String id;
     private final VariantResource resource;
-    private Supplier<MetaProcessor> processor;
-    private Supplier<ClassTransformer> transformer;
 
     public PluginWrapper(boolean incremental, Plugin plugin,
                          Arguments args,
@@ -36,9 +32,6 @@ public class PluginWrapper extends ForwardingLancet {
         this.args = args;
         this.id = id;
         this.resource = resource;
-
-        this.processor = Functions.cache(plugin::onProcessAnnotations);
-        this.transformer = Functions.cache(plugin::onTransformClass);
     }
 
     public String id() {
@@ -62,7 +55,7 @@ public class PluginWrapper extends ForwardingLancet {
     }
 
     public MetaProcessor getProcessor() {
-        return
+        return processor.get();
     }
 
     @Nullable

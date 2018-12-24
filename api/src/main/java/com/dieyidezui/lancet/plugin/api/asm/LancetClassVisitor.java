@@ -4,6 +4,7 @@ import com.dieyidezui.lancet.plugin.api.transform.TransformContext;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public abstract class LancetClassVisitor extends ClassVisitor {
@@ -15,7 +16,7 @@ public abstract class LancetClassVisitor extends ClassVisitor {
         this(null);
     }
 
-    protected LancetClassVisitor(LancetClassVisitor next) {
+    public LancetClassVisitor(@Nullable LancetClassVisitor next) {
         super(Opcodes.ASM7, next);
         this.next = cv;
     }

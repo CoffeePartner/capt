@@ -89,7 +89,7 @@ public abstract class MetaProcessor {
         return null;
     }
 
-    @Thread(Type.IO)
+    @Thread(Type.COMPUTATION)
     public void onProcessEnd() {
     }
 }

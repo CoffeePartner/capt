@@ -13,7 +13,7 @@ public interface ClassTransformer {
      *
      * @return class request
      */
-    @Thread(Type.IO)
+    @Thread(Type.COMPUTATION)
     ClassRequest beforeTransform();
 
     /**

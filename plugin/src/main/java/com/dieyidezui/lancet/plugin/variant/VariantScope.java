@@ -65,7 +65,7 @@ public class VariantScope implements Constants {
         GlobalLancet lancet = new GlobalLancet(graph, global, variantResource);
 
         ClassDispatcher dispatcher = new ClassDispatcher(invocation, global);
-        PluginManager manager = new PluginManager(global, variantResource, invocation);
+        PluginManager manager = new PluginManager(dispatcher, global, variantResource, invocation);
 
         if (invocation.isIncremental()) {
             internalCache.loadAsync(graph.readClasses());
@@ -84,6 +84,9 @@ public class VariantScope implements Constants {
         manager.callCreate();
 
 
+
+
+        // transform done, store cache
         internalCache.storeAsync(manager.asSupplier());
         internalCache.storeAsync(graph.writeClasses());
         internalCache.await();

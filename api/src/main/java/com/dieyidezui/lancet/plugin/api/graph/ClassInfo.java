@@ -1,6 +1,8 @@
 package com.dieyidezui.lancet.plugin.api.graph;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 public interface ClassInfo {
@@ -34,6 +36,13 @@ public interface ClassInfo {
      * @return class of this.
      */
     Class<?> loadClass() throws ClassNotFoundException;
+
+
+    /**
+     * @return the input stream of class bytes
+     * @throws IOException if open failed
+     */
+    InputStream openStream() throws IOException;
 
     /**
      * @return the signature of this class. May be {@literal null} if the class is not a

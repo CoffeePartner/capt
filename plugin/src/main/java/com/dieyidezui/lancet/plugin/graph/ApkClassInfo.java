@@ -8,6 +8,8 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -63,7 +65,7 @@ public class ApkClassInfo implements ClassInfo {
                 }
             }
             if (throwIfDuplicated) {
-                throw new IllegalStateException("Found duplicated class: " + oldBean.name + "in '" + clazz.belongsTo + "' and ''");
+                throw new IllegalStateException("Found duplicated class: " + oldBean.name + "in '" + oldBean.belongsTo + "' and ' " + bean.belongsTo + "'");
             }
             LOGGER.error("Found duplicated class: {} in '{}' and '{}'", oldBean.name, oldBean.belongsTo, bean.belongsTo);
         }
@@ -93,6 +95,11 @@ public class ApkClassInfo implements ClassInfo {
     @Override
     public Class<?> loadClass() throws ClassNotFoundException {
         return resource.loadClass(name());
+    }
+
+    @Override
+    public InputStream openStream() throws IOException {
+        return resource.openStream(name());
     }
 
     @Nullable
