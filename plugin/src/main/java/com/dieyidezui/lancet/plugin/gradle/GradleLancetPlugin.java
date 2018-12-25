@@ -18,6 +18,7 @@ import com.google.gson.InstanceCreator;
 import org.gradle.api.*;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
+import org.omg.SendingContext.RunTime;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -56,13 +57,18 @@ public class GradleLancetPlugin implements Plugin<Project>, Constants {
 
     private static GlobalResource createGlobalResource(Project project, BaseExtension baseExtension) {
 
-        // use 10s instead if 60s to opt memory
-        ExecutorService io = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
-                10L, TimeUnit.SECONDS,
+        int core = Runtime.getRuntime().availableProcessors();
+        // use 20s instead if 60s to opt memory
+        // 2 x core threads at most
+        // Use it combine with ForkJoinPool
+        ExecutorService io = new ThreadPoolExecutor(0, core * 2,
+                20L, TimeUnit.SECONDS,
                 new SynchronousQueue<>(),
                 new LancetThreadFactory());
 
-        ForkJoinPool computation = ForkJoinPool.commonPool();
+        // ForkJoinPool.common() just have core - 1, because it use the waiting thread,
+        // But we just wait at IO threads, not computation, so we need core threads.
+        ForkJoinPool computation = new ForkJoinPool(core);
 
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()

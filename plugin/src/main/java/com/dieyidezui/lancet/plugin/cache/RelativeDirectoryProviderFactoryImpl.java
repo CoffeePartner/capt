@@ -45,7 +45,7 @@ public class RelativeDirectoryProviderFactoryImpl implements RelativeDirectoryPr
 
         private File ensure(String path) throws IOException {
             if ('/' != File.separatorChar) {
-                path = path.replace("/", File.separator);
+                path = path.replace('/', File.separatorChar);
             }
             File target = new File(root, path);
             Files.createParentDirs(target);
