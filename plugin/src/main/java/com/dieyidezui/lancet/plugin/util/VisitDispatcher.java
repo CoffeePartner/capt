@@ -5,7 +5,6 @@ import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
-import org.apache.commons.io.FileUtils;
 
 import javax.annotation.Nullable;
 import java.io.*;
@@ -20,7 +19,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-public class VisitDispatcher {
+/**
+ * This makes faster when IO does not block computation job in ForkJoinPool.
+ */
+public final class VisitDispatcher {
 
     private static FileTime ZERO = FileTime.fromMillis(0);
 
@@ -46,7 +48,7 @@ public class VisitDispatcher {
 
 
     public final static class ClassEntry extends InternalEntry {
-        ClassEntry(String className, byte[] bytes) {
+        public ClassEntry(String className, byte[] bytes) {
             super(className + ".class", bytes);
         }
     }
@@ -61,7 +63,10 @@ public class VisitDispatcher {
             this.bytes = bytes;
         }
 
-        public final void writeTo(ZipOutputStream zos) throws IOException {
+        /**
+         * write ZIP faster without compress!
+         */
+        final void writeTo(ZipOutputStream zos) throws IOException {
             ZipEntry outEntry = new ZipEntry(name);
             CRC32 crc32 = new CRC32();
             crc32.update(bytes);
@@ -76,7 +81,7 @@ public class VisitDispatcher {
             zos.write(bytes);
         }
 
-        public void writeTo(File root) throws IOException {
+        final void writeTo(File root) throws IOException {
             File target = new File(root, name.replace('/', File.separatorChar));
             Files.createParentDirs(target);
             Files.write(bytes, target);
@@ -118,6 +123,8 @@ public class VisitDispatcher {
                 return null;
             }
 
+            Status status = incremental ? jar.getStatus() : Status.NOTCHANGED;
+
             ForkJoinPool pool = resource.computation();
             ZipOutputStream zos = null;
             List<Future<ClassEntry>> futures = null;
@@ -143,7 +150,7 @@ public class VisitDispatcher {
                             pool,
                             classBytes,
                             name.substring(0, name.length() - 6), // .class = 6
-                            jar.getStatus()
+                            status
                     );
                     if (write) {
                         futures.add(future);
