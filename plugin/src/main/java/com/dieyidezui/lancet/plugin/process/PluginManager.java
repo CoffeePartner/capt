@@ -3,7 +3,7 @@ package com.dieyidezui.lancet.plugin.process;
 import com.android.build.api.transform.TransformException;
 import com.android.build.api.transform.TransformInvocation;
 import com.dieyidezui.lancet.plugin.api.*;
-import com.dieyidezui.lancet.plugin.process.dispatch.ClassDispatcher;
+import com.dieyidezui.lancet.plugin.process.dispatch.TransformDispatcher;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.gradle.GradleLancetExtension;
 import com.dieyidezui.lancet.plugin.process.plugin.GlobalLancet;
@@ -34,12 +34,12 @@ public class PluginManager implements Constants {
     private final GlobalResource global;
     private final VariantResource resource;
     private final TransformInvocation invocation;
-    private final ClassDispatcher dispatcher;
+    private final TransformDispatcher dispatcher;
     private Map<String, PluginBean> prePlugins = Collections.emptyMap();
     private final Map<String, Plugin> plugins = new HashMap<>();
     private final List<PluginWrapper> wrappers = new ArrayList<>();
 
-    public PluginManager(ClassDispatcher dispatcher, GlobalResource global, VariantResource resource, TransformInvocation invocation) {
+    public PluginManager(TransformDispatcher dispatcher, GlobalResource global, VariantResource resource, TransformInvocation invocation) {
         this.dispatcher = dispatcher;
         this.global = global;
         this.resource = resource;

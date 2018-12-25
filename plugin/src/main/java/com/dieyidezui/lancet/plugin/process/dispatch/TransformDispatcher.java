@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ClassDispatcher {
+public class TransformDispatcher {
 
 
     private final TransformInvocation invocation;
@@ -18,7 +18,7 @@ public class ClassDispatcher {
     private boolean incremental = false;
     private Set<String> rerack = Collections.emptySet();
 
-    public ClassDispatcher(TransformInvocation invocation, GlobalResource global) {
+    public TransformDispatcher(TransformInvocation invocation, GlobalResource global) {
         this.invocation = invocation;
         this.global = global;
     }

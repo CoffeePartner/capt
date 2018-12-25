@@ -10,11 +10,12 @@ import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactoryImpl;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
 import com.dieyidezui.lancet.plugin.process.PluginManager;
-import com.dieyidezui.lancet.plugin.process.dispatch.ClassDispatcher;
+import com.dieyidezui.lancet.plugin.process.dispatch.TransformDispatcher;
 import com.dieyidezui.lancet.plugin.process.plugin.GlobalLancet;
 import com.dieyidezui.lancet.plugin.cache.FileManager;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
+import com.dieyidezui.lancet.plugin.util.ClassWalker;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.Logger;
@@ -55,6 +56,9 @@ public class VariantScope implements Constants {
     public void doTransform(TransformInvocation invocation) throws IOException, TransformException, InterruptedException {
 
         // load and prepare
+        ClassWalker walker = new ClassWalker(global, invocation);
+
+
         RelativeDirectoryProviderFactory singleFactory = new RelativeDirectoryProviderFactoryImpl();
         OutputProviderFactory factory = new OutputProviderFactory(singleFactory, files.asSelector());
         VariantResource variantResource = new VariantResource(getVariant(),
@@ -64,7 +68,7 @@ public class VariantScope implements Constants {
         ApkClassGraph graph = new ApkClassGraph(variantResource, global.gradleLancetExtension().getThrowIfDuplicated());
         GlobalLancet lancet = new GlobalLancet(graph, global, variantResource);
 
-        ClassDispatcher dispatcher = new ClassDispatcher(invocation, global);
+        TransformDispatcher dispatcher = new TransformDispatcher(invocation, global);
         PluginManager manager = new PluginManager(dispatcher, global, variantResource, invocation);
 
         if (invocation.isIncremental()) {
@@ -80,10 +84,19 @@ public class VariantScope implements Constants {
         variantResource.init(incremental, invocation, getLancetConfiguration());
 
 
+
+        // Round 1: make class graph, collect metas
+        walker.visit(incremental, );
+
+
         // everything ready, start plugin logic
         manager.callCreate();
 
 
+        // Round 2: visit Metas
+
+
+        // Round 3: transform classes
 
 
         // transform done, store cache

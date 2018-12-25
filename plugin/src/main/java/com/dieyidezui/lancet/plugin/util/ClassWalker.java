@@ -22,14 +22,14 @@ import java.util.zip.ZipOutputStream;
 /**
  * This makes faster when IO does not block computation job in ForkJoinPool.
  */
-public final class VisitDispatcher {
+public final class ClassWalker {
 
     private static FileTime ZERO = FileTime.fromMillis(0);
 
     private final GlobalResource resource;
     private final TransformInvocation invocation;
 
-    public VisitDispatcher(GlobalResource resource, TransformInvocation invocation) {
+    public ClassWalker(GlobalResource resource, TransformInvocation invocation) {
         this.resource = resource;
         this.invocation = invocation;
     }
