@@ -117,14 +117,14 @@ public final class ClassWalker {
 
         @Override
         public Void call() throws Exception {
-            Visitor visitor = factory.newVisitor(jar);
+            Visitor visitor = factory.newVisitor(incremental, jar);
             if (visitor == null) {
                 return null;
             }
 
-            // For not changed, it is illegal
-            // For removed, we can't read the jar
-            if (incremental && (jar.getStatus() == Status.NOTCHANGED || jar.getStatus() == Status.REMOVED)) {
+            // 1. we can't read removed jar anyway
+            // 2. incremental && not changed, it is illegal, we skip it
+            if (jar.getStatus() == Status.REMOVED || incremental && jar.getStatus() == Status.NOTCHANGED) {
                 return null;
             }
 
@@ -204,7 +204,7 @@ public final class ClassWalker {
 
         @Override
         public Void call() throws Exception {
-            Visitor visitor = factory.newVisitor(d);
+            Visitor visitor = factory.newVisitor(incremental, d);
             if (visitor == null) {
                 return null;
             }
@@ -214,12 +214,14 @@ public final class ClassWalker {
 
             // just process .class, skip others
             if (!incremental) {
-                for (File file : Files.fileTreeTraverser().preOrderTraversal(d.getFile())) {
-                    if (file.isFile() && file.getName().endsWith(".class")) {
-                        byte[] bytes = Files.toByteArray(file);
-                        ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, fileToClassName(file), Status.NOTCHANGED);
-                        if (futures != null) {
-                            futures.add(task);
+                if (d.getFile().exists()) { // we check if directory removed for lancet in  full mode & transform in incremental mode
+                    for (File file : Files.fileTreeTraverser().preOrderTraversal(d.getFile())) {
+                        if (file.isFile() && file.getName().endsWith(".class")) {
+                            byte[] bytes = Files.toByteArray(file);
+                            ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, fileToClassName(file), Status.NOTCHANGED);
+                            if (futures != null) {
+                                futures.add(task);
+                            }
                         }
                     }
                 }

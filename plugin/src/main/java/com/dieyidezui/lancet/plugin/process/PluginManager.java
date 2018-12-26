@@ -30,6 +30,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PluginManager implements Constants {
 
@@ -109,15 +110,14 @@ public class PluginManager implements Constants {
     /**
      * Rerack classes for removed plugin
      */
-    public Set<ApkClassInfo> collectRemovedPluginsAffectedClasses(ApkClassGraph graph) {
+    public Stream<ApkClassInfo> collectRemovedPluginsAffectedClasses(ApkClassGraph graph) {
         return prePlugins.entrySet().parallelStream()
                 .filter(e -> !plugins.containsKey(e.getKey()))
                 .map(Map.Entry::getValue)
                 .flatMap(b -> b.getAffectedClasses().stream())
                 .map(graph::get)
                 .filter(Objects::nonNull)
-                .filter(c -> c.status() == Status.NOT_CHANGED) // others are already called.
-                .collect(Collectors.toSet());
+                .filter(c -> c.status() == Status.NOT_CHANGED);// others are already called.
     }
 
 

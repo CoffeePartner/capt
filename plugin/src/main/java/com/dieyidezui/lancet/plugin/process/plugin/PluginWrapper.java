@@ -4,15 +4,15 @@ import com.dieyidezui.lancet.plugin.api.Arguments;
 import com.dieyidezui.lancet.plugin.api.LancetInternal;
 import com.dieyidezui.lancet.plugin.api.OutputProvider;
 import com.dieyidezui.lancet.plugin.api.Plugin;
-import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 import com.dieyidezui.lancet.plugin.process.PluginBean;
+import com.dieyidezui.lancet.plugin.process.visitors.ThirdRound;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
-import com.dieyidezui.lancet.plugin.util.Functions;
 
-import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
-import java.util.function.Supplier;
 
 @SuppressWarnings("unchecked")
 public class PluginWrapper extends ForwardingLancet {
@@ -22,6 +22,7 @@ public class PluginWrapper extends ForwardingLancet {
     private final Arguments args;
     private final String id;
     private final VariantResource resource;
+    private final List<String> affected = Collections.synchronizedList(new ArrayList<>());
 
     public PluginWrapper(boolean incremental, Plugin plugin,
                          Arguments args,
@@ -54,13 +55,24 @@ public class PluginWrapper extends ForwardingLancet {
         return plugin.getSupportedAnnotations();
     }
 
-    public MetaProcessor getProcessor() {
-        return processor.get();
-    }
+    public ThirdRound.PluginProvider newProvider() {
+        ClassTransformer transformer = plugin.onTransformClass();
+        if (transformer != null) {
+            return new ThirdRound.PluginProvider() {
 
-    @Nullable
-    public ClassTransformer getClassTransformer() {
-        return plugin.onTransformClass();
+
+                @Override
+                public void onClassAffected(String className) {
+                    affected.add(className);
+                }
+
+                @Override
+                public ClassTransformer transformer() {
+                    return transformer;
+                }
+            };
+        }
+        return null;
     }
 
     @Override
@@ -79,6 +91,6 @@ public class PluginWrapper extends ForwardingLancet {
     }
 
     public PluginBean toBean() {
-        return new PluginBean(id,);
+        return new PluginBean(id, affected);
     }
 }

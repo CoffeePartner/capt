@@ -3,6 +3,7 @@ package com.dieyidezui.lancet.plugin.variant;
 import com.android.build.api.transform.TransformException;
 import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.api.BaseVariant;
+import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 import com.dieyidezui.lancet.plugin.cache.InternalCache;
 import com.dieyidezui.lancet.plugin.cache.OutputProviderFactory;
 import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactory;
@@ -15,7 +16,7 @@ import com.dieyidezui.lancet.plugin.process.dispatch.TransformDispatcher;
 import com.dieyidezui.lancet.plugin.process.plugin.GlobalLancet;
 import com.dieyidezui.lancet.plugin.cache.FileManager;
 import com.dieyidezui.lancet.plugin.process.visitors.FirstRound;
-import com.dieyidezui.lancet.plugin.process.visitors.SecondRound;
+import com.dieyidezui.lancet.plugin.process.visitors.ThirdRound;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
 import com.dieyidezui.lancet.plugin.util.ClassWalker;
@@ -103,18 +104,11 @@ public class VariantScope implements Constants {
 
         // Round 2: visit Metas
 
-
         // Round 3: transform classes
         // use the actual incremental (for plugins input)
         // remember to ignore removed classes if incremental
-        SecondRound secondRound = new SecondRound(firstRound.getToRemove());
-        walker.visit(incremental, true, );
-        if (incremental) {
-            // tell plugins the removed classes
-
-            transformDispatcher.rerack(manager.collectRemovedPluginsAffectedClasses(graph));
-        }
-
+        ThirdRound thirdRound = new ThirdRound(firstRound.getToRemove());
+        thirdRound.accept(incremental, walker, manager, graph);
 
         // transform done, store cache
         internalCache.storeAsync(manager.writePlugins());

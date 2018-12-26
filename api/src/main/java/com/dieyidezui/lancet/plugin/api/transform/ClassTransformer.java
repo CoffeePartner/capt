@@ -7,14 +7,14 @@ import com.dieyidezui.lancet.plugin.api.hint.Type;
 
 import javax.annotation.Nullable;
 
-public interface ClassTransformer {
+public abstract class ClassTransformer {
     /**
      * After parse every meta class, tell lancet which classes require to transform.
      *
      * @return class request
      */
     @Thread(Type.COMPUTATION)
-    ClassRequest beforeTransform();
+    public abstract ClassRequest beforeTransform();
 
     /**
      * @param classInfo the basic info of class
@@ -23,11 +23,12 @@ public interface ClassTransformer {
      */
     @Thread(Type.COMPUTATION)
     @Nullable
-    LancetClassVisitor onTransform(ClassInfo classInfo, boolean required);
+    public abstract LancetClassVisitor onTransform(ClassInfo classInfo, boolean required);
 
     /**
      * Invoked after all class transform done.
      */
     @Thread(Type.IO)
-    void afterTransform();
+    public void afterTransform() {
+    }
 }

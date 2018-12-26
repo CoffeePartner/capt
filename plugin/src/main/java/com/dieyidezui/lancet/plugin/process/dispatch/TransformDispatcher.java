@@ -4,6 +4,7 @@ import com.android.build.api.transform.TransformInvocation;
 import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 import com.dieyidezui.lancet.plugin.graph.ApkClassInfo;
+import com.dieyidezui.lancet.plugin.process.visitors.ThirdRound;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 
 import java.util.Collections;
@@ -28,7 +29,7 @@ public class TransformDispatcher {
 
     }
 
-    public void rerack(Set<ApkClassInfo> classes) {
+    public void rerackForRemovedPlugins(Set<ApkClassInfo> classes) {
 
     }
 }
