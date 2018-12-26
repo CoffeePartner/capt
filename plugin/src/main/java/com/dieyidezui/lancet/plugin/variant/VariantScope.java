@@ -10,6 +10,7 @@ import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactoryImpl;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
 import com.dieyidezui.lancet.plugin.process.PluginManager;
+import com.dieyidezui.lancet.plugin.process.dispatch.MetaDispatcher;
 import com.dieyidezui.lancet.plugin.process.dispatch.TransformDispatcher;
 import com.dieyidezui.lancet.plugin.process.plugin.GlobalLancet;
 import com.dieyidezui.lancet.plugin.cache.FileManager;
@@ -57,6 +58,8 @@ public class VariantScope implements Constants {
 
         // load and prepare
         ClassWalker walker = new ClassWalker(global, invocation);
+        TransformDispatcher transformDispatcher = new TransformDispatcher(invocation, global);
+        MetaDispatcher metaDispatcher = new MetaDispatcher();
 
 
         RelativeDirectoryProviderFactory singleFactory = new RelativeDirectoryProviderFactoryImpl();
@@ -68,8 +71,7 @@ public class VariantScope implements Constants {
         ApkClassGraph graph = new ApkClassGraph(variantResource, global.gradleLancetExtension().getThrowIfDuplicated());
         GlobalLancet lancet = new GlobalLancet(graph, global, variantResource);
 
-        TransformDispatcher dispatcher = new TransformDispatcher(invocation, global);
-        PluginManager manager = new PluginManager(dispatcher, global, variantResource, invocation);
+        PluginManager manager = new PluginManager(global, variantResource, invocation);
 
         if (invocation.isIncremental()) {
             internalCache.loadAsync(graph.readClasses());
@@ -80,23 +82,34 @@ public class VariantScope implements Constants {
 
         int scope = variant.endsWith(ANDROID_TEST) ? LancetPluginExtension.ANDROID_TEST : LancetPluginExtension.ASSEMBLE;
         boolean incremental = manager.initPlugins(global.gradleLancetExtension(), scope, lancet);
+        if (incremental) {
+
+        }
 
         variantResource.init(incremental, invocation, getLancetConfiguration());
 
 
-
-        // Round 1: make class graph, collect metas
-        walker.visit(incremental, );
+        // Round 1: make class graph & collect metas
+        // use the invocation.isIncremental()
+        walker.visit(invocation.isIncremental(), false, );
 
 
         // everything ready, start plugin logic
         manager.callCreate();
 
 
+        MetaDispatcher meta
         // Round 2: visit Metas
 
 
         // Round 3: transform classes
+        // use the actual incremental (for plugins input)
+        // remember to ignore removed classes if incremental
+        walker.visit(incremental, true, );
+        if (incremental) {
+            // tell plugins the removed classes
+            transformDispatcher.rerack(manager.collectRemovedPluginsAffectedClasses());
+        }
 
 
         // transform done, store cache

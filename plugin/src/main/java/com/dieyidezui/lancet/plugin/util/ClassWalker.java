@@ -11,20 +11,18 @@ import java.io.*;
 import java.net.URI;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
-import java.util.zip.CRC32;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
+import java.util.zip.*;
 
 /**
  * This makes faster when IO does not block computation job in ForkJoinPool.
  */
 public final class ClassWalker {
 
-    private static FileTime ZERO = FileTime.fromMillis(0);
+    private static final FileTime ZERO = FileTime.fromMillis(0);
 
     private final GlobalResource resource;
     private final TransformInvocation invocation;
@@ -90,7 +88,11 @@ public final class ClassWalker {
 
 
     public interface Visitor {
-        ForkJoinTask<ClassEntry> onVisit(ForkJoinPool pool, byte[] classBytes, String className, Status status);
+
+        /**
+         * @param classBytes null for REMOVED
+         */
+        ForkJoinTask<ClassEntry> onVisit(ForkJoinPool pool, @Nullable byte[] classBytes, String className, Status status);
 
         interface Factory {
             @Nullable
@@ -119,7 +121,9 @@ public final class ClassWalker {
                 return null;
             }
 
-            if (incremental && jar.getStatus() == Status.NOTCHANGED) {
+            // For not changed, it is illegal
+            // For removed, we can't read the jar
+            if (incremental && (jar.getStatus() == Status.NOTCHANGED || jar.getStatus() == Status.REMOVED)) {
                 return null;
             }
 
@@ -128,8 +132,7 @@ public final class ClassWalker {
             ForkJoinPool pool = resource.computation();
             ZipOutputStream zos = null;
             List<Future<ClassEntry>> futures = null;
-            ZipInputStream zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(jar.getFile())));
-            ZipEntry entry;
+            ZipFile file = new ZipFile(jar.getFile());
 
             if (write) {
                 File output = invocation.getOutputProvider().getContentLocation(
@@ -138,14 +141,18 @@ public final class ClassWalker {
                 futures = new ArrayList<>();
             }
 
-            while ((entry = zis.getNextEntry()) != null) {
+            Enumeration<? extends ZipEntry> entries = file.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = entries.nextElement();
                 if (entry.isDirectory()) {
                     continue;
                 }
 
                 String name = entry.getName();
                 if (name.endsWith(".class")) {
-                    byte[] classBytes = ByteStreams.toByteArray(zis);
+                    InputStream is = file.getInputStream(entry);
+                    byte[] classBytes = ByteStreams.toByteArray(is);
+                    is.close();
                     Future<ClassEntry> future = visitor.onVisit(
                             pool,
                             classBytes,
@@ -155,13 +162,14 @@ public final class ClassWalker {
                     if (write) {
                         futures.add(future);
                     }
-                } else if (write) {
-                    byte[] content = ByteStreams.toByteArray(zis);
-                    new ClassEntry(name, content).writeTo(zos);
+                } else if (write) { // keep other resources content in jar
+                    InputStream is = file.getInputStream(entry);
+                    byte[] content = ByteStreams.toByteArray(is);
+                    is.close();
+                    new InternalEntry(name, content).writeTo(zos);
                 }
-                zis.closeEntry();
             }
-            Closeables.closeQuietly(zis);
+            Closeables.close(file, true);
 
             // write class result
             if (write) {
@@ -203,6 +211,7 @@ public final class ClassWalker {
             ForkJoinPool pool = resource.computation();
             List<Future<ClassEntry>> futures = write ? null : new ArrayList<>();
 
+            // just process .class, skip others
             if (!incremental) {
                 for (File file : Files.fileTreeTraverser().preOrderTraversal(d.getFile())) {
                     if (file.isFile() && file.getName().endsWith(".class")) {
@@ -215,8 +224,9 @@ public final class ClassWalker {
                 }
             } else {
                 for (Map.Entry<File, Status> entry : d.getChangedFiles().entrySet()) {
-                    if (entry.getValue() != Status.NOTCHANGED && entry.getKey().getName().endsWith(".class")) {
-                        byte[] bytes = Files.toByteArray(entry.getKey());
+                    Status status = entry.getValue();
+                    if (status != Status.NOTCHANGED && entry.getKey().getName().endsWith(".class")) {
+                        byte[] bytes = status == Status.REMOVED ? null : Files.toByteArray(entry.getKey());
                         ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, fileToClassName(entry.getKey()), entry.getValue());
                         if (futures != null) {
                             futures.add(task);

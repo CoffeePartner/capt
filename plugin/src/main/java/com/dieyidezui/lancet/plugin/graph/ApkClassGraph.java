@@ -55,7 +55,7 @@ public class ApkClassGraph implements ClassGraph {
                 return new Classes(classes.values().parallelStream()
                         .filter(ApkClassInfo::exists)
                         .map(n -> n.clazz)
-                        .collect(Collectors.toCollection(() -> new ArrayList<>(classes.size() / 2))));
+                        .collect(Collectors.toCollection(() -> new ArrayList<>(classes.size() >> 3))));
             }
         };
     }

@@ -54,7 +54,7 @@ public class ApkClassInfo implements ClassInfo {
     void update(ClassBean bean, Status newStatus, boolean throwIfDuplicated) {
         ClassBean oldBean = clazz;
         Status oldStatus = this.status.getAndSet(newStatus);
-        if (oldStatus != Status.NOT_EXISTS) {
+        if (oldStatus != Status.NOT_EXISTS && oldStatus != Status.NOT_CHANGED) {
             // remove && add ==  changed
             if (oldStatus == Status.ADDED && newStatus == Status.REMOVED
                     || oldStatus == Status.REMOVED && newStatus == Status.ADDED) {

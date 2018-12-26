@@ -34,13 +34,11 @@ public class PluginManager implements Constants {
     private final GlobalResource global;
     private final VariantResource resource;
     private final TransformInvocation invocation;
-    private final TransformDispatcher dispatcher;
     private Map<String, PluginBean> prePlugins = Collections.emptyMap();
     private final Map<String, Plugin> plugins = new HashMap<>();
     private final List<PluginWrapper> wrappers = new ArrayList<>();
 
-    public PluginManager(TransformDispatcher dispatcher, GlobalResource global, VariantResource resource, TransformInvocation invocation) {
-        this.dispatcher = dispatcher;
+    public PluginManager(GlobalResource global, VariantResource resource, TransformInvocation invocation) {
         this.global = global;
         this.resource = resource;
         this.invocation = invocation;
@@ -87,10 +85,6 @@ public class PluginManager implements Constants {
             LOGGER.lifecycle("Found new plugin applied, turn into full mode");
         }
 
-        if (incremental) {
-            collectRemovedPluginsClasses();
-        }
-
         CommonArgs args = CommonArgs.createBy(extension, scope, plugins);
 
         for (Map.Entry<String, Plugin> entry : plugins.entrySet()) {
@@ -112,13 +106,12 @@ public class PluginManager implements Constants {
     /**
      * Rerack classes for removed plugin
      */
-    private void collectRemovedPluginsClasses() {
-        Set<String> classes = prePlugins.entrySet().parallelStream()
+    public Set<String> collectRemovedPluginsAffectedClasses() {
+        return prePlugins.entrySet().stream()
                 .filter(e -> !plugins.containsKey(e.getKey()))
                 .map(Map.Entry::getValue)
                 .flatMap(b -> b.getAffectedClasses().stream())
                 .collect(Collectors.toSet());
-        dispatcher.rerack(classes);
     }
 
 
