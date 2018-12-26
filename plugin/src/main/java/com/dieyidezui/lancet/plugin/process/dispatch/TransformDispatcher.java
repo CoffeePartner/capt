@@ -3,6 +3,7 @@ package com.dieyidezui.lancet.plugin.process.dispatch;
 import com.android.build.api.transform.TransformInvocation;
 import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
+import com.dieyidezui.lancet.plugin.graph.ApkClassInfo;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 
 import java.util.Collections;
@@ -23,16 +24,11 @@ public class TransformDispatcher {
         this.global = global;
     }
 
-    public void dispatchMetas(Map<String, MetaProcessor> processors) {
-
-    }
-
     public void dispatchTransforms(List<ClassTransformer> transformers) {
 
     }
 
-    public void rerack(Set<String> classes) {
-        incremental = true;
-        rerack = classes;
+    public void rerack(Set<ApkClassInfo> classes) {
+
     }
 }

@@ -59,9 +59,9 @@ public class GradleLancetPlugin implements Plugin<Project>, Constants {
 
         int core = Runtime.getRuntime().availableProcessors();
         // use 20s instead if 60s to opt memory
-        // 2 x core threads at most
+        // 3 x core threads at most
         // Use it combine with ForkJoinPool
-        ExecutorService io = new ThreadPoolExecutor(0, core * 2,
+        ExecutorService io = new ThreadPoolExecutor(0, core * 3,
                 20L, TimeUnit.SECONDS,
                 new SynchronousQueue<>(),
                 new LancetThreadFactory());

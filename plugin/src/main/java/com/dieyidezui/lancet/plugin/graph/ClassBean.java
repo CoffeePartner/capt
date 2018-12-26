@@ -5,6 +5,7 @@ import org.objectweb.asm.Opcodes;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,16 +28,16 @@ public class ClassBean {
 
 
     public ClassBean(String name, boolean isInterface) {
-        this(isInterface ? Opcodes.ACC_INTERFACE | Opcodes.ACC_ABSTRACT : 0, name, null, null);
+        this(isInterface ? Opcodes.ACC_INTERFACE | Opcodes.ACC_ABSTRACT : 0, name, null, null, null);
     }
 
 
-    public ClassBean(int access, String name, @Nullable String signature, @Nullable String superName) {
+    public ClassBean(int access, String name, @Nullable String signature, @Nullable String superName, @Nullable String[] interfaces) {
         this.access = access;
         this.name = name;
         this.signature = signature;
         this.superName = superName;
-        this.interfaces = Collections.emptyList();
+        this.interfaces = interfaces == null ? Collections.emptyList() : Arrays.asList(interfaces);
         this.methods = Collections.emptyList();
     }
 

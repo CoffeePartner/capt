@@ -153,12 +153,10 @@ public class VariantManager implements Constants {
         }
 
         @Override
-        public VariantScope create(BaseVariant v, @Nullable VariantScope parent) {
+        public VariantScope create(BaseVariant v, VariantScope parent) {
             VariantScope child = create(v);
-            if (parent != null) {
-                // TODO: should androidTest variant extendsFrom normal variant ?
-                child.getLancetConfiguration().extendsFrom(parent.getLancetConfiguration());
-            }
+            // TODO: should androidTest variant extendsFrom normal variant ?
+            child.getLancetConfiguration().extendsFrom(parent.getLancetConfiguration());
             return child;
         }
     }

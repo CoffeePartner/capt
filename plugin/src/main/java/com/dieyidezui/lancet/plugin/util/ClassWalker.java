@@ -92,11 +92,12 @@ public final class ClassWalker {
         /**
          * @param classBytes null for REMOVED
          */
+        @Nullable
         ForkJoinTask<ClassEntry> onVisit(ForkJoinPool pool, @Nullable byte[] classBytes, String className, Status status);
 
         interface Factory {
             @Nullable
-            Visitor newVisitor(QualifiedContent content);
+            Visitor newVisitor(boolean incremental, QualifiedContent content);
         }
     }
 
@@ -159,7 +160,7 @@ public final class ClassWalker {
                             name.substring(0, name.length() - 6), // .class = 6
                             status
                     );
-                    if (write) {
+                    if (write && future != null) {
                         futures.add(future);
                     }
                 } else if (write) { // keep other resources content in jar

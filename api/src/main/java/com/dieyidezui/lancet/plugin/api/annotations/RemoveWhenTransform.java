@@ -9,6 +9,6 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.CLASS)
 @Target({ElementType.TYPE})
-@RemoveAfterTransform
-public @interface RemoveAfterTransform {
+@RemoveWhenTransform
+public @interface RemoveWhenTransform {
 }

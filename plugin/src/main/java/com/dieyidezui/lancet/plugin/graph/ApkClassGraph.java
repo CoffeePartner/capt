@@ -9,9 +9,7 @@ import org.gradle.api.logging.Logging;
 import org.objectweb.asm.Opcodes;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -24,7 +22,7 @@ public class ApkClassGraph implements ClassGraph {
     private final Map<String, ApkClassInfo> classes = new ConcurrentHashMap<>(Constants.OPT_SIZE);
     private final VariantResource variantResource;
     private final boolean throwIfDuplicated;
-    private boolean incremental;
+    private ConcurrentHashMap<String, ApkClassGraph> removedJars;
 
     public ApkClassGraph(VariantResource variantResource, boolean throwIfDuplicated) {
         this.variantResource = variantResource;
@@ -58,6 +56,32 @@ public class ApkClassGraph implements ClassGraph {
                         .collect(Collectors.toCollection(() -> new ArrayList<>(classes.size() >> 3))));
             }
         };
+    }
+
+
+    public void onJarRemoved(String name) {
+        removedJars.put(name, this);
+    }
+
+
+    public void collectRemovedClasses() {
+        Set<String> removed = new HashSet<>(removedJars.keySet());
+         this.getAll()
+                .values()
+                .parallelStream()
+                // on removed directory, status == REMOVED
+                // on changed/removed jar ,but class is NOT_CHANGED, means the class is removed
+                .filter(c -> {
+                    if (c.status() == Status.REMOVED) {
+                        return true;
+                    }
+                    if (c.status() == Status.NOT_CHANGED && removed.contains(c.clazz.belongsTo)) {
+                        c.markRemoved();
+                        return true;
+                    }
+                    return false;
+                })
+                .collect(Collectors.toList());
     }
 
     public void add(ClassBean clazz, Status status) {

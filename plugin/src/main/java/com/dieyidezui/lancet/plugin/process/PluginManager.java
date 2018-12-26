@@ -3,6 +3,9 @@ package com.dieyidezui.lancet.plugin.process;
 import com.android.build.api.transform.TransformException;
 import com.android.build.api.transform.TransformInvocation;
 import com.dieyidezui.lancet.plugin.api.*;
+import com.dieyidezui.lancet.plugin.api.graph.Status;
+import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
+import com.dieyidezui.lancet.plugin.graph.ApkClassInfo;
 import com.dieyidezui.lancet.plugin.process.dispatch.TransformDispatcher;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.gradle.GradleLancetExtension;
@@ -45,7 +48,7 @@ public class PluginManager implements Constants {
     }
 
     @SuppressWarnings("Convert2Lambda")
-    public Consumer<LastPlugins> asConsumer() {
+    public Consumer<LastPlugins> readPrePlugins() {
         return new Consumer<LastPlugins>() {
             @Override
             public void accept(LastPlugins l) {
@@ -55,7 +58,7 @@ public class PluginManager implements Constants {
     }
 
     @SuppressWarnings("Convert2Lambda")
-    public Supplier<LastPlugins> asSupplier() {
+    public Supplier<LastPlugins> writePlugins() {
         return new Supplier<LastPlugins>() {
             @Override
             public LastPlugins get() {
@@ -106,11 +109,14 @@ public class PluginManager implements Constants {
     /**
      * Rerack classes for removed plugin
      */
-    public Set<String> collectRemovedPluginsAffectedClasses() {
-        return prePlugins.entrySet().stream()
+    public Set<ApkClassInfo> collectRemovedPluginsAffectedClasses(ApkClassGraph graph) {
+        return prePlugins.entrySet().parallelStream()
                 .filter(e -> !plugins.containsKey(e.getKey()))
                 .map(Map.Entry::getValue)
                 .flatMap(b -> b.getAffectedClasses().stream())
+                .map(graph::get)
+                .filter(Objects::nonNull)
+                .filter(c -> c.status() == Status.NOT_CHANGED) // others are already called.
                 .collect(Collectors.toSet());
     }
 

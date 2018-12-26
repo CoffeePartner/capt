@@ -14,6 +14,8 @@ import com.dieyidezui.lancet.plugin.process.dispatch.MetaDispatcher;
 import com.dieyidezui.lancet.plugin.process.dispatch.TransformDispatcher;
 import com.dieyidezui.lancet.plugin.process.plugin.GlobalLancet;
 import com.dieyidezui.lancet.plugin.cache.FileManager;
+import com.dieyidezui.lancet.plugin.process.visitors.FirstRound;
+import com.dieyidezui.lancet.plugin.process.visitors.SecondRound;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
 import com.dieyidezui.lancet.plugin.util.ClassWalker;
@@ -22,7 +24,6 @@ import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 
@@ -75,7 +76,8 @@ public class VariantScope implements Constants {
 
         if (invocation.isIncremental()) {
             internalCache.loadAsync(graph.readClasses());
-            internalCache.loadAsync(manager.asConsumer());
+            internalCache.loadAsync(manager.readPrePlugins());
+            internalCache.loadAsync(metaDispatcher.readPreMetas());
 
             internalCache.await();
         }
@@ -91,29 +93,31 @@ public class VariantScope implements Constants {
 
         // Round 1: make class graph & collect metas
         // use the invocation.isIncremental()
-        walker.visit(invocation.isIncremental(), false, );
+        FirstRound firstRound = new FirstRound(graph, metaDispatcher);
+        walker.visit(invocation.isIncremental(), false, firstRound);
 
 
-        // everything ready, start plugin logic
+        // everything ready, call plugin lifecycle
         manager.callCreate();
 
 
-        MetaDispatcher meta
         // Round 2: visit Metas
 
 
         // Round 3: transform classes
         // use the actual incremental (for plugins input)
         // remember to ignore removed classes if incremental
+        SecondRound secondRound = new SecondRound(firstRound.getToRemove());
         walker.visit(incremental, true, );
         if (incremental) {
             // tell plugins the removed classes
-            transformDispatcher.rerack(manager.collectRemovedPluginsAffectedClasses());
+
+            transformDispatcher.rerack(manager.collectRemovedPluginsAffectedClasses(graph));
         }
 
 
         // transform done, store cache
-        internalCache.storeAsync(manager.asSupplier());
+        internalCache.storeAsync(manager.writePlugins());
         internalCache.storeAsync(graph.writeClasses());
         internalCache.await();
     }
@@ -122,6 +126,6 @@ public class VariantScope implements Constants {
 
         VariantScope create(BaseVariant v);
 
-        VariantScope create(BaseVariant v, @Nullable VariantScope parent);
+        VariantScope create(BaseVariant v, VariantScope parent);
     }
 }

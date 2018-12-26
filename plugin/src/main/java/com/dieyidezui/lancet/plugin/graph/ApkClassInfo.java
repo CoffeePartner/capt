@@ -18,7 +18,7 @@ public class ApkClassInfo implements ClassInfo {
 
     private static final Logger LOGGER = Logging.getLogger(ApkClassInfo.class);
 
-    private AtomicReference<Status> status;
+    public AtomicReference<Status> status;
     public ClassBean clazz;
 
     /**
@@ -46,9 +46,10 @@ public class ApkClassInfo implements ClassInfo {
     }
 
     public void markRemoved() {
-        status.set(Status.REMOVED);
-        parent = null;
-        interfaces = classChildren = interfaceChildren = implementedClasses = Collections.emptyList();
+        if (status.getAndSet(Status.REMOVED) != Status.ADDED) {
+            parent = null;
+            interfaces = classChildren = interfaceChildren = implementedClasses = Collections.emptyList();
+        }
     }
 
     void update(ClassBean bean, Status newStatus, boolean throwIfDuplicated) {

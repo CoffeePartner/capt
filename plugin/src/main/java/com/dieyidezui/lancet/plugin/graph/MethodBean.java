@@ -4,6 +4,9 @@ import com.dieyidezui.lancet.plugin.api.graph.MethodInfo;
 
 import javax.annotation.Nullable;
 
+/**
+ * Ignore exceptions, too large
+ */
 public class MethodBean implements MethodInfo {
 
     public int access;
