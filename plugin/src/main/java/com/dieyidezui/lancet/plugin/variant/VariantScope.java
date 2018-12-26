@@ -97,11 +97,8 @@ public class VariantScope implements Constants {
         FirstRound firstRound = new FirstRound(graph, metaDispatcher);
         walker.visit(invocation.isIncremental(), false, firstRound);
 
-
         // everything ready, call plugin lifecycle
         manager.callCreate();
-
-
         // Round 2: visit Metas
 
         // Round 3: transform classes

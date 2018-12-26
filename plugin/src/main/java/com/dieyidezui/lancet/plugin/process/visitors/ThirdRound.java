@@ -20,7 +20,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 
 /**
- * toRemove is higher than ClassTransformer.
+ * toRemove is higher than ClassTransformer
  */
 public class ThirdRound {
     private final GlobalResource global;
@@ -33,10 +33,12 @@ public class ThirdRound {
 
     public void accept(boolean incremental, ClassWalker walker, PluginManager manager, ApkClassGraph graph) throws IOException, InterruptedException, TransformException {
 
-        WaitableTasks tasks = WaitableTasks.get(global.computation());
+        WaitableTasks tasks;
 
+        tasks = WaitableTasks.get(global.computation());
         tasks.submit();
 
+        tasks.await();
         // 1. call beforeTransform to collect class request
 
 
@@ -58,7 +60,11 @@ public class ThirdRound {
         }
 
 
-        // 4. call afterTransform
+        // 3. call afterTransform
+        tasks = WaitableTasks.get(global.io());
+        tasks.submit();
+
+        tasks.await();
     }
 
     private ClassWalker.Visitor.Factory asFactory() {
@@ -66,7 +72,7 @@ public class ThirdRound {
             if (incremental && content instanceof JarInput && ((JarInput) content).getStatus() == Status.REMOVED) {
                 return null;
             }
-            return null;
+            return new TransformVisitor();
         };
     }
 
@@ -90,9 +96,10 @@ public class ThirdRound {
             this.provider = provider;
         }
 
-        public TransformContext makeContext(String className, ClassWriter writer) {
+        public TransformContext makeVisitor(String className, ClassWriter writer) {
             return new TransformContext() {
                 boolean once = false;
+
                 @Override
                 public void notifyChanged() {
                     if (!once) {
