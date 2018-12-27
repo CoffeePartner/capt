@@ -1,8 +1,8 @@
 package stub.weaver.internal.parser.anno;
 
+import org.objectweb.asm.tree.AnnotationNode;
 import stub.weaver.internal.parser.AcceptableAnnoParser;
 import stub.weaver.internal.parser.AnnotationMeta;
-import org.objectweb.asm.tree.AnnotationNode;
 
 import java.util.Arrays;
 

@@ -4,7 +4,10 @@ import com.android.build.api.transform.Status;
 import com.dieyidezui.lancet.rt.Scope;
 import stub.weaver.internal.log.Log;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 

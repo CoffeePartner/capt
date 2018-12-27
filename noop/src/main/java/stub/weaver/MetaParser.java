@@ -1,13 +1,12 @@
 package stub.weaver;
 
-import java.util.List;
-
 import stub.weaver.internal.entity.TransformInfo;
 import stub.weaver.internal.graph.Graph;
 
+import java.util.List;
+
 
 /**
- *
  * Created by gengwanpeng on 17/3/21.
  */
 public interface MetaParser {

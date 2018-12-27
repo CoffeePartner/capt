@@ -10,8 +10,8 @@ import java.util.List;
  * GeneratedInterface 有两种：
  * 1. 每个 hook 方法对应 一个，这种只会被单向影响，且目标方法只有一个(包括 Interceptable）
  * 2. 每个 Insert & Proxy 匹配到的 Class 对应一个(存在 synthetic associated 方法)，这种可能会被双向影响。
- *   1. 一方面是目标类的方法 存在与否
- *   2. 一方面是Hook的方法存在与否
+ * 1. 一方面是目标类的方法 存在与否
+ * 2. 一方面是Hook的方法存在与否
  */
 public class GeneratedInterceptorInfo {
 

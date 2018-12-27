@@ -22,7 +22,6 @@
 package stub.weaver.internal.log;
 
 
-
 import stub.weaver.internal.log.Impl.SystemLoggerImpl;
 
 /**

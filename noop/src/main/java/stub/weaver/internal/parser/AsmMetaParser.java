@@ -1,35 +1,11 @@
 package stub.weaver.internal.parser;
 
+import com.dieyidezui.lancet.rt.annotations.*;
 import com.google.common.base.Joiner;
-
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.AnnotationNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.InnerClassNode;
-import org.objectweb.asm.tree.MethodNode;
-
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import com.dieyidezui.lancet.rt.annotations.ClassOf;
-import com.dieyidezui.lancet.rt.annotations.ImplementedInterface;
-import com.dieyidezui.lancet.rt.annotations.Insert;
-import com.dieyidezui.lancet.rt.annotations.NameRegex;
-import com.dieyidezui.lancet.rt.annotations.Proxy;
-import com.dieyidezui.lancet.rt.annotations.TargetClass;
-import com.dieyidezui.lancet.rt.annotations.TryCatchHandler;
+import org.objectweb.asm.tree.*;
 import stub.weaver.MetaParser;
 import stub.weaver.internal.entity.TransformInfo;
 import stub.weaver.internal.exception.LoadClassException;
@@ -38,16 +14,14 @@ import stub.weaver.internal.graph.Graph;
 import stub.weaver.internal.log.Log;
 import stub.weaver.internal.meta.ClassMetaInfo;
 import stub.weaver.internal.meta.MethodMetaInfo;
-import stub.weaver.internal.parser.anno.AcceptAny;
-import stub.weaver.internal.parser.anno.ClassOfAnnoParser;
-import stub.weaver.internal.parser.anno.DelegateAcceptableAnnoParser;
-import stub.weaver.internal.parser.anno.GatheredAcceptableAnnoParser;
-import stub.weaver.internal.parser.anno.ImplementedInterfaceAnnoParser;
-import stub.weaver.internal.parser.anno.InsertAnnoParser;
-import stub.weaver.internal.parser.anno.NameRegexAnnoParser;
-import stub.weaver.internal.parser.anno.ProxyAnnoParser;
-import stub.weaver.internal.parser.anno.TargetClassAnnoParser;
-import stub.weaver.internal.parser.anno.TryCatchAnnoParser;
+import stub.weaver.internal.parser.anno.*;
+
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.net.URLConnection;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -171,21 +145,21 @@ public class AsmMetaParser implements MetaParser {
         @SuppressWarnings("unchecked")
         private void checkNode(ClassNode cn) {
             if (cn.fields.size() > 0) {
-                String s = ((List<FieldNode>)cn.fields).stream().map(fieldNode -> fieldNode.name).collect(Collectors.joining(","));
-                Log.w("can't declare fields '"+s+"' in hook class "+cn.name);
+                String s = ((List<FieldNode>) cn.fields).stream().map(fieldNode -> fieldNode.name).collect(Collectors.joining(","));
+                Log.w("can't declare fields '" + s + "' in hook class " + cn.name);
             }
             int ac = Opcodes.ACC_STATIC | Opcodes.ACC_PUBLIC;
             cn.innerClasses.forEach(c -> {
                 InnerClassNode n = (InnerClassNode) c;
                 if ((n.access & ac) != ac) {
-                    throw new IllegalStateException("inner class in hook class "+cn.name+" must be public static");
+                    throw new IllegalStateException("inner class in hook class " + cn.name + " must be public static");
                 }
             });
         }
 
         private boolean checkMethod(MethodNode methodNode) {
             List<AnnotationNode> list = methodNode.visibleAnnotations;
-            if (list != null ){
+            if (list != null) {
                 return list.stream().anyMatch(annotationNode -> annotationNode.desc.contains("lancet"));
             }
             return false;

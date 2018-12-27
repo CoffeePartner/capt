@@ -3,17 +3,13 @@ package com.dieyidezui.lancet.plugin.variant;
 import com.android.build.api.transform.TransformException;
 import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.api.BaseVariant;
-import com.dieyidezui.lancet.plugin.cache.InternalCache;
-import com.dieyidezui.lancet.plugin.cache.OutputProviderFactory;
-import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactory;
-import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactoryImpl;
+import com.dieyidezui.lancet.plugin.cache.*;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
 import com.dieyidezui.lancet.plugin.process.PluginManager;
-import com.dieyidezui.lancet.plugin.process.visitors.MetaDispatcher;
 import com.dieyidezui.lancet.plugin.process.plugin.GlobalLancet;
-import com.dieyidezui.lancet.plugin.cache.FileManager;
 import com.dieyidezui.lancet.plugin.process.visitors.FirstRound;
+import com.dieyidezui.lancet.plugin.process.visitors.MetaDispatcher;
 import com.dieyidezui.lancet.plugin.process.visitors.ThirdRound;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
@@ -82,10 +78,6 @@ public class VariantScope implements Constants {
 
         int scope = variant.endsWith(ANDROID_TEST) ? LancetPluginExtension.ANDROID_TEST : LancetPluginExtension.ASSEMBLE;
         boolean incremental = manager.initPlugins(global.gradleLancetExtension(), scope, lancet);
-        if (incremental) {
-
-        }
-
         variantResource.init(incremental, invocation, getLancetConfiguration());
 
 
@@ -99,7 +91,7 @@ public class VariantScope implements Constants {
         manager.callCreate();
 
         // Round 2: visit Metas
-        metaDispatcher.dispatchMetas(variantResource, null);
+        metaDispatcher.dispatchMetas(incremental, variantResource, null);
 
         // Round 3: transform classes
         // use the actual incremental (for plugins input)

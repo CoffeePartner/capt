@@ -1,13 +1,13 @@
 package stub.weaver.internal.graph;
 
+import com.dieyidezui.lancet.rt.Scope;
+import stub.weaver.internal.log.Log;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-
-import com.dieyidezui.lancet.rt.Scope;
-import stub.weaver.internal.log.Log;
 
 /**
  * Created by gengwanpeng on 17/5/5.
@@ -32,7 +32,6 @@ public class Graph {
      * Before prepare, the Graph only has vector from child to super.
      * this method will add vector from super to child.
      * After prepare, there is a full graph.
-     *
      */
     public void prepare() {
         nodeMap.values()

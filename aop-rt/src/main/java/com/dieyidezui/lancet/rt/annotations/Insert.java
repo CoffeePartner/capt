@@ -2,8 +2,6 @@ package com.dieyidezui.lancet.rt.annotations;
 
 import com.dieyidezui.lancet.rt.internal.annotations.AutoReplaced;
 
-import java.lang.annotation.*;
-
 /**
  * Indicate the hook method.
  */

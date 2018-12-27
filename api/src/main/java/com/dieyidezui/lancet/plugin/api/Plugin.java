@@ -1,14 +1,17 @@
 package com.dieyidezui.lancet.plugin.api;
 
 import com.dieyidezui.lancet.plugin.api.annotations.Def;
-import com.dieyidezui.lancet.rt.annotations.Meta;
 import com.dieyidezui.lancet.plugin.api.hint.Thread;
 import com.dieyidezui.lancet.plugin.api.hint.Type;
 import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
+import com.dieyidezui.lancet.rt.annotations.Meta;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Lifecycle:
@@ -50,7 +53,6 @@ public abstract class Plugin<T> {
     public abstract void onCreate(T lancet);
 
     /**
-     *
      * @return meta processor
      */
     @Thread(Type.SINGLE)
@@ -58,7 +60,6 @@ public abstract class Plugin<T> {
     public abstract MetaProcessor onProcessAnnotations();
 
     /**
-     *
      * @return
      */
     @Thread(Type.SINGLE)

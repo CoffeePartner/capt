@@ -1,6 +1,5 @@
 package stub.weaver.internal.util;
 
-import stub.weaver.internal.log.Log;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -10,6 +9,7 @@ import org.objectweb.asm.util.ASMifier;
 import org.objectweb.asm.util.Printer;
 import org.objectweb.asm.util.TraceClassVisitor;
 import org.objectweb.asm.util.TraceMethodVisitor;
+import stub.weaver.internal.log.Log;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -63,7 +63,7 @@ public class TraceUtil {
         PrintWriter pw = new PrintWriter(sw);
         Printer printer = new ASMifier();
         TraceMethodVisitor traceMv = new TraceMethodVisitor(printer);
-        return new MethodVisitor(Opcodes.ASM5,traceMv) {
+        return new MethodVisitor(Opcodes.ASM5, traceMv) {
 
             @Override
             public void visitEnd() {

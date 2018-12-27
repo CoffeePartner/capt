@@ -1,11 +1,10 @@
 package stub.weaver.internal.log.Impl;
 
 import org.gradle.api.logging.LogLevel;
+import stub.weaver.internal.log.ILogger;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
-import stub.weaver.internal.log.ILogger;
 
 /**
  * Created by gengwanpeng on 17/5/17.

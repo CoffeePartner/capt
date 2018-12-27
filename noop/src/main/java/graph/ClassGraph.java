@@ -1,11 +1,13 @@
 package graph;
 
-import com.android.build.api.transform.Status;
 import bean.ClassInfo;
+import com.android.build.api.transform.Status;
 import com.dieyidezui.lancet.plugin.util.Constants;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -30,7 +32,7 @@ public class ClassGraph {
     /**
      * Don't generate the reverse direction edge because of concurrent problem, do it later.
      *
-     * @param clazz the class info
+     * @param clazz  the class info
      * @param status the class status
      */
     public void add(ClassInfo clazz, Status status) {

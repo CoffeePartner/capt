@@ -8,15 +8,11 @@ import com.dieyidezui.lancet.plugin.api.OutputProvider;
 import com.dieyidezui.lancet.plugin.api.graph.ClassGraph;
 import com.dieyidezui.lancet.plugin.api.log.Logger;
 import com.dieyidezui.lancet.plugin.api.logger.LoggerFactory;
-import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
-import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
 import org.gradle.api.Project;
 
-import java.lang.annotation.Annotation;
 import java.net.URLClassLoader;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 

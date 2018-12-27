@@ -1,17 +1,12 @@
 package stub.weaver.internal.meta;
 
+import com.dieyidezui.lancet.rt.Scope;
 import com.google.common.collect.Sets;
-
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.MethodNode;
-
-import java.util.Arrays;
-import java.util.Set;
-
-import com.dieyidezui.lancet.rt.Scope;
-import stub.weaver.internal.entity.ProxyInfo;
 import stub.weaver.internal.entity.InsertInfo;
+import stub.weaver.internal.entity.ProxyInfo;
 import stub.weaver.internal.entity.TransformInfo;
 import stub.weaver.internal.entity.TryCatchInfo;
 import stub.weaver.internal.exception.IllegalAnnotationException;
@@ -22,6 +17,9 @@ import stub.weaver.internal.graph.Node;
 import stub.weaver.internal.log.Log;
 import stub.weaver.internal.parser.AopMethodAdjuster;
 import stub.weaver.internal.util.TypeUtil;
+
+import java.util.Arrays;
+import java.util.Set;
 
 /**
  * Created by gengwanpeng on 17/5/3.

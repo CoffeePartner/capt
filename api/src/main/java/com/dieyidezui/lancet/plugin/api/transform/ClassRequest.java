@@ -12,6 +12,7 @@ public abstract class ClassRequest {
 
     /**
      * Regardless of scope(), extra specified classes
+     *
      * @return extra specified classes
      */
     public Set<String> extraSpecified() {

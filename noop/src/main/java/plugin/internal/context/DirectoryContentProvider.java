@@ -4,13 +4,12 @@ import com.android.build.api.transform.DirectoryInput;
 import com.android.build.api.transform.QualifiedContent;
 import com.android.build.api.transform.Status;
 import com.google.common.io.Files;
+import stub.weaver.internal.log.Log;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
-
-import stub.weaver.internal.log.Log;
 
 /**
  * Created by gengwanpeng on 17/4/28.

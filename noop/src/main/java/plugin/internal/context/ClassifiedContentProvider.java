@@ -6,9 +6,8 @@ import java.io.IOException;
 
 /**
  * Created by gengwanpeng on 17/4/28.
- *
+ * <p>
  * A QualifiedContentProvider proxy multiple ContentProviders.
- *
  */
 public class ClassifiedContentProvider implements QualifiedContentProvider {
 
@@ -25,8 +24,8 @@ public class ClassifiedContentProvider implements QualifiedContentProvider {
     @Override
     public void forEach(QualifiedContent content, ClassFetcher processor) throws IOException {
         for (TargetedQualifiedContentProvider provider : providers) {
-            if(provider.accepted(content)){
-                provider.forEach(content,processor);
+            if (provider.accepted(content)) {
+                provider.forEach(content, processor);
             }
         }
     }

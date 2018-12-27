@@ -3,10 +3,10 @@ package plugin.internal.preprocess;
 import com.dieyidezui.lancet.rt.annotations.Insert;
 import com.dieyidezui.lancet.rt.annotations.Proxy;
 import com.dieyidezui.lancet.rt.annotations.TryCatchHandler;
+import org.objectweb.asm.*;
 import stub.weaver.internal.graph.ClassEntity;
 import stub.weaver.internal.graph.FieldEntity;
 import stub.weaver.internal.graph.MethodEntity;
-import org.objectweb.asm.*;
 
 import java.util.Arrays;
 import java.util.Collections;

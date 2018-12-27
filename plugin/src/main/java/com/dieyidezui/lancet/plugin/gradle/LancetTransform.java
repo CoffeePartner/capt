@@ -10,10 +10,8 @@ import com.dieyidezui.lancet.plugin.variant.VariantManager;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Set;
-import java.util.stream.Stream;
 
 public class LancetTransform extends Transform implements Constants {
 
@@ -55,29 +53,6 @@ public class LancetTransform extends Transform implements Constants {
         LOGGER.lifecycle("Start lancet transform for '{}', incremental: {}", invocation.getContext().getVariantName(), invocation.isIncremental());
         variantManager.getVariantScope(invocation.getContext().getVariantName())
                 .doTransform(invocation);
-
-        invocation.getInputs()
-                .stream()
-                .flatMap(i -> Stream.<QualifiedContent>concat(i.getDirectoryInputs().stream(), i.getJarInputs().stream()))
-                .forEach(i -> {
-                    //   LOGGER.error(i.toString());
-                });
-
-        LOGGER.error("------------------------");
-        invocation.getReferencedInputs()
-                .stream()
-                .flatMap(i -> Stream.<QualifiedContent>concat(i.getDirectoryInputs().stream(), i.getJarInputs().stream()))
-                .forEach(i -> {
-                    // LOGGER.error(i.toString());
-                });
-        // full mode
-        // parse
-
-
-        // diff
-
-
-        // weave
         LOGGER.lifecycle("End lancet transform, cost: {}ms", (System.currentTimeMillis() - startMs));
     }
 

@@ -1,4 +1,3 @@
-
 package plugin;
 
 import com.google.common.base.Strings;

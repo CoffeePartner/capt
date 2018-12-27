@@ -1,12 +1,12 @@
 package stub.weaver.internal.parser.anno;
 
 import com.google.common.base.Strings;
+import org.objectweb.asm.tree.AnnotationNode;
 import stub.weaver.internal.exception.IllegalAnnotationException;
 import stub.weaver.internal.meta.HookInfoLocator;
 import stub.weaver.internal.parser.AnnoParser;
 import stub.weaver.internal.parser.AnnotationMeta;
 import stub.weaver.internal.util.RefHolder;
-import org.objectweb.asm.tree.AnnotationNode;
 
 import java.util.List;
 

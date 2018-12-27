@@ -1,7 +1,7 @@
 package stub.weaver.internal.meta;
 
-import stub.weaver.internal.parser.AnnotationMeta;
 import org.objectweb.asm.tree.MethodNode;
+import stub.weaver.internal.parser.AnnotationMeta;
 
 import java.util.List;
 

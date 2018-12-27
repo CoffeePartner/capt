@@ -2,11 +2,10 @@ package stub.weaver.internal.asm.classvisitor;
 
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-
-import java.util.Set;
-
 import stub.weaver.internal.asm.LinkedClassVisitor;
 import stub.weaver.internal.util.TypeUtil;
+
+import java.util.Set;
 
 /**
  * Created by gengwanpeng on 17/5/15.
@@ -33,9 +32,9 @@ public class HookClassVisitor extends LinkedClassVisitor {
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-        if (matched){
-            return super.visitMethod(TypeUtil.resetAccessScope(access,Opcodes.ACC_PUBLIC), name, desc, signature, exceptions);
-        }else {
+        if (matched) {
+            return super.visitMethod(TypeUtil.resetAccessScope(access, Opcodes.ACC_PUBLIC), name, desc, signature, exceptions);
+        } else {
             return super.visitMethod(access, name, desc, signature, exceptions);
         }
     }

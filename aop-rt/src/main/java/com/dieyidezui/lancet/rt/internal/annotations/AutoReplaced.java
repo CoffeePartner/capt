@@ -1,7 +1,5 @@
 package com.dieyidezui.lancet.rt.internal.annotations;
 
-import java.lang.annotation.*;
-
 /**
  * Indicates that annotations will replace / move / transform their annotated methods' bytecode.
  */

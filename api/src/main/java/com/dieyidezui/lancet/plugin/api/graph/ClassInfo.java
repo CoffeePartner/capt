@@ -17,6 +17,7 @@ public interface ClassInfo {
 
     /**
      * Alias for: status != REMOVED && status != NOT_EXISTS
+     *
      * @return true if exists in APK.
      */
     boolean exists();

@@ -3,12 +3,11 @@ package stub.weaver.internal.asm.classvisitor.methodvisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import stub.weaver.internal.entity.TryCatchInfo;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import stub.weaver.internal.entity.TryCatchInfo;
 
 
 /**

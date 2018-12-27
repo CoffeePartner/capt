@@ -49,15 +49,15 @@ public class TypeUtil {
         return index;
     }
 
-    public static boolean isStatic(int access){
+    public static boolean isStatic(int access) {
         return (access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC;
     }
 
-    public static boolean isAbstract(int access){
+    public static boolean isAbstract(int access) {
         return (access & Opcodes.ACC_ABSTRACT) == Opcodes.ACC_ABSTRACT;
     }
 
-    public static boolean isSynthetic(int access){
+    public static boolean isSynthetic(int access) {
         return (access & Opcodes.ACC_SYNTHETIC) == Opcodes.ACC_SYNTHETIC;
     }
 
@@ -69,7 +69,7 @@ public class TypeUtil {
         return (access & Opcodes.ACC_PUBLIC) == Opcodes.ACC_PUBLIC;
     }
 
-    public static int resetAccessScope(int access,int scope){
+    public static int resetAccessScope(int access, int scope) {
         return access & ~(Opcodes.ACC_PRIVATE | Opcodes.ACC_PUBLIC | Opcodes.ACC_PROTECTED) | scope;
     }
 }

@@ -2,11 +2,11 @@ package stub.weaver.internal.parser;
 
 import com.dieyidezui.lancet.rt.Origin;
 import com.dieyidezui.lancet.rt.This;
-import stub.weaver.internal.util.PrimitiveUtil;
-import stub.weaver.internal.util.TypeUtil;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
+import stub.weaver.internal.util.PrimitiveUtil;
+import stub.weaver.internal.util.TypeUtil;
 
 /**
  * Created by gengwanpeng on 17/3/28.

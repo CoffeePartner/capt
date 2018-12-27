@@ -1,9 +1,8 @@
 package stub.weaver.internal.entity;
 
 import com.google.common.base.Strings;
-
-import stub.weaver.internal.util.AsmUtil;
 import org.objectweb.asm.tree.MethodNode;
+import stub.weaver.internal.util.AsmUtil;
 
 import java.nio.file.FileSystems;
 import java.util.regex.Pattern;
@@ -23,7 +22,7 @@ public class ProxyInfo {
 
     public Pattern pattern;
 
-    private ThreadLocal<MethodNode> local = new ThreadLocal<MethodNode>(){
+    private ThreadLocal<MethodNode> local = new ThreadLocal<MethodNode>() {
         @Override
         synchronized protected MethodNode initialValue() {
             return AsmUtil.clone(sourceMethod);

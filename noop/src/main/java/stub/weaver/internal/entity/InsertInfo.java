@@ -1,7 +1,7 @@
 package stub.weaver.internal.entity;
 
-import stub.weaver.internal.util.AsmUtil;
 import org.objectweb.asm.tree.MethodNode;
+import stub.weaver.internal.util.AsmUtil;
 
 /**
  * Created by gengwanpeng on 17/3/27.
@@ -15,7 +15,7 @@ public class InsertInfo {
     public String sourceClass;
     public MethodNode sourceMethod;
 
-    private ThreadLocal<MethodNode> local = new ThreadLocal<MethodNode>(){
+    private ThreadLocal<MethodNode> local = new ThreadLocal<MethodNode>() {
         @Override
         synchronized protected MethodNode initialValue() {
             return AsmUtil.clone(sourceMethod);

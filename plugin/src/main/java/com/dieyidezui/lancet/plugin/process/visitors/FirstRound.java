@@ -3,14 +3,14 @@ package com.dieyidezui.lancet.plugin.process.visitors;
 import com.android.build.api.transform.JarInput;
 import com.android.build.api.transform.QualifiedContent;
 import com.android.build.api.transform.Status;
-import com.dieyidezui.lancet.rt.annotations.Meta;
-import com.dieyidezui.lancet.rt.annotations.RemoveWhenTransform;
 import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
 import com.dieyidezui.lancet.plugin.graph.ClassBean;
 import com.dieyidezui.lancet.plugin.graph.MethodBean;
 import com.dieyidezui.lancet.plugin.util.ClassWalker;
 import com.dieyidezui.lancet.plugin.util.ConcurrentHashSet;
 import com.dieyidezui.lancet.plugin.util.TypeUtil;
+import com.dieyidezui.lancet.rt.annotations.Meta;
+import com.dieyidezui.lancet.rt.annotations.RemoveWhenTransform;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.objectweb.asm.*;
@@ -97,7 +97,7 @@ public class FirstRound implements ClassWalker.Visitor.Factory {
         @Override
         public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
             if (!expectedName.equals(name)) {
-                throw new IllegalArgumentException("Class name '" + name + "' is not the same as expected '" + expectedName + "' in"  + belongsTo);
+                throw new IllegalArgumentException("Class name '" + name + "' is not the same as expected '" + expectedName + "' in" + belongsTo);
             }
             bean = new ClassBean(access, name, signature, superName, interfaces);
             bean.belongsTo = belongsTo;

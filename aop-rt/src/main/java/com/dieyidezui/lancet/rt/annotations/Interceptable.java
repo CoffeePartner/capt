@@ -1,9 +1,7 @@
 package com.dieyidezui.lancet.rt.annotations;
 
-import com.dieyidezui.lancet.rt.internal.annotations.AutoReplaced;
 import com.dieyidezui.lancet.rt.Lancet;
-
-import java.lang.annotation.*;
+import com.dieyidezui.lancet.rt.internal.annotations.AutoReplaced;
 
 /**
  * Annotate a method to make it interceptable by {@link Lancet#getGlobalInterceptor()}.

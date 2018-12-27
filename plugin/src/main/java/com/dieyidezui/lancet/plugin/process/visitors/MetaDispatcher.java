@@ -5,7 +5,9 @@ import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
 import com.dieyidezui.lancet.plugin.util.ConcurrentHashSet;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -56,7 +58,7 @@ public class MetaDispatcher {
     }
 
 
-    public void dispatchMetas(VariantResource resource, MetaProcessorFactory factory) {
+    public void dispatchMetas(boolean incremental, VariantResource resource, MetaProcessorFactory factory) {
 
     }
 

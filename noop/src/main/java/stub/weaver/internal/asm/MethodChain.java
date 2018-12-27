@@ -1,7 +1,12 @@
 package stub.weaver.internal.asm;
 
-import com.google.common.base.Preconditions;
 import com.dieyidezui.lancet.rt.annotations.ClassOf;
+import com.google.common.base.Preconditions;
+import org.objectweb.asm.*;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 import stub.weaver.internal.asm.classvisitor.methodvisitor.AutoUnboxMethodVisitor;
 import stub.weaver.internal.graph.ClassEntity;
 import stub.weaver.internal.graph.FieldEntity;
@@ -11,11 +16,6 @@ import stub.weaver.internal.parser.AopMethodAdjuster;
 import stub.weaver.internal.util.Bitset;
 import stub.weaver.internal.util.PrimitiveUtil;
 import stub.weaver.internal.util.TypeUtil;
-import org.objectweb.asm.*;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -155,7 +155,7 @@ public class MethodChain {
         headFromInsert(access, className, name, desc);
     }
 
-    public Invoker getHead(){
+    public Invoker getHead() {
         return head;
     }
 

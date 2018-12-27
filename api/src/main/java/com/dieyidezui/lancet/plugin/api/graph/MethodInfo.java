@@ -1,13 +1,13 @@
 package com.dieyidezui.lancet.plugin.api.graph;
 
 
-
 import javax.annotation.Nullable;
 
 public interface MethodInfo {
 
     /**
      * method access with deprecated flag, {@see Opcodes.ACC_DEPRECATED}
+     *
      * @return method access
      */
     int access();

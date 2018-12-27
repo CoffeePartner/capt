@@ -5,9 +5,8 @@ import java.util.*;
 
 /**
  * Created by gengwanpeng on 17/3/27.
- *
+ * <p>
  * A data sets store all data for transform operation.
- *
  */
 public class TransformInfo {
 

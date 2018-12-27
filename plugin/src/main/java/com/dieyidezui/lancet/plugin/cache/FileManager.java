@@ -3,7 +3,6 @@ package com.dieyidezui.lancet.plugin.cache;
 import com.android.build.api.transform.Format;
 import com.android.build.api.transform.QualifiedContent;
 import com.android.build.api.transform.TransformInvocation;
-import com.dieyidezui.lancet.plugin.cache.OutputProviderFactory;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;

@@ -5,21 +5,16 @@ import com.android.build.api.transform.QualifiedContent;
 import com.android.build.api.transform.Status;
 import com.android.utils.FileUtils;
 import com.google.common.io.Files;
-
-import java.io.BufferedOutputStream;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.jar.JarOutputStream;
-import java.util.zip.ZipEntry;
-
 import plugin.Util;
 import plugin.internal.context.ClassFetcher;
 import stub.weaver.ClassData;
 import stub.weaver.Weaver;
+
+import java.io.*;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.jar.JarOutputStream;
+import java.util.zip.ZipEntry;
 
 /**
  * Created by gengwanpeng on 17/5/4.

@@ -1,8 +1,8 @@
 package com.dieyidezui.lancet.plugin.graph;
 
-import com.dieyidezui.lancet.plugin.api.graph.Status;
 import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
 import com.dieyidezui.lancet.plugin.api.graph.MethodInfo;
+import com.dieyidezui.lancet.plugin.api.graph.Status;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;

@@ -12,6 +12,7 @@ public interface ClassFetcher {
 
     /**
      * begin unzip a QualifiedContent.
+     *
      * @param content the Jar or Dir QualifiedContent.
      * @return whether the Fetcher can accept this QualifiedContent.
      * @throws IOException
@@ -20,6 +21,7 @@ public interface ClassFetcher {
 
     /**
      * fetch each class in QualifiedContent. each invoke will in one thread.
+     *
      * @param content
      * @param status
      * @param relativePath
@@ -30,6 +32,7 @@ public interface ClassFetcher {
 
     /**
      * has finished fetch class in this QualifiedContent
+     *
      * @param content
      * @throws IOException
      */

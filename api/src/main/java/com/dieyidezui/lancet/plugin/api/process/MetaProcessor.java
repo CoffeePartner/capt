@@ -1,9 +1,9 @@
 package com.dieyidezui.lancet.plugin.api.process;
 
-import com.dieyidezui.lancet.rt.annotations.Meta;
 import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
 import com.dieyidezui.lancet.plugin.api.hint.Thread;
 import com.dieyidezui.lancet.plugin.api.hint.Type;
+import com.dieyidezui.lancet.rt.annotations.Meta;
 
 import javax.annotation.Nullable;
 

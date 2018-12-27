@@ -1,11 +1,11 @@
 package plugin.internal;
 
 
-import java.util.Collections;
-import java.util.List;
-
 import stub.weaver.internal.graph.CheckFlow;
 import stub.weaver.internal.graph.ClassEntity;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by gengwanpeng on 17/4/26.

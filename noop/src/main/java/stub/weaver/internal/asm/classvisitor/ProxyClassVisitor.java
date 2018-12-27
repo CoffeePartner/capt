@@ -1,16 +1,15 @@
 package stub.weaver.internal.asm.classvisitor;
 
-import stub.weaver.internal.asm.MethodChain;
 import org.objectweb.asm.MethodVisitor;
+import stub.weaver.internal.asm.LinkedClassVisitor;
+import stub.weaver.internal.asm.MethodChain;
+import stub.weaver.internal.asm.classvisitor.methodvisitor.ProxyMethodVisitor;
+import stub.weaver.internal.entity.ProxyInfo;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import stub.weaver.internal.asm.LinkedClassVisitor;
-import stub.weaver.internal.asm.classvisitor.methodvisitor.ProxyMethodVisitor;
-import stub.weaver.internal.entity.ProxyInfo;
 
 /**
  * Created by Jude on 17/4/26.
@@ -20,6 +19,7 @@ public class ProxyClassVisitor extends LinkedClassVisitor {
     private List<ProxyInfo> infos;
     private Map<String, List<ProxyInfo>> matches;
     private Map<String, MethodChain.Invoker> maps = new HashMap<>();
+
     public ProxyClassVisitor(List<ProxyInfo> infos) {
         this.infos = infos;
     }

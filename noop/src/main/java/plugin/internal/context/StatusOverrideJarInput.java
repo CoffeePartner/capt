@@ -4,11 +4,10 @@ import com.android.build.api.transform.JarInput;
 import com.android.build.api.transform.Status;
 import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
+import plugin.internal.TransformContext;
 
 import java.io.File;
 import java.util.Set;
-
-import plugin.internal.TransformContext;
 
 /**
  * Created by Jude on 2017/7/14.
@@ -16,7 +15,7 @@ import plugin.internal.TransformContext;
 
 public class StatusOverrideJarInput implements JarInput {
     private JarInput jarInput;
-    private File jar ;
+    private File jar;
     private Status status;
 
 
@@ -33,7 +32,7 @@ public class StatusOverrideJarInput implements JarInput {
 
     @Override
     public String getName() {
-        return Hashing.sha1().hashString(jar.getPath()+status, Charsets.UTF_16LE).toString();
+        return Hashing.sha1().hashString(jar.getPath() + status, Charsets.UTF_16LE).toString();
     }
 
     @Override

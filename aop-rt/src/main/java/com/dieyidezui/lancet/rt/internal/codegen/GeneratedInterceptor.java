@@ -1,7 +1,7 @@
 package com.dieyidezui.lancet.rt.internal.codegen;
 
-import com.dieyidezui.lancet.rt.Interceptor;
 import com.dieyidezui.lancet.rt.AroundContext;
+import com.dieyidezui.lancet.rt.Interceptor;
 
 import javax.annotation.Nullable;
 

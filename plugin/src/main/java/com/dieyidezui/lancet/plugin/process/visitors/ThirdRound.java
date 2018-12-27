@@ -46,7 +46,7 @@ public class ThirdRound {
         computation.await();
 
         // 2. dispatch classes
-        walker.visit(!hasAll && incremental, true, asFactory());
+        walker.visit(!hasAll && incremental, true, asFactory(transforms));
         if (incremental) {
             // dispatch REMOVED
             graph.getAll().values()
@@ -78,7 +78,7 @@ public class ThirdRound {
                                 }, Collector.Characteristics.UNORDERED)));
             });
             try {
-                walker.visitTargets(asFactory(), future.get());
+                walker.visitTargets(asFactory(transforms), future.get());
             } catch (ExecutionException e) {
                 if (e.getCause() instanceof IOException) {
                     throw (IOException) e.getCause();
@@ -110,7 +110,7 @@ public class ThirdRound {
         });
     }
 
-    private ClassWalker.Visitor.Factory asFactory() {
+    private ClassWalker.Visitor.Factory asFactory(List<PluginTransform> transforms) {
         return (incremental, content) -> {
             if (incremental && content instanceof JarInput && ((JarInput) content).getStatus() == Status.REMOVED) {
                 return null;

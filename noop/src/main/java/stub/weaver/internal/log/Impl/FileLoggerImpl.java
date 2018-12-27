@@ -47,7 +47,7 @@ public class FileLoggerImpl extends BaseLogger {
 
     @Override
     protected void write(LogLevel level, String prefix, String msg, Throwable t) {
-        pr.println(String.format("%s [%-10s] %s",level.name(), prefix, msg));
+        pr.println(String.format("%s [%-10s] %s", level.name(), prefix, msg));
         if (t != null) {
             t.printStackTrace(pr);
         }

@@ -1,7 +1,5 @@
 package com.dieyidezui.lancet.rt.annotations;
 
-import java.lang.annotation.*;
-
 /**
  * Annotates a parameter that its actual desc is the value().
  * The parameter should be instance of the desc of class.

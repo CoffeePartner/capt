@@ -9,10 +9,10 @@ public class GeneratedStaticEntranceInfo {
 
     /**
      * Proxy Desc like:
-     *   1. none static: target args this
-     *   2. static: args this
+     * 1. none static: target args this
+     * 2. static: args this
      * Throw Desc like:
-     *   1. (type, this)type
+     * 1. (type, this)type
      */
     public MethodLocator locator;
 

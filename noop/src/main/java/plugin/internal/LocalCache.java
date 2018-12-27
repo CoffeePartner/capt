@@ -5,8 +5,10 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
-
 import org.apache.commons.io.Charsets;
+import plugin.internal.preprocess.MetaGraphGeneratorImpl;
+import stub.weaver.internal.graph.CheckFlow;
+import stub.weaver.internal.graph.ClassEntity;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,10 +16,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
 import java.util.stream.Stream;
-
-import plugin.internal.preprocess.MetaGraphGeneratorImpl;
-import stub.weaver.internal.graph.CheckFlow;
-import stub.weaver.internal.graph.ClassEntity;
 
 /**
  * Created by gengwanpeng on 17/4/26.
@@ -66,6 +64,7 @@ public class LocalCache {
 
     /**
      * if hook class has modified.
+     *
      * @param context TransformContext for this compile
      * @return true if hook class hasn't modified.
      */

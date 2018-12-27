@@ -6,13 +6,9 @@ import com.dieyidezui.lancet.plugin.api.Context;
 import com.dieyidezui.lancet.plugin.api.LancetInternal;
 import com.dieyidezui.lancet.plugin.api.OutputProvider;
 import com.dieyidezui.lancet.plugin.api.graph.ClassGraph;
-import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
-import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 import org.gradle.api.Project;
 
-import java.lang.annotation.Annotation;
 import java.net.URLClassLoader;
-import java.util.Set;
 
 public class ForwardingLancet implements LancetInternal {
 

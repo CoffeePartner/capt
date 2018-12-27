@@ -1,14 +1,14 @@
 package stub.weaver.internal.parser.anno;
 
-import com.google.common.base.Strings;
 import com.dieyidezui.lancet.rt.annotations.ClassOf;
+import com.google.common.base.Strings;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.AnnotationNode;
 import stub.weaver.internal.exception.IllegalAnnotationException;
 import stub.weaver.internal.graph.Graph;
 import stub.weaver.internal.meta.HookInfoLocator;
 import stub.weaver.internal.parser.AnnoParser;
 import stub.weaver.internal.parser.AnnotationMeta;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.AnnotationNode;
 
 import java.util.List;
 import java.util.regex.Matcher;

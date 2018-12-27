@@ -3,7 +3,6 @@ package plugin.internal.context;
 import com.android.build.api.transform.JarInput;
 import com.android.build.api.transform.QualifiedContent;
 import com.google.common.io.ByteStreams;
-
 import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedInputStream;

@@ -1,7 +1,6 @@
 package stub.weaver.internal.asm;
 
 import org.objectweb.asm.ClassReader;
-
 import stub.weaver.ClassData;
 import stub.weaver.internal.asm.classvisitor.HookClassVisitor;
 import stub.weaver.internal.asm.classvisitor.InsertClassVisitor;

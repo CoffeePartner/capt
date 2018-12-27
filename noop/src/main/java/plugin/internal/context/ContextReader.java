@@ -4,33 +4,24 @@ import com.android.build.api.transform.JarInput;
 import com.android.build.api.transform.QualifiedContent;
 import com.android.build.api.transform.Status;
 import com.google.common.collect.ImmutableList;
+import plugin.internal.TransformContext;
+import plugin.internal.preprocess.ParseFailureException;
+import stub.weaver.internal.log.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import plugin.internal.TransformContext;
-import plugin.internal.preprocess.ParseFailureException;
-import stub.weaver.internal.log.Log;
-
 /**
  * Created by gengwanpeng on 17/5/2.
- *
+ * <p>
  * This class will unzip all jars,and accept all class with input ClassFetcher in thread pool.
  * Used in pre-analysis and formal analysis.
- *
  */
 public class ContextReader {
 
@@ -49,8 +40,9 @@ public class ContextReader {
 
     /**
      * read the classes in thread pool and send class to fetcher.
+     *
      * @param incremental is incremental compile
-     * @param fetcher the fetcher to visit classes
+     * @param fetcher     the fetcher to visit classes
      * @throws IOException
      * @throws InterruptedException
      */
@@ -94,16 +86,16 @@ public class ContextReader {
 
     /**
      * Transform the change operation to delete & add.
+     *
      * @return
      */
-    private Collection<? extends JarInput> changedToDeleteAndAdd(){
+    private Collection<? extends JarInput> changedToDeleteAndAdd() {
         List<JarInput> jarInputs = new ArrayList<>();
         context.getChangedJars().stream()
-                .peek(c -> jarInputs.add(new StatusOverrideJarInput(context,c, Status.REMOVED)))
-                .peek(c -> jarInputs.add(new StatusOverrideJarInput(context,c, Status.ADDED)));
+                .peek(c -> jarInputs.add(new StatusOverrideJarInput(context, c, Status.REMOVED)))
+                .peek(c -> jarInputs.add(new StatusOverrideJarInput(context, c, Status.ADDED)));
         return jarInputs;
     }
-
 
 
     private void shutDownAndRestart() {

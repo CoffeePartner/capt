@@ -1,17 +1,21 @@
 package stub.weaver.internal.asm.classvisitor;
 
-import stub.weaver.internal.asm.MethodChain;
-import org.objectweb.asm.*;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.GeneratorAdapter;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
 import stub.weaver.internal.asm.ClassTransform;
 import stub.weaver.internal.asm.LinkedClassVisitor;
+import stub.weaver.internal.asm.MethodChain;
 import stub.weaver.internal.entity.InsertInfo;
 import stub.weaver.internal.log.Log;
 import stub.weaver.internal.util.TypeUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by gengwanpeng on 17/3/27.

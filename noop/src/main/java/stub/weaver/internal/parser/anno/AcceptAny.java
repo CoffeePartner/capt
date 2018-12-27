@@ -1,10 +1,10 @@
 package stub.weaver.internal.parser.anno;
 
+import org.objectweb.asm.tree.AnnotationNode;
 import stub.weaver.internal.log.Log;
 import stub.weaver.internal.meta.HookInfoLocator;
 import stub.weaver.internal.parser.AcceptableAnnoParser;
 import stub.weaver.internal.parser.AnnotationMeta;
-import org.objectweb.asm.tree.AnnotationNode;
 
 /**
  * Created by gengwanpeng on 17/5/4.
@@ -13,7 +13,7 @@ public class AcceptAny implements AcceptableAnnoParser {
 
     public static AcceptAny INSTANCE = new AcceptAny();
 
-    private AcceptAny(){
+    private AcceptAny() {
     }
 
     @Override

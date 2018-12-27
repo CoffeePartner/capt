@@ -1,13 +1,12 @@
 package stub.weaver.internal.asm;
 
 
-import stub.weaver.internal.graph.Graph;
 import org.objectweb.asm.*;
+import stub.weaver.ClassData;
+import stub.weaver.internal.graph.Graph;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import stub.weaver.ClassData;
 
 /**
  * Created by Jude on 2017/4/25.
@@ -35,7 +34,7 @@ public class ClassCollector {
     }
 
     public ClassVisitor getOriginClassVisitor() {
-        if(originClassWriter ==null){
+        if (originClassWriter == null) {
             originClassWriter = new ClassWriter(mClassReader, 0);
         }
         return originClassWriter;

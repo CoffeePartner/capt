@@ -1,7 +1,7 @@
 package com.dieyidezui.lancet.plugin.graph;
 
-import com.dieyidezui.lancet.plugin.api.graph.Status;
 import com.dieyidezui.lancet.plugin.api.graph.ClassGraph;
+import com.dieyidezui.lancet.plugin.api.graph.Status;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
 import com.dieyidezui.lancet.plugin.util.ConcurrentHashSet;
 import com.dieyidezui.lancet.plugin.util.Constants;

@@ -10,6 +10,7 @@ public abstract class TargetedQualifiedContentProvider implements QualifiedConte
 
     /**
      * Judge the QualifiedContent type
+     *
      * @param qualifiedContent {@link com.android.build.api.transform.JarInput} or {@link com.android.build.api.transform.DirectoryInput}
      * @return can this provider accept this QualifiedContent.
      */

@@ -1,7 +1,6 @@
 package stub.weaver.internal.util;
 
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.MethodNode;
 
 /**

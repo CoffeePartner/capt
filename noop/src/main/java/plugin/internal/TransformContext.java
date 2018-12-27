@@ -1,10 +1,8 @@
 package plugin.internal;
 
-import com.android.build.api.transform.DirectoryInput;
-import com.android.build.api.transform.Format;
-import com.android.build.api.transform.JarInput;
-import com.android.build.api.transform.QualifiedContent;
-import com.android.build.api.transform.TransformInvocation;
+import com.android.build.api.transform.*;
+import stub.weaver.internal.graph.Graph;
+import stub.weaver.internal.log.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,14 +11,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import stub.weaver.internal.graph.Graph;
-import stub.weaver.internal.log.Log;
-
 /**
  * Created by gengwanpeng on 17/4/26.
- *
+ * <p>
  * A data sets collect all jar info and pre-analysis result.
- *
  */
 public class TransformContext {
 

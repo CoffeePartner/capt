@@ -1,16 +1,24 @@
 package plugin;
 
-import com.android.build.api.transform.QualifiedContent;
-import com.android.build.api.transform.SecondaryFile;
-import com.android.build.api.transform.Transform;
-import com.android.build.api.transform.TransformException;
-import com.android.build.api.transform.TransformInvocation;
+import com.android.build.api.transform.*;
 import com.android.build.gradle.internal.pipeline.TransformManager;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
-
 import org.gradle.api.Project;
+import plugin.internal.GlobalContext;
+import plugin.internal.LocalCache;
+import plugin.internal.TransformContext;
+import plugin.internal.TransformProcessor;
+import plugin.internal.context.ContextReader;
+import plugin.internal.preprocess.PreClassAnalysis;
+import stub.weaver.MetaParser;
+import stub.weaver.Weaver;
+import stub.weaver.internal.AsmWeaver;
+import stub.weaver.internal.entity.TransformInfo;
+import stub.weaver.internal.log.Impl.FileLoggerImpl;
+import stub.weaver.internal.log.Log;
+import stub.weaver.internal.parser.AsmMetaParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,20 +30,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import plugin.internal.GlobalContext;
-import plugin.internal.LocalCache;
-import plugin.internal.preprocess.PreClassAnalysis;
-import plugin.internal.TransformContext;
-import plugin.internal.TransformProcessor;
-import plugin.internal.context.ContextReader;
-import stub.weaver.MetaParser;
-import stub.weaver.Weaver;
-import stub.weaver.internal.AsmWeaver;
-import stub.weaver.internal.entity.TransformInfo;
-import stub.weaver.internal.log.Impl.FileLoggerImpl;
-import stub.weaver.internal.log.Log;
-import stub.weaver.internal.parser.AsmMetaParser;
 
 class LancetTransform extends Transform {
 

@@ -3,13 +3,6 @@ package plugin.internal.preprocess;
 import com.android.build.api.transform.JarInput;
 import com.android.build.api.transform.QualifiedContent;
 import com.android.build.api.transform.Status;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import plugin.Util;
 import plugin.internal.LocalCache;
 import plugin.internal.TransformContext;
@@ -17,15 +10,20 @@ import plugin.internal.context.ClassFetcher;
 import plugin.internal.context.ContextReader;
 import stub.weaver.internal.log.Log;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Created by gengwanpeng on 17/4/26.
- *
+ * <p>
  * When you see this class you may be as happy as me like this:
  * <a href="http://wx1.sinaimg.cn/large/415f82b9ly1fe9kqcoe2nj20k00k0dhy.jpg"></a>
- *
+ * <p>
  * PreClassAnalysis mainly records the variant graph of all classes,
  * and record the hook classes to judge if incremental compile available in next time.
- *
  */
 public class PreClassAnalysis {
 
@@ -60,7 +58,7 @@ public class PreClassAnalysis {
 
         contextReader = new ContextReader(context);
 
-        if (incremental && context.isIncremental() && !cache.isHookClassModified(context)){
+        if (incremental && context.isIncremental() && !cache.isHookClassModified(context)) {
             // can use incremental
             partial = true;
 
