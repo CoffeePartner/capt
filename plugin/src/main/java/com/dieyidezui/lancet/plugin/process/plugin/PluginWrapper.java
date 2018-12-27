@@ -9,6 +9,7 @@ import com.dieyidezui.lancet.plugin.process.PluginBean;
 import com.dieyidezui.lancet.plugin.process.visitors.ThirdRound;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -55,6 +56,7 @@ public class PluginWrapper extends ForwardingLancet {
         return plugin.getSupportedAnnotations();
     }
 
+    @Nullable
     public ThirdRound.PluginProvider newProvider() {
         ClassTransformer transformer = plugin.onTransformClass();
         if (transformer != null) {

@@ -18,7 +18,7 @@ public abstract class ClassRequest {
         return Collections.emptySet();
     }
 
-    enum Scope {
+    public enum Scope {
         ALL,
         CHANGED,
         NONE,

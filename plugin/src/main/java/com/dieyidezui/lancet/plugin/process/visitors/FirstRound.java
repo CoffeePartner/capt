@@ -8,7 +8,6 @@ import com.dieyidezui.lancet.plugin.api.annotations.RemoveWhenTransform;
 import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
 import com.dieyidezui.lancet.plugin.graph.ClassBean;
 import com.dieyidezui.lancet.plugin.graph.MethodBean;
-import com.dieyidezui.lancet.plugin.process.dispatch.MetaDispatcher;
 import com.dieyidezui.lancet.plugin.util.ClassWalker;
 import com.dieyidezui.lancet.plugin.util.ConcurrentHashSet;
 import com.dieyidezui.lancet.plugin.util.TypeUtil;
@@ -17,7 +16,6 @@ import org.gradle.api.logging.Logging;
 import org.objectweb.asm.*;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
@@ -67,7 +65,7 @@ public class FirstRound implements ClassWalker.Visitor.Factory {
         @Override
         public ForkJoinTask<ClassWalker.ClassEntry> onVisit(ForkJoinPool pool, @Nullable byte[] classBytes, String className, Status status) {
             if (status == Status.REMOVED) {
-                Objects.requireNonNull(graph.get(className)).markRemoved();
+                graph.markRemoved(className, name);
                 return null;
             }
             return pool.submit(() -> {
@@ -75,7 +73,7 @@ public class FirstRound implements ClassWalker.Visitor.Factory {
                     ClassReader reader = new ClassReader(classBytes);
                     reader.accept(new FirstRoundVisitor(className, status, name), ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG);
                 } catch (RuntimeException e) { // class maybe illegal, we catch and ignore it.
-                    LOGGER.warn("Class '" + className + "'parse failed, skip it", e);
+                    LOGGER.warn("Class '" + className + "' in " + name + "parse failed, skip it", e);
                 }
                 return null;
             });
@@ -99,7 +97,7 @@ public class FirstRound implements ClassWalker.Visitor.Factory {
         @Override
         public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
             if (!expectedName.equals(name)) {
-                throw new IllegalArgumentException("Class name '" + name + "' is not the same as expected '" + expectedName + "'");
+                throw new IllegalArgumentException("Class name '" + name + "' is not the same as expected '" + expectedName + "' in"  + belongsTo);
             }
             bean = new ClassBean(access, name, signature, superName, interfaces);
             bean.belongsTo = belongsTo;

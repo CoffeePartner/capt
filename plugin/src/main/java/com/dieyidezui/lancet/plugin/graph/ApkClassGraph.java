@@ -3,6 +3,7 @@ package com.dieyidezui.lancet.plugin.graph;
 import com.dieyidezui.lancet.plugin.api.graph.Status;
 import com.dieyidezui.lancet.plugin.api.graph.ClassGraph;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
+import com.dieyidezui.lancet.plugin.util.ConcurrentHashSet;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -22,7 +23,7 @@ public class ApkClassGraph implements ClassGraph {
     private final Map<String, ApkClassInfo> classes = new ConcurrentHashMap<>(Constants.OPT_SIZE);
     private final VariantResource variantResource;
     private final boolean throwIfDuplicated;
-    private ConcurrentHashMap<String, ApkClassGraph> removedJars;
+    private Set<String> removedJars = new ConcurrentHashSet<>();
 
     public ApkClassGraph(VariantResource variantResource, boolean throwIfDuplicated) {
         this.variantResource = variantResource;
@@ -60,28 +61,18 @@ public class ApkClassGraph implements ClassGraph {
 
 
     public void onJarRemoved(String name) {
-        removedJars.put(name, this);
+        removedJars.add(name);
     }
 
 
-    public void collectRemovedClasses() {
-        Set<String> removed = new HashSet<>(removedJars.keySet());
-         this.getAll()
+    public void markRemovedClasses() {
+        Set<String> removed = new HashSet<>(removedJars);
+        this.getAll()
                 .values()
                 .parallelStream()
-                // on removed directory, status == REMOVED
-                // on changed/removed jar ,but class is NOT_CHANGED, means the class is removed
-                .filter(c -> {
-                    if (c.status() == Status.REMOVED) {
-                        return true;
-                    }
-                    if (c.status() == Status.NOT_CHANGED && removed.contains(c.clazz.belongsTo)) {
-                        c.markRemoved();
-                        return true;
-                    }
-                    return false;
-                })
-                .collect(Collectors.toList());
+                .filter(c -> c.status() == Status.NOT_CHANGED && removed.contains(c.clazz.belongsTo))
+                // make sure mark remove succeed, so pass null is OK
+                .forEach(c -> c.markRemoved(throwIfDuplicated, null));
     }
 
     public void add(ClassBean clazz, Status status) {
@@ -104,6 +95,10 @@ public class ApkClassGraph implements ClassGraph {
     @Override
     public ApkClassInfo get(String name) {
         return classes.get(name);
+    }
+
+    public void markRemoved(String className, String belongsTo) {
+        classes.get(className).markRemoved(throwIfDuplicated, belongsTo);
     }
 
 

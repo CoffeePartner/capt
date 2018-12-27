@@ -45,32 +45,42 @@ public class ApkClassInfo implements ClassInfo {
         this.status = new AtomicReference<>(Status.NOT_EXISTS);
     }
 
-    public void markRemoved() {
-        if (status.getAndSet(Status.REMOVED) != Status.ADDED) {
-            parent = null;
-            interfaces = classChildren = interfaceChildren = implementedClasses = Collections.emptyList();
+    public void markRemoved(boolean throwIfDuplicated, String belongsTo) {
+        if (updateStatus(Status.REMOVED)) {
+            if (status.get() == Status.REMOVED) {
+                parent = null;
+                interfaces = classChildren = interfaceChildren = implementedClasses = Collections.emptyList();
+            }
+        } else {
+            throwOrLog(throwIfDuplicated, belongsTo);
         }
     }
 
     void update(ClassBean bean, Status newStatus, boolean throwIfDuplicated) {
-        ClassBean oldBean = clazz;
+        if (updateStatus(newStatus)) {
+            this.clazz = bean;
+        } else {
+            throwOrLog(throwIfDuplicated, bean.belongsTo);
+        }
+    }
+
+    private void throwOrLog(boolean throwIfDuplicated, String belongsTo) {
+        if (throwIfDuplicated) {
+            throw new IllegalStateException("Found duplicated class: " + clazz.name + "in '" + clazz.belongsTo + "' and ' " + belongsTo + "'");
+        }
+        LOGGER.error("Found duplicated class: {} in '{}' and '{}'", clazz.name, clazz.belongsTo, belongsTo);
+    }
+
+    private boolean updateStatus(Status newStatus) {
         Status oldStatus = this.status.getAndSet(newStatus);
         if (oldStatus != Status.NOT_EXISTS && oldStatus != Status.NOT_CHANGED) {
-            // remove && add ==  changed
             if (oldStatus == Status.ADDED && newStatus == Status.REMOVED
                     || oldStatus == Status.REMOVED && newStatus == Status.ADDED) {
-                Status pre = this.status.getAndSet(Status.CHANGED);
-                if (pre == newStatus) {
-                    this.clazz = bean;
-                    return;
-                }
+                return status.getAndSet(Status.CHANGED) == newStatus;
             }
-            if (throwIfDuplicated) {
-                throw new IllegalStateException("Found duplicated class: " + oldBean.name + "in '" + oldBean.belongsTo + "' and ' " + bean.belongsTo + "'");
-            }
-            LOGGER.error("Found duplicated class: {} in '{}' and '{}'", oldBean.name, oldBean.belongsTo, bean.belongsTo);
+            return false;
         }
-        this.clazz = bean;
+        return true;
     }
 
 

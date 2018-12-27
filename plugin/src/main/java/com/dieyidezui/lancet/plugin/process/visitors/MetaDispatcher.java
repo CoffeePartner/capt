@@ -1,4 +1,4 @@
-package com.dieyidezui.lancet.plugin.process.dispatch;
+package com.dieyidezui.lancet.plugin.process.visitors;
 
 import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
@@ -15,11 +15,9 @@ public class MetaDispatcher {
     private Set<String> preMetas = Collections.emptySet();
     private Set<String> metas = new ConcurrentHashSet<>();
 
-    private final VariantResource resource;
     private final GlobalResource global;
 
-    public MetaDispatcher(VariantResource resource, GlobalResource global) {
-        this.resource = resource;
+    public MetaDispatcher(GlobalResource global) {
         this.global = global;
     }
 
@@ -58,7 +56,7 @@ public class MetaDispatcher {
     }
 
 
-    public void dispatchMetas(MetaProcessorFactory factory) {
+    public void dispatchMetas(VariantResource resource, MetaProcessorFactory factory) {
 
     }
 

@@ -6,11 +6,11 @@ import com.dieyidezui.lancet.plugin.api.*;
 import com.dieyidezui.lancet.plugin.api.graph.Status;
 import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
 import com.dieyidezui.lancet.plugin.graph.ApkClassInfo;
-import com.dieyidezui.lancet.plugin.process.dispatch.TransformDispatcher;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.gradle.GradleLancetExtension;
 import com.dieyidezui.lancet.plugin.process.plugin.GlobalLancet;
 import com.dieyidezui.lancet.plugin.process.plugin.PluginWrapper;
+import com.dieyidezui.lancet.plugin.process.visitors.ThirdRound;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
 import com.dieyidezui.lancet.plugin.util.Constants;
@@ -120,6 +120,10 @@ public class PluginManager implements Constants {
                 .filter(c -> c.status() == Status.NOT_CHANGED);// others are already called.
     }
 
+    public Stream<ThirdRound.PluginProvider> getProviders() {
+        return wrappers.stream().map(PluginWrapper::newProvider).filter(Objects::nonNull);
+    }
+
 
     private Class<? extends Plugin> findPluginInProperties(String id) throws IOException {
         URL url = resource.loadPluginOnLancet(id);
@@ -173,6 +177,11 @@ public class PluginManager implements Constants {
         waitable.await();
     }
 
+    public void callDestroy() throws IOException, InterruptedException, TransformException {
+        WaitableTasks waitable = WaitableTasks.get(global.io());
+        wrappers.forEach(p -> waitable.execute(p::callOnDestroy));
+        waitable.await();
+    }
 
     public static class LastPlugins {
         public List<PluginBean> plugins;

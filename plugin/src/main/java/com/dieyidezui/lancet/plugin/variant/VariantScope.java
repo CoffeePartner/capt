@@ -3,7 +3,6 @@ package com.dieyidezui.lancet.plugin.variant;
 import com.android.build.api.transform.TransformException;
 import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.api.BaseVariant;
-import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 import com.dieyidezui.lancet.plugin.cache.InternalCache;
 import com.dieyidezui.lancet.plugin.cache.OutputProviderFactory;
 import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactory;
@@ -11,8 +10,7 @@ import com.dieyidezui.lancet.plugin.cache.RelativeDirectoryProviderFactoryImpl;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
 import com.dieyidezui.lancet.plugin.process.PluginManager;
-import com.dieyidezui.lancet.plugin.process.dispatch.MetaDispatcher;
-import com.dieyidezui.lancet.plugin.process.dispatch.TransformDispatcher;
+import com.dieyidezui.lancet.plugin.process.visitors.MetaDispatcher;
 import com.dieyidezui.lancet.plugin.process.plugin.GlobalLancet;
 import com.dieyidezui.lancet.plugin.cache.FileManager;
 import com.dieyidezui.lancet.plugin.process.visitors.FirstRound;
@@ -60,7 +58,6 @@ public class VariantScope implements Constants {
 
         // load and prepare
         ClassWalker walker = new ClassWalker(global, invocation);
-        TransformDispatcher transformDispatcher = new TransformDispatcher(invocation, global);
         MetaDispatcher metaDispatcher = new MetaDispatcher();
 
 
@@ -96,20 +93,26 @@ public class VariantScope implements Constants {
         // use the invocation.isIncremental()
         FirstRound firstRound = new FirstRound(graph, metaDispatcher);
         walker.visit(invocation.isIncremental(), false, firstRound);
+        graph.markRemovedClasses();
 
         // everything ready, call plugin lifecycle
         manager.callCreate();
+
         // Round 2: visit Metas
+        metaDispatcher.dispatchMetas(variantResource, );
 
         // Round 3: transform classes
         // use the actual incremental (for plugins input)
         // remember to ignore removed classes if incremental
-        ThirdRound thirdRound = new ThirdRound(firstRound.getToRemove());
-        thirdRound.accept(incremental, walker, manager, graph);
+        new ThirdRound(global, firstRound.getToRemove())
+                .accept(incremental, walker, manager, graph, invocation);
 
         // transform done, store cache
-        internalCache.storeAsync(manager.writePlugins());
         internalCache.storeAsync(graph.writeClasses());
+        internalCache.storeAsync(manager.writePlugins());
+        internalCache.storeAsync(metaDispatcher.writeMetas());
+
+        manager.callDestroy(); // call destroy after store to save time
         internalCache.await();
     }
 
