@@ -58,7 +58,7 @@ public class VariantScope implements Constants {
 
         // load and prepare
         ClassWalker walker = new ClassWalker(global, invocation);
-        MetaDispatcher metaDispatcher = new MetaDispatcher();
+        MetaDispatcher metaDispatcher = new MetaDispatcher(global);
 
 
         RelativeDirectoryProviderFactory singleFactory = new RelativeDirectoryProviderFactoryImpl();
@@ -99,7 +99,7 @@ public class VariantScope implements Constants {
         manager.callCreate();
 
         // Round 2: visit Metas
-        metaDispatcher.dispatchMetas(variantResource, );
+        metaDispatcher.dispatchMetas(variantResource, null);
 
         // Round 3: transform classes
         // use the actual incremental (for plugins input)
