@@ -111,7 +111,8 @@ public class PluginManager implements Constants {
      * Rerack classes for removed plugin
      */
     public Stream<ApkClassInfo> collectRemovedPluginsAffectedClasses(ApkClassGraph graph) {
-        return prePlugins.entrySet().parallelStream()
+        return prePlugins.entrySet()
+                .stream()
                 .filter(e -> !plugins.containsKey(e.getKey()))
                 .map(Map.Entry::getValue)
                 .flatMap(b -> b.getAffectedClasses().stream())

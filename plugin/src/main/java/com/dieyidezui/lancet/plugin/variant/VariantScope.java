@@ -93,7 +93,7 @@ public class VariantScope implements Constants {
         // use the invocation.isIncremental()
         FirstRound firstRound = new FirstRound(graph, metaDispatcher);
         walker.visit(invocation.isIncremental(), false, firstRound);
-        graph.markRemovedClasses();
+        graph.markRemovedClassesAndBuildGraph();
 
         // everything ready, call plugin lifecycle
         manager.callCreate();

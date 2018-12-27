@@ -87,8 +87,9 @@ public class ApkClassInfo implements ClassInfo {
     @Override
     public Status status() {
         Status res = status.get();
-        if (res != Status.NOT_EXISTS && !resource.isIncremental()) {
-            return Status.NOT_CHANGED;
+        if (!resource.isIncremental()) {
+            return res == Status.NOT_EXISTS || res == Status.REMOVED ? Status.NOT_EXISTS
+                    : Status.NOT_CHANGED;
         }
         return res;
     }

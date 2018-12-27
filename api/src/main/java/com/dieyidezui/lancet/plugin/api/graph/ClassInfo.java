@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+/**
+ * REMOVED & NOT_EXISTS are not in graph
+ */
 public interface ClassInfo {
 
     /**

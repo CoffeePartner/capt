@@ -65,14 +65,40 @@ public class ApkClassGraph implements ClassGraph {
     }
 
 
-    public void markRemovedClasses() {
+    public void markRemovedClassesAndBuildGraph() {
         Set<String> removed = new HashSet<>(removedJars);
-        this.getAll()
-                .values()
-                .parallelStream()
-                .filter(c -> c.status() == Status.NOT_CHANGED && removed.contains(c.clazz.belongsTo))
-                // make sure mark remove succeed, so pass null is OK
-                .forEach(c -> c.markRemoved(throwIfDuplicated, null));
+        this.getAll().values()
+                .forEach(n -> {
+                    if (n.status() == Status.NOT_CHANGED && removed.contains(n.clazz.belongsTo)) {
+                        // make sure mark remove succeed, so pass null is OK
+                        n.markRemoved(throwIfDuplicated, null);
+                    } else if (n.exists()) { // exists means parent is not null.
+                        ApkClassInfo parent = n.parent;
+                        if (parent.classChildren == Collections.<ApkClassInfo>emptyList()) {
+                            // optimize for Object, I guess 1/32 classes directly extend Object
+                            if (parent.name().equals("java/lang/Object")) {
+                                parent.classChildren = new ArrayList<>(getAll().size() >> 6);
+                            } else {
+                                parent.classChildren = new ArrayList<>();
+                            }
+                        }
+                        parent.classChildren.add(n);
+
+                        n.interfaces.forEach(i -> {
+                            if ((n.access() & Opcodes.ACC_INTERFACE) != 0) {
+                                if (i.interfaceChildren == Collections.<ApkClassInfo>emptyList()) {
+                                    i.interfaceChildren = new ArrayList<>();
+                                }
+                                i.interfaceChildren.add(n);
+                            } else {
+                                if (i.implementedClasses == Collections.<ApkClassInfo>emptyList()) {
+                                    i.implementedClasses = new ArrayList<>();
+                                }
+                                i.implementedClasses.add(n);
+                            }
+                        });
+                    }
+                });
     }
 
     public void add(ClassBean clazz, Status status) {

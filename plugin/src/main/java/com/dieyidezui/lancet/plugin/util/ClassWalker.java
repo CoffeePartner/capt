@@ -10,10 +10,7 @@ import javax.annotation.Nullable;
 import java.io.*;
 import java.net.URI;
 import java.nio.file.attribute.FileTime;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.zip.*;
 
@@ -33,15 +30,41 @@ public final class ClassWalker {
     }
 
     public void visit(boolean incremental, boolean write, Visitor.Factory factory) throws IOException, InterruptedException, TransformException {
+        visit(incremental, write, factory, null);
+    }
+
+    public void visit(boolean incremental, boolean write, Visitor.Factory factory, @Nullable Map<QualifiedContent, Set<String>> targets) throws IOException, InterruptedException, TransformException {
         WaitableTasks io = WaitableTasks.get(resource.io());
         invocation.getInputs()
                 .forEach(i -> {
                     i.getDirectoryInputs()
-                            .forEach(d -> io.submit(new DirectoryTask(d, incremental, write, factory)));
+                            .forEach(d -> {
+                                if (targets == null) {
+                                    io.submit(new DirectoryTask(d, incremental, write, factory, null));
+                                } else {
+                                    Set<String> t = targets.get(d);
+                                    if (t != null) {
+                                        io.submit(new DirectoryTask(d, incremental, write, factory, t));
+                                    }
+                                }
+                            });
                     i.getJarInputs()
-                            .forEach(j -> io.submit(new JarTask(j, incremental, write, factory)));
+                            .forEach(j -> {
+                                if (targets == null) {
+                                    io.submit(new JarTask(j, incremental, write, factory, null));
+                                } else {
+                                    Set<String> t = targets.get(j);
+                                    if (t != null) {
+                                        io.submit(new JarTask(j, incremental, write, factory, t));
+                                    }
+                                }
+                            });
                 });
         io.await();
+    }
+
+    public void visitTargets(Visitor.Factory factory, Map<QualifiedContent, Set<String>> targets) throws InterruptedException, TransformException, IOException {
+        visit(false, true, factory, targets);
     }
 
 
@@ -101,32 +124,43 @@ public final class ClassWalker {
         }
     }
 
+    /**
+     * For jar, targets is useless. We will transform all classes in jar.
+     */
     class JarTask implements Callable<Void> {
 
         private final JarInput jar;
         private final boolean incremental;
         private final boolean write;
         private final Visitor.Factory factory;
+        @Nullable
+        private final Set<String> targets;
 
-        JarTask(JarInput jar, boolean incremental, boolean write, Visitor.Factory factory) {
+        JarTask(JarInput jar, boolean incremental, boolean write, Visitor.Factory factory, @Nullable Set<String> targets) {
             this.jar = jar;
             this.incremental = incremental;
             this.write = write;
             this.factory = factory;
+            this.targets = targets;
         }
 
         @Override
         public Void call() throws Exception {
+            if (incremental && jar.getStatus() == Status.NOTCHANGED) {
+                return null;
+            }
+
             Visitor visitor = factory.newVisitor(incremental, jar);
             if (visitor == null) {
                 return null;
             }
 
-            // 1. we can't read removed jar anyway
-            // 2. incremental && not changed, it is illegal, we skip it
-            if (jar.getStatus() == Status.REMOVED || incremental && jar.getStatus() == Status.NOTCHANGED) {
+            if (jar.getStatus() == Status.REMOVED) {
                 return null;
             }
+
+            // 1. we can't read removed jar anyway
+            // 2. incremental && not changed, it is illegal, we skip it
 
             Status status = incremental ? jar.getStatus() : Status.NOTCHANGED;
 
@@ -186,24 +220,34 @@ public final class ClassWalker {
         }
     }
 
+    /**
+     * For directory, targets is good. We can just transform targeted classes.
+     */
     class DirectoryTask implements Callable<Void> {
 
         private final DirectoryInput d;
         private final boolean incremental;
         private final boolean write;
         private final Visitor.Factory factory;
+        @Nullable
+        private final Set<String> targets;
         private URI base;
 
-        DirectoryTask(DirectoryInput directory, boolean incremental, boolean write, Visitor.Factory factory) {
+        DirectoryTask(DirectoryInput directory, boolean incremental, boolean write, Visitor.Factory factory, @Nullable Set<String> targets) {
             this.d = directory;
             this.incremental = incremental;
             this.write = write;
             this.factory = factory;
+            this.targets = targets;
             this.base = d.getFile().toURI();
         }
 
         @Override
         public Void call() throws Exception {
+            if (incremental && d.getChangedFiles().isEmpty()) {
+                return null;
+            }
+
             Visitor visitor = factory.newVisitor(incremental, d);
             if (visitor == null) {
                 return null;
@@ -229,6 +273,7 @@ public final class ClassWalker {
                 for (Map.Entry<File, Status> entry : d.getChangedFiles().entrySet()) {
                     Status status = entry.getValue();
                     if (status != Status.NOTCHANGED && entry.getKey().getName().endsWith(".class")) {
+
                         byte[] bytes = status == Status.REMOVED ? null : Files.toByteArray(entry.getKey());
                         ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, fileToClassName(entry.getKey()), entry.getValue());
                         if (futures != null) {

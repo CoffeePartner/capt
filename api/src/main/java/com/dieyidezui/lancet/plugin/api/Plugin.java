@@ -1,7 +1,7 @@
 package com.dieyidezui.lancet.plugin.api;
 
 import com.dieyidezui.lancet.plugin.api.annotations.Def;
-import com.dieyidezui.lancet.plugin.api.annotations.Meta;
+import com.dieyidezui.lancet.rt.annotations.Meta;
 import com.dieyidezui.lancet.plugin.api.hint.Thread;
 import com.dieyidezui.lancet.plugin.api.hint.Type;
 import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;

@@ -1,17 +1,11 @@
 package com.dieyidezui.lancet.plugin.api.process;
 
-import com.dieyidezui.lancet.plugin.api.annotations.Meta;
-import com.dieyidezui.lancet.plugin.api.asm.LancetClassVisitor;
+import com.dieyidezui.lancet.rt.annotations.Meta;
 import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
 import com.dieyidezui.lancet.plugin.api.hint.Thread;
 import com.dieyidezui.lancet.plugin.api.hint.Type;
-import com.dieyidezui.lancet.plugin.api.transform.ClassRequest;
-import org.objectweb.asm.MethodVisitor;
 
 import javax.annotation.Nullable;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import java.lang.annotation.Annotation;
-import java.util.Set;
 
 /**
  * Only class contains plugin interested annotations will pass to MetaProcessor

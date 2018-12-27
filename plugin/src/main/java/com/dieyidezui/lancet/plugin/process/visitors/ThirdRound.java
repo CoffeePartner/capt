@@ -16,15 +16,10 @@ import org.objectweb.asm.ClassWriter;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
-import java.util.concurrent.RecursiveAction;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -57,25 +52,42 @@ public class ThirdRound {
             graph.getAll().values()
                     .stream()
                     .filter(c -> c.status() == com.dieyidezui.lancet.plugin.api.graph.Status.REMOVED)
-                    .forEach(c -> transforms(pool, transforms, c));
-
+                    .forEach(c -> transformForRemoved(pool, transforms, c));
         }
         if (!hasAll && incremental) {
             // dispatch extraSpecified() & re rack for removed plugins
             // directory is simple, jar may cause rewrite the whole jar, take care of it
-            Map<String, QualifiedContent> inputs = invocation.getInputs().stream()
-                    .flatMap(i -> Stream.concat(i.getDirectoryInputs().stream(), i.getJarInputs().stream()))
-                    .collect(Collectors.toMap(QualifiedContent::getName, Function.identity()));
+            Future<Map<QualifiedContent, Set<String>>> future = computation.submit(() -> {
+                Map<String, QualifiedContent> inputs = invocation.getInputs().stream()
+                        .flatMap(i -> Stream.concat(i.getDirectoryInputs().stream(), i.getJarInputs().stream()))
+                        .collect(Collectors.toMap(QualifiedContent::getName, Function.identity()));
 
-            Map<QualifiedContent, List<ApkClassInfo>> rerack = Stream.concat(manager.collectRemovedPluginsAffectedClasses(graph),
-                    transforms.stream()
-                            .flatMap(t -> t.extra.stream())
-                            .map(graph::get)
-                            .filter(Objects::nonNull)
-                            .filter(c -> c.status() == com.dieyidezui.lancet.plugin.api.graph.Status.NOT_CHANGED)
-            ).distinct().collect(Collectors.groupingBy(s -> inputs.get(s.name()), Collectors.toList()));
+                return Stream.concat(
+                        manager.collectRemovedPluginsAffectedClasses(graph),
+                        transforms.stream()
+                                .flatMap(t -> t.extra.stream())
+                                .map(graph::get)
+                                .filter(Objects::nonNull)
+                                .filter(c -> c.status() == com.dieyidezui.lancet.plugin.api.graph.Status.NOT_CHANGED))
+                        // ignore to remove
+                        .filter(c -> !toRemove.contains(c.name()))
+                        .collect(Collectors.groupingBy(s -> inputs.get(s.clazz.belongsTo), HashMap::new,
+                                Collector.of(HashSet::new, (s, v) -> s.add(v.name()), (s1, s2) -> {
+                                    s1.addAll(s2);
+                                    return s1;
+                                }, Collector.Characteristics.UNORDERED)));
+            });
+            try {
+                walker.visitTargets(asFactory(), future.get());
+            } catch (ExecutionException e) {
+                if (e.getCause() instanceof IOException) {
+                    throw (IOException) e.getCause();
+                }
+                throw new TransformException(e.getCause());
+            }
+        } else {
+            pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         }
-        pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
         // 3. call afterTransform
         WaitableTasks io = WaitableTasks.get(global.io());
@@ -83,7 +95,7 @@ public class ThirdRound {
         io.await();
     }
 
-    private static void transforms(ForkJoinPool pool, List<PluginTransform> transforms, ApkClassInfo info) {
+    private static void transformForRemoved(ForkJoinPool pool, List<PluginTransform> transforms, ApkClassInfo info) {
         pool.execute(new RecursiveAction() {
             @Override
             protected void compute() {
@@ -138,7 +150,12 @@ public class ThirdRound {
         }
 
         public LancetClassVisitor callTransform(ApkClassInfo info) {
-            return provider.transformer().onTransform(info, isTarget(info));
+            boolean target = isTarget(info);
+            // we skip the plugin that scope == NONE
+            if (!target && request.scope() == ClassRequest.Scope.NONE) {
+                return null;
+            }
+            return provider.transformer().onTransform(info, target);
         }
 
         public boolean isTarget(ApkClassInfo info) {
@@ -154,7 +171,7 @@ public class ThirdRound {
             }
         }
 
-        public TransformContext makeVisitor(String className, ClassWriter writer) {
+        public TransformContext makeContext(String className, ClassWriter writer) {
             return new TransformContext() {
                 boolean once = false;
 
