@@ -10,7 +10,6 @@ import java.util.Objects;
 public abstract class LancetClassVisitor extends ClassVisitor {
 
     private TransformContext context;
-    private ClassVisitor next;
 
     public LancetClassVisitor() {
         this(null);
@@ -18,7 +17,6 @@ public abstract class LancetClassVisitor extends ClassVisitor {
 
     public LancetClassVisitor(@Nullable LancetClassVisitor next) {
         super(Opcodes.ASM7, next);
-        this.next = cv;
     }
 
     final void linkNext(ClassVisitor next) {
@@ -31,7 +29,6 @@ public abstract class LancetClassVisitor extends ClassVisitor {
         } else {
             cv = next;
         }
-        this.next = cv;
     }
 
     final void attach(TransformContext context) {
@@ -45,14 +42,4 @@ public abstract class LancetClassVisitor extends ClassVisitor {
     protected final TransformContext context() {
         return Objects.requireNonNull(context, "Don't use context() outside visit lifecycle.");
     }
-
-    @Override
-    public final void visitEnd() {
-        if (next != cv) {
-            throw new IllegalStateException("Don't change this.cv by yourself!");
-        }
-        onVisitEnd();
-    }
-
-    protected abstract void onVisitEnd();
 }

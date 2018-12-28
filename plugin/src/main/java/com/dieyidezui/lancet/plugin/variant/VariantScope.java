@@ -96,8 +96,8 @@ public class VariantScope implements Constants {
         // Round 3: transform classes
         // use the actual incremental (for plugins input)
         // remember to ignore removed classes if incremental
-        new ThirdRound(global, firstRound.getToRemove())
-                .accept(incremental, walker, manager, graph, invocation);
+        new ThirdRound(global, firstRound.getToRemove(), graph)
+                .accept(incremental, walker, manager, invocation);
 
         // transform done, store cache
         internalCache.storeAsync(graph.writeClasses());

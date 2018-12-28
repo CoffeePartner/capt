@@ -1,6 +1,7 @@
 package com.dieyidezui.lancet.plugin.process.visitors;
 
 import com.android.build.api.transform.*;
+import com.dieyidezui.lancet.plugin.api.asm.ClassVisitorManager;
 import com.dieyidezui.lancet.plugin.api.asm.LancetClassVisitor;
 import com.dieyidezui.lancet.plugin.api.transform.ClassRequest;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
@@ -11,6 +12,9 @@ import com.dieyidezui.lancet.plugin.process.PluginManager;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.util.ClassWalker;
 import com.dieyidezui.lancet.plugin.util.WaitableTasks;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
+import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 
@@ -27,16 +31,20 @@ import java.util.stream.Stream;
  * toRemove is higher than ClassTransformer
  */
 public class ThirdRound {
+    private static final Logger LOGGER = Logging.getLogger(ThirdRound.class);
     private final GlobalResource global;
     private final Set<String> toRemove;
+    private final ApkClassGraph graph;
     private boolean hasAll = false;
+    ClassVisitorManager manager = new ClassVisitorManager();
 
-    public ThirdRound(GlobalResource global, Set<String> toRemove) {
+    public ThirdRound(GlobalResource global, Set<String> toRemove, ApkClassGraph graph) {
         this.global = global;
         this.toRemove = toRemove;
+        this.graph = graph;
     }
 
-    public void accept(boolean incremental, ClassWalker walker, PluginManager manager, ApkClassGraph graph, TransformInvocation invocation) throws IOException, InterruptedException, TransformException {
+    public void accept(boolean incremental, ClassWalker walker, PluginManager manager, TransformInvocation invocation) throws IOException, InterruptedException, TransformException {
         List<PluginTransform> transforms = manager.getProviders().map(PluginTransform::new).collect(Collectors.toList());
 
         // 1. call beforeTransform to collect class request
@@ -103,7 +111,7 @@ public class ThirdRound {
                     @Override
                     protected void compute() {
                         // just ignore result, because removed class can't be transformed
-                        c.callTransform(info);
+                        c.createVisitor(info);
                     }
                 }).toArray(ForkJoinTask[]::new));
             }
@@ -115,18 +123,46 @@ public class ThirdRound {
             if (incremental && content instanceof JarInput && ((JarInput) content).getStatus() == Status.REMOVED) {
                 return null;
             }
-            return new TransformVisitor();
+            return new TransformVisitor(transforms);
         };
     }
 
 
     class TransformVisitor implements ClassWalker.Visitor {
 
+        private final List<PluginTransform> transforms;
+
+        TransformVisitor(List<PluginTransform> transforms) {
+            this.transforms = transforms;
+        }
+
         @Nullable
         @Override
         public ForkJoinTask<ClassWalker.ClassEntry> onVisit(ForkJoinPool pool, @Nullable byte[] classBytes, String className, Status status) {
             if (status != Status.REMOVED && !toRemove.contains(className)) {
+                pool.submit(() -> {
+                    ClassReader cr = new ClassReader(classBytes);
+                    ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS); // just compute max, it may cause 10% slower
+                    List<LancetClassVisitor> visitors = transforms
+                            .stream()
+                            .map(t -> {
+                                LancetClassVisitor visitor = t.createVisitor(graph.get(className));
+                                if (visitor != null) {
+                                    manager.attach(visitor, t.makeContext(className, cw));
+                                }
+                                return visitor;
+                            })
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList());
 
+                    try {
+                        cr.accept(manager.link(visitors, cw), 0);
+                    } catch (RuntimeException e) {
+                        LOGGER.warn("Transform class '" + className + "' failed, skip it", e);
+                        return new ClassWalker.ClassEntry(className, classBytes);
+                    }
+                    return new ClassWalker.ClassEntry(className, cw.toByteArray());
+                });
             }
             return null;
         }
@@ -141,7 +177,7 @@ public class ThirdRound {
             this.provider = provider;
         }
 
-        public void doRequest() {
+        void doRequest() {
             this.request = Objects.requireNonNull(provider.transformer().beforeTransform());
             extra = Objects.requireNonNull(request.extraSpecified());
             if (!hasAll && Objects.requireNonNull(request.scope()) == ClassRequest.Scope.ALL) {
@@ -149,7 +185,7 @@ public class ThirdRound {
             }
         }
 
-        public LancetClassVisitor callTransform(ApkClassInfo info) {
+        LancetClassVisitor createVisitor(ApkClassInfo info) {
             boolean target = isTarget(info);
             // we skip the plugin that scope == NONE
             if (!target && request.scope() == ClassRequest.Scope.NONE) {
@@ -158,7 +194,7 @@ public class ThirdRound {
             return provider.transformer().onTransform(info, target);
         }
 
-        public boolean isTarget(ApkClassInfo info) {
+        boolean isTarget(ApkClassInfo info) {
             switch (request.scope()) {
                 case ALL:
                     return true;
@@ -171,7 +207,7 @@ public class ThirdRound {
             }
         }
 
-        public TransformContext makeContext(String className, ClassWriter writer) {
+        TransformContext makeContext(String className, ClassWriter writer) {
             return new TransformContext() {
                 boolean once = false;
 
