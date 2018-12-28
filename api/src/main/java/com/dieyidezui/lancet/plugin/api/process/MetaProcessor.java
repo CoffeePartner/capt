@@ -61,7 +61,7 @@ public abstract class MetaProcessor {
     /**
      * Class added, current has {@link Meta}.
      *
-     * @param basicInfo
+     * @param basicInfo info
      * @return class consumer
      */
     @Thread(Type.COMPUTATION)

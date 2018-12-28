@@ -62,7 +62,7 @@ public abstract class Plugin<T> {
     }
 
     /**
-     * @return
+     * @return transformer
      */
     @Thread(Type.SINGLE)
     @Nullable
@@ -83,7 +83,7 @@ public abstract class Plugin<T> {
         assert array != null;
         Set<String> set = new HashSet<String>(array.length);
         for (String s : array)
-            set.add(s);
+            set.add(s.replace('.', '/'));
         return Collections.unmodifiableSet(set);
     }
 }

@@ -70,7 +70,7 @@ public class FirstRound implements ClassWalker.Visitor.Factory, Constants {
                     ClassReader reader = new ClassReader(classBytes);
                     reader.accept(new FirstRoundVisitor(className, status, name), ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG);
                 } catch (RuntimeException e) { // class maybe illegal, we catch and ignore it.
-                    LOGGER.warn("Class '" + className + "' in " + name + "parse failed, skip it", e);
+                    LOGGER.warn("Class '" + className + "' in " + name + " parse failed, skip it", e);
                 }
                 return null;
             });
@@ -85,7 +85,7 @@ public class FirstRound implements ClassWalker.Visitor.Factory, Constants {
         private ClassBean bean;
 
         FirstRoundVisitor(String expectedName, Status status, String belongsTo) {
-            super(Opcodes.ASM7, null);
+            super(Opcodes.ASM5, null);
             this.expectedName = expectedName;
             this.status = status;
             this.belongsTo = belongsTo;
@@ -103,9 +103,9 @@ public class FirstRound implements ClassWalker.Visitor.Factory, Constants {
         @Override
         public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
             if (META.equals(descriptor)) {
-                metaDispatcher.addMeta(TypeUtil.objDescToInternalName(descriptor));
+                metaDispatcher.addMeta(expectedName);
             } else if (REMOVE.equals(descriptor)) {
-                toRemoveWhenTransform.add(TypeUtil.objDescToInternalName(descriptor));
+                toRemoveWhenTransform.add(expectedName);
             }
             return null;
         }

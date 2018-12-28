@@ -10,6 +10,7 @@ public interface RelativeDirectoryProvider {
 
     /**
      * @return get the root directory, ensure exists
+     * @throws IOException if make dir failed
      */
     File root() throws IOException;
 

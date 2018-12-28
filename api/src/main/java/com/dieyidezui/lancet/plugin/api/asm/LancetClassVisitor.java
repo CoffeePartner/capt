@@ -16,7 +16,7 @@ public abstract class LancetClassVisitor extends ClassVisitor {
     }
 
     public LancetClassVisitor(@Nullable LancetClassVisitor next) {
-        super(Opcodes.ASM7, next);
+        super(Opcodes.ASM5, next);
     }
 
     final void linkNext(ClassVisitor next) {

@@ -8,9 +8,12 @@ import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
 import com.dieyidezui.lancet.plugin.graph.ApkClassInfo;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
+import com.dieyidezui.lancet.plugin.util.Constants;
 import com.dieyidezui.lancet.plugin.util.TypeUtil;
 import com.dieyidezui.lancet.plugin.util.WaitableTasks;
 import com.google.common.io.ByteStreams;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -26,10 +29,10 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.dieyidezui.lancet.plugin.util.Constants.META;
-
 public class MetaDispatcher {
 
+    private static final String META_NAME = TypeUtil.objDescToInternalName(Constants.META);
+    private static final Logger LOGGER = Logging.getLogger(MetaDispatcher.class);
 
     private Map<String, Set<String>> preMetas = Collections.emptyMap();
     private Map<String, Set<String>> metas = new ConcurrentHashMap<>();
@@ -62,7 +65,7 @@ public class MetaDispatcher {
     }
 
     public void addMeta(String meta) {
-        metas.put(meta, null);
+        metas.put(meta, Collections.emptySet());
     }
 
     public static class MetaClasses {
@@ -83,7 +86,7 @@ public class MetaDispatcher {
         Set<String> set = new HashSet<>(metas.keySet());
         set.addAll(preMetas.keySet());
 
-        //
+        metas.clear();
 
         for (String className : set) {
             ApkClassInfo info = Objects.requireNonNull(graph.get(className));
@@ -99,7 +102,7 @@ public class MetaDispatcher {
                     AnnotationCollector collector = new AnnotationCollector(node);
                     cr.accept(collector, 0);
                     Set<String> annotations = collector.annotations();
-                    if (!annotations.contains(META)) {
+                    if (!annotations.contains(META_NAME)) {
                         annotations = null;
                     } else {
                         metas.put(className, annotations);
@@ -123,7 +126,7 @@ public class MetaDispatcher {
         Set<String> annotations = new HashSet<>();
 
         public AnnotationCollector(ClassVisitor next) {
-            super(Opcodes.ASM7, next);
+            super(Opcodes.ASM5, next);
         }
 
         @Override
@@ -134,7 +137,7 @@ public class MetaDispatcher {
 
         @Override
         public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
-            return new FieldVisitor(Opcodes.ASM7, super.visitField(access, name, descriptor, signature, value)) {
+            return new FieldVisitor(Opcodes.ASM5, super.visitField(access, name, descriptor, signature, value)) {
                 @Override
                 public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
                     annotations.add(TypeUtil.objDescToInternalName(descriptor));
@@ -149,7 +152,7 @@ public class MetaDispatcher {
 
         @Override
         public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
-            return new MethodVisitor(Opcodes.ASM7, super.visitMethod(access, name, descriptor, signature, exceptions)) {
+            return new MethodVisitor(Opcodes.ASM5, super.visitMethod(access, name, descriptor, signature, exceptions)) {
                 @Override
                 public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
                     annotations.add(TypeUtil.objDescToInternalName(descriptor));
@@ -187,7 +190,7 @@ public class MetaDispatcher {
                                 boolean matchCur = cur != null && !Collections.disjoint(cur, supported);
                                 switch (info.status()) {
                                     case NOT_CHANGED:
-                                        if (matchPre) { // or  matchCur, they are the same
+                                        if (matchCur) {
                                             consume(processor.onMetaClassNotChanged(info), node);
                                         }
                                         break;

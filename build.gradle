@@ -93,8 +93,9 @@ evaluationDependsOnChildren()
 task jarToTest(type: Copy) {
     Jar p = project(":plugin").tasks.jar
     Jar a = project(":api").tasks.jar
+    Jar r = project(":rt").tasks.jar
 
-    from p.destinationDir, a.destinationDir
+    from p.destinationDir, a.destinationDir, r.destinationDir
     into TEST_DIR
     dependsOn p, a
 }

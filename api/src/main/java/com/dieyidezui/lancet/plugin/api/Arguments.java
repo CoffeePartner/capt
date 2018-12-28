@@ -16,7 +16,7 @@ public interface Arguments {
         int priority();
 
         /**
-         * build.gradle passed arguments for specific plugin
+         * @return build.gradle passed arguments for specific plugin
          */
         Map<String, Object> arguments();
     }

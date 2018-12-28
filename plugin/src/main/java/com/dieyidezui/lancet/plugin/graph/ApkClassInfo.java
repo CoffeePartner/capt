@@ -156,4 +156,12 @@ public class ApkClassInfo implements ClassInfo {
         Status s = status.get();
         return s != Status.NOT_EXISTS && s != Status.REMOVED;
     }
+
+    @Override
+    public String toString() {
+        return "ApkClassInfo{" +
+                "status=" + status.get() +
+                ", clazz=" + clazz +
+                '}';
+    }
 }

@@ -63,7 +63,7 @@ public class GradleLancetPlugin implements Plugin<Project>, Constants {
         // Use it combine with ForkJoinPool
         ExecutorService io = new ThreadPoolExecutor(0, core * 3,
                 20L, TimeUnit.SECONDS,
-                new SynchronousQueue<>(),
+                new LinkedBlockingQueue<>(),
                 new LancetThreadFactory());
 
         // ForkJoinPool.common() just have core - 1, because it use the waiting thread,

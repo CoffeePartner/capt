@@ -57,10 +57,12 @@ public class VariantScope implements Constants {
         MetaDispatcher metaDispatcher = new MetaDispatcher(global);
 
 
+
         RelativeDirectoryProviderFactory singleFactory = new RelativeDirectoryProviderFactoryImpl();
         OutputProviderFactory factory = new OutputProviderFactory(singleFactory, files.asSelector());
         VariantResource variantResource = new VariantResource(getVariant(),
                 files, factory);
+        variantResource.init(invocation, getLancetConfiguration());
         InternalCache internalCache = new InternalCache(singleFactory.newProvider(new File(files.variantRoot(), "core"))
                 , global);
         ApkClassGraph graph = new ApkClassGraph(variantResource, global.gradleLancetExtension().getThrowIfDuplicated());
@@ -72,14 +74,12 @@ public class VariantScope implements Constants {
             internalCache.loadAsync(graph.readClasses());
             internalCache.loadAsync(manager.readPrePlugins());
             internalCache.loadAsync(metaDispatcher.readPreMetas());
-
             internalCache.await();
         }
 
         int scope = variant.endsWith(ANDROID_TEST) ? LancetPluginExtension.ANDROID_TEST : LancetPluginExtension.ASSEMBLE;
         boolean incremental = manager.initPlugins(global.gradleLancetExtension(), scope, lancet);
-        variantResource.init(incremental, invocation, getLancetConfiguration());
-
+        variantResource.setIncremental(incremental);
 
         // Round 1: make class graph & collect metas
         // use the invocation.isIncremental()

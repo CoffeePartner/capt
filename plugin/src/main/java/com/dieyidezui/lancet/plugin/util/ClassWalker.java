@@ -5,6 +5,8 @@ import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import javax.annotation.Nullable;
 import java.io.*;
@@ -26,6 +28,7 @@ import java.util.zip.ZipOutputStream;
 public final class ClassWalker {
 
     private static final FileTime ZERO = FileTime.fromMillis(0);
+    private static final Logger LOGGER = Logging.getLogger(ClassWalker.class);
 
     private final GlobalResource resource;
     private final TransformInvocation invocation;
@@ -260,7 +263,7 @@ public final class ClassWalker {
             }
 
             ForkJoinPool pool = resource.computation();
-            List<Future<ClassEntry>> futures = write ? null : new ArrayList<>();
+            List<Future<ClassEntry>> futures = !write ? null : new ArrayList<>();
 
             // just process .class, skip others
             if (!incremental) {
@@ -269,7 +272,7 @@ public final class ClassWalker {
                         if (file.isFile() && file.getName().endsWith(".class")) {
                             byte[] bytes = Files.toByteArray(file);
                             ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, fileToClassName(file), Status.NOTCHANGED);
-                            if (futures != null) {
+                            if (futures != null && task != null) {
                                 futures.add(task);
                             }
                         }
@@ -282,7 +285,7 @@ public final class ClassWalker {
 
                         byte[] bytes = status == Status.REMOVED ? null : Files.toByteArray(entry.getKey());
                         ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, fileToClassName(entry.getKey()), entry.getValue());
-                        if (futures != null) {
+                        if (futures != null && task != null) {
                             futures.add(task);
                         }
                     }
@@ -290,10 +293,11 @@ public final class ClassWalker {
             }
 
             if (futures != null) {
+                File out = invocation.getOutputProvider().getContentLocation(d.getName(), d.getContentTypes(), d.getScopes(), Format.DIRECTORY);
                 for (Future<ClassEntry> future : futures) {
                     ClassEntry e = future.get();
                     if (e != null) {
-                        e.writeTo(d.getFile());
+                        e.writeTo(out);
                     }
                 }
             }

@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * REMOVED & NOT_EXISTS are not in graph
+ * REMOVED and NOT_EXISTS are not in graph
  */
 public interface ClassInfo {
 
@@ -16,14 +16,14 @@ public interface ClassInfo {
     Status status();
 
     /**
-     * Alias for: status != REMOVED && status != NOT_EXISTS
+     * Alias for: status != REMOVED and status != NOT_EXISTS
      *
      * @return true if exists in APK.
      */
     boolean exists();
 
     /**
-     * class access with deprecated flag, {@see Opcodes.ACC_DEPRECATED}
+     * class access with deprecated flag, see Opcodes.ACC_DEPRECATED
      *
      * @return class access.
      */
@@ -38,6 +38,7 @@ public interface ClassInfo {
      * Use it carefully! This class MUST NOT use classes in Android Framework.
      *
      * @return class of this.
+     * @throws ClassNotFoundException not found class
      */
     Class<?> loadClass() throws ClassNotFoundException;
 
