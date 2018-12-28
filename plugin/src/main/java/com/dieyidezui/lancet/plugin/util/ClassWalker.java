@@ -97,6 +97,7 @@ public final class ClassWalker {
          * write ZIP faster without compress!
          */
         final void writeTo(ZipOutputStream zos) throws IOException {
+            LOGGER.lifecycle("{}: {}", name, zos);
             ZipEntry outEntry = new ZipEntry(name);
             CRC32 crc32 = new CRC32();
             crc32.update(bytes);
@@ -112,6 +113,7 @@ public final class ClassWalker {
         }
 
         final void writeTo(File root) throws IOException {
+            LOGGER.lifecycle("{}: {}", name, root);
             File target = new File(root, name.replace('/', File.separatorChar));
             Files.createParentDirs(target);
             Files.write(bytes, target);
@@ -291,6 +293,7 @@ public final class ClassWalker {
                     }
                 }
             }
+            LOGGER.lifecycle("fut: {}", futures);
 
             if (futures != null) {
                 File out = invocation.getOutputProvider().getContentLocation(d.getName(), d.getContentTypes(), d.getScopes(), Format.DIRECTORY);
