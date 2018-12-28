@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -75,7 +76,7 @@ public class MetaDispatcher {
 
 
     public void dispatchMetas(boolean incremental, ApkClassGraph graph, VariantResource resource, MetaProcessorFactory factory) throws InterruptedException, TransformException, IOException {
-        PerMetaDispatcher wrapper = new PerMetaDispatcher(factory);
+        PerMetaDispatcher inner = new PerMetaDispatcher(factory);
         ForkJoinPool pool = global.computation();
         WaitableTasks tasks = WaitableTasks.get(global.io());
 
@@ -103,15 +104,18 @@ public class MetaDispatcher {
                     } else {
                         metas.put(className, annotations);
                     }
-                    wrapper.process(pool, info, preMetas.get(className), annotations, node);
+                    inner.process(pool, info, preMetas.get(className), annotations, node);
                     return null;
                 });
             } else if (incremental) {
                 // class removed
-                wrapper.process(pool, info, Objects.requireNonNull(preMetas.get(className)), null, null);
+                inner.process(pool, info, Objects.requireNonNull(preMetas.get(className)), null, null);
             }
         }
         tasks.await();
+        pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        inner.providers.forEach(i -> pool.execute(() -> i.processor().onProcessEnd()));
+        pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
     }
 
     static class AnnotationCollector extends ClassVisitor {
@@ -162,7 +166,7 @@ public class MetaDispatcher {
     }
 
     static class PerMetaDispatcher {
-        private List<MetaProcessorProvider> providers;
+        List<MetaProcessorProvider> providers;
 
         public PerMetaDispatcher(MetaProcessorFactory factory) {
             this.providers = factory.create().collect(Collectors.toList());
@@ -179,28 +183,28 @@ public class MetaDispatcher {
                                 // not exists means: pre has, but cur removed
                                 processor.onMetaClassRemoved(info);
                             } else {
+                                boolean matchPre = pre != null && !Collections.disjoint(pre, supported);
+                                boolean matchCur = cur != null && !Collections.disjoint(cur, supported);
                                 switch (info.status()) {
                                     case NOT_CHANGED:
-                                        if (!Collections.disjoint(pre, supported)) {
+                                        if (matchPre) { // or  matchCur, they are the same
                                             consume(processor.onMetaClassNotChanged(info), node);
                                         }
                                         break;
                                     case ADDED:
-                                        if (!Collections.disjoint(cur, supported)) {
+                                        if (matchCur) {
                                             consume(processor.onMetaClassAdded(info), node);
                                         }
                                         break;
                                     case CHANGED:
-                                        if (pre == null || Collections.disjoint(pre, supported)) {
-                                            if (!Collections.disjoint(cur, supported)) {
-                                                consume(processor.onMetaMatched(info), node);
-                                            }
-                                        } else if (cur == null || Collections.disjoint(cur, supported)) {
-                                            if (!Collections.disjoint(pre, cur)) {
+                                        if (matchPre) {
+                                            if (matchCur) {
+                                                consume(processor.onMetaChanged(info), node);
+                                            } else {
                                                 consume(processor.onMetaMismatch(info), node);
                                             }
-                                        } else {
-                                            consume(processor.onMetaChanged(info), node);
+                                        } else if (matchCur) {
+                                            consume(processor.onMetaMatched(info), node);
                                         }
                                 }
                             }
