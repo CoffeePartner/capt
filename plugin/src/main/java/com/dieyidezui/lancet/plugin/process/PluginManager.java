@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -39,7 +40,7 @@ public class PluginManager implements Constants {
     private final VariantResource resource;
     private final TransformInvocation invocation;
     private Map<String, PluginBean> prePlugins = Collections.emptyMap();
-    private final Map<String, Plugin> plugins = new HashMap<>();
+    private final Map<String, Plugin> plugins = new ConcurrentHashMap<>();
     private final List<PluginWrapper> wrappers = new ArrayList<>();
 
     public PluginManager(GlobalResource global, VariantResource resource, TransformInvocation invocation) {
@@ -68,21 +69,26 @@ public class PluginManager implements Constants {
         };
     }
 
-    public boolean initPlugins(GradleLancetExtension extension, int scope, GlobalLancet globalLancet) throws IOException {
+    public boolean initPlugins(GradleLancetExtension extension, int scope, GlobalLancet globalLancet) throws IOException, TransformException, InterruptedException {
+        WaitableTasks tasks = WaitableTasks.get(global.io());
         for (LancetPluginExtension e : extension.getPlugins()) {
-            Class<? extends Plugin> clazz = findPluginInProperties(e.getName());
-            if (clazz == null) {
-                clazz = findPluginInApkGraph(e.getName());
-            }
-            if (clazz == null) {
-                throw pluginNotFound(e.getName(), null, null);
-            }
-            try {
-                plugins.put(e.getName(), clazz.newInstance());
-            } catch (IllegalAccessException | InstantiationException ex) {
-                throw pluginNotFound(e.getName(), clazz.getName(), ex);
-            }
+            tasks.submit(() -> {
+                Class<? extends Plugin> clazz = findPluginInProperties(e.getName());
+                if (clazz == null) {
+                    clazz = findPluginInApkGraph(e.getName());
+                }
+                if (clazz == null) {
+                    throw pluginNotFound(e.getName(), null, null);
+                }
+                try {
+                    plugins.put(e.getName(), clazz.newInstance());
+                } catch (IllegalAccessException | InstantiationException ex) {
+                    throw pluginNotFound(e.getName(), clazz.getName(), ex);
+                }
+                return null;
+            });
         }
+        tasks.await();
 
         boolean incremental = invocation.isIncremental() && prePlugins.keySet().containsAll(plugins.keySet());
         if (incremental != invocation.isIncremental()) {
