@@ -97,7 +97,6 @@ public final class ClassWalker {
          * write ZIP faster without compress!
          */
         final void writeTo(ZipOutputStream zos) throws IOException {
-            LOGGER.lifecycle("{}: {}", name, zos);
             ZipEntry outEntry = new ZipEntry(name);
             CRC32 crc32 = new CRC32();
             crc32.update(bytes);
@@ -113,7 +112,6 @@ public final class ClassWalker {
         }
 
         final void writeTo(File root) throws IOException {
-            LOGGER.lifecycle("{}: {}", name, root);
             File target = new File(root, name.replace('/', File.separatorChar));
             Files.createParentDirs(target);
             Files.write(bytes, target);
@@ -272,10 +270,13 @@ public final class ClassWalker {
                 if (d.getFile().exists()) { // we check if directory removed for lancet in  full mode & transform in incremental mode
                     for (File file : Files.fileTreeTraverser().preOrderTraversal(d.getFile())) {
                         if (file.isFile() && file.getName().endsWith(".class")) {
-                            byte[] bytes = Files.toByteArray(file);
-                            ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, fileToClassName(file), Status.NOTCHANGED);
-                            if (futures != null && task != null) {
-                                futures.add(task);
+                            String className = fileToClassName(file);
+                            if(targets == null || targets.contains(className)) {
+                                byte[] bytes = Files.toByteArray(file);
+                                ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, className, Status.NOTCHANGED);
+                                if (futures != null && task != null) {
+                                    futures.add(task);
+                                }
                             }
                         }
                     }
@@ -284,16 +285,17 @@ public final class ClassWalker {
                 for (Map.Entry<File, Status> entry : d.getChangedFiles().entrySet()) {
                     Status status = entry.getValue();
                     if (status != Status.NOTCHANGED && entry.getKey().getName().endsWith(".class")) {
-
-                        byte[] bytes = status == Status.REMOVED ? null : Files.toByteArray(entry.getKey());
-                        ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, fileToClassName(entry.getKey()), entry.getValue());
-                        if (futures != null && task != null) {
-                            futures.add(task);
+                        String className = fileToClassName(entry.getKey());
+                        if(targets == null || targets.contains(className)) {
+                            byte[] bytes = status == Status.REMOVED ? null : Files.toByteArray(entry.getKey());
+                            ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, className, entry.getValue());
+                            if (futures != null && task != null) {
+                                futures.add(task);
+                            }
                         }
                     }
                 }
             }
-            LOGGER.lifecycle("fut: {}", futures);
 
             if (futures != null) {
                 File out = invocation.getOutputProvider().getContentLocation(d.getName(), d.getContentTypes(), d.getScopes(), Format.DIRECTORY);

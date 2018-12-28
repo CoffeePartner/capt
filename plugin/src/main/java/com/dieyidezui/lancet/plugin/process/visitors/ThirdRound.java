@@ -141,7 +141,7 @@ public class ThirdRound {
         @Override
         public ForkJoinTask<ClassWalker.ClassEntry> onVisit(ForkJoinPool pool, @Nullable byte[] classBytes, String className, Status status) {
             if (status != Status.REMOVED && !toRemove.contains(className)) {
-                pool.submit(() -> {
+                return pool.submit(() -> {
                     ClassReader cr = new ClassReader(classBytes);
                     ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS); // just compute max, it may cause 10% slower
                     List<LancetClassVisitor> visitors = transforms
@@ -161,6 +161,8 @@ public class ThirdRound {
                     } catch (RuntimeException e) {
                         LOGGER.warn("Transform class '" + className + "' failed, skip it", e);
                         return new ClassWalker.ClassEntry(className, classBytes);
+                    } finally {
+                        visitors.forEach(manager::detach);
                     }
                     return new ClassWalker.ClassEntry(className, cw.toByteArray());
                 });

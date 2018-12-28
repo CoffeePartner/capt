@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 public class VariantResource implements Constants {
@@ -48,11 +49,11 @@ public class VariantResource implements Constants {
     }
 
     public InputStream openStream(String className) throws IOException {
-        InputStream is = loader.runtimeLoader.getResourceAsStream(className + ".class");
+        URL is = loader.runtimeLoader.getResource(className + ".class");
         if (is == null) {
             throw new IOException("open class failed: " + className);
         }
-        return is;
+        return is.openStream();
     }
 
     public Class<?> loadClass(String className) throws ClassNotFoundException {
@@ -81,15 +82,16 @@ public class VariantResource implements Constants {
         private URLClassLoader runtimeLoader;
 
         void initClassLoader(TransformInvocation invocation, Configuration target) {
-            URLClassLoader lancetDependencies = URLClassLoader.newInstance(
-                    target.resolve().stream()
-                            .map(f -> {
-                                try {
-                                    return f.toURI().toURL();
-                                } catch (MalformedURLException e) {
-                                    throw new AssertionError(e);
-                                }
-                            }).toArray(URL[]::new), Plugin.class.getClassLoader());
+
+            URL[] runnerUrls = target.resolve().stream()
+                    .map(f -> {
+                        try {
+                            return f.toURI().toURL();
+                        } catch (MalformedURLException e) {
+                            throw new AssertionError(e);
+                        }
+                    }).toArray(URL[]::new);
+            URLClassLoader lancetDependencies = URLClassLoader.newInstance(runnerUrls, Plugin.class.getClassLoader());
 
             URL[] runtimeUrls = invocation.getInputs().stream()
                     .flatMap(s -> Stream.concat(s.getDirectoryInputs().stream(), s.getJarInputs().stream()))
@@ -102,8 +104,10 @@ public class VariantResource implements Constants {
                         }
                     })
                     .toArray(URL[]::new);
+            LOGGER.lifecycle("runner: {}", Arrays.toString(runnerUrls));
+            LOGGER.lifecycle("runtime: {}", Arrays.toString(runtimeUrls));
             this.runnerLoader = URLClassLoader.newInstance(runtimeUrls, lancetDependencies);
-            this.runtimeLoader = URLClassLoader.newInstance(runtimeUrls, null);
+            this.runtimeLoader = URLClassLoader.newInstance(runtimeUrls);
         }
 
         public Class<?> loadClass(String className) throws ClassNotFoundException {

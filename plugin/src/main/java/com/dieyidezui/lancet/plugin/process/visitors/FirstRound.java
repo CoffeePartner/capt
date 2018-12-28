@@ -9,7 +9,6 @@ import com.dieyidezui.lancet.plugin.graph.MethodBean;
 import com.dieyidezui.lancet.plugin.util.ClassWalker;
 import com.dieyidezui.lancet.plugin.util.ConcurrentHashSet;
 import com.dieyidezui.lancet.plugin.util.Constants;
-import com.dieyidezui.lancet.plugin.util.TypeUtil;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.objectweb.asm.*;
@@ -37,10 +36,12 @@ public class FirstRound implements ClassWalker.Visitor.Factory, Constants {
     public ClassWalker.Visitor newVisitor(boolean incremental, QualifiedContent content) {
         if (incremental && content instanceof JarInput) {
             JarInput j = (JarInput) content;
-            if (j.getStatus() == Status.REMOVED || j.getStatus() == Status.CHANGED) {
+            if (j.getStatus() == Status.REMOVED) {
+                graph.onJarRemoved(j.getName());
+                return null;
+            } else if (j.getStatus() == Status.CHANGED) {
                 graph.onJarRemoved(j.getName());
             }
-            return null;
         }
         return new NamedVisitor(content.getName());
     }
