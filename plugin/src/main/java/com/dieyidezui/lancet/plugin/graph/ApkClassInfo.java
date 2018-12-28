@@ -72,6 +72,10 @@ public class ApkClassInfo implements ClassInfo {
     }
 
     private boolean updateStatus(Status newStatus) {
+        // for not exists in incremental mode, we change the new status to ADDED
+        if (newStatus == Status.CHANGED && status.get() == Status.NOT_EXISTS) {
+            newStatus = Status.ADDED;
+        }
         Status oldStatus = this.status.getAndSet(newStatus);
         if (oldStatus != Status.NOT_EXISTS && oldStatus != Status.NOT_CHANGED) {
             if (oldStatus == Status.ADDED && newStatus == Status.REMOVED

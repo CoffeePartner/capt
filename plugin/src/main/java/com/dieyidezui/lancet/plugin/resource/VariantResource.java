@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -53,7 +54,9 @@ public class VariantResource implements Constants {
         if (is == null) {
             throw new IOException("open class failed: " + className);
         }
-        return is.openStream();
+        URLConnection connection = is.openConnection();
+        connection.setUseCaches(false); // ignore jar entry cache, or else you will die
+        return connection.getInputStream();
     }
 
     public Class<?> loadClass(String className) throws ClassNotFoundException {
@@ -104,8 +107,6 @@ public class VariantResource implements Constants {
                         }
                     })
                     .toArray(URL[]::new);
-            LOGGER.lifecycle("runner: {}", Arrays.toString(runnerUrls));
-            LOGGER.lifecycle("runtime: {}", Arrays.toString(runtimeUrls));
             this.runnerLoader = URLClassLoader.newInstance(runtimeUrls, lancetDependencies);
             this.runtimeLoader = URLClassLoader.newInstance(runtimeUrls);
         }

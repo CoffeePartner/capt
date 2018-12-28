@@ -105,16 +105,6 @@ public class VariantScope implements Constants {
 
         manager.callDestroy(); // call destroy after store to save time
         internalCache.await();
-
-
-        for (TransformInput input : invocation.getInputs()) {
-            for (JarInput jarInput : input.getJarInputs()) {
-                System.out.println(jarInput.toString());
-            }
-            for (DirectoryInput directoryInput : input.getDirectoryInputs()) {
-                System.out.println(directoryInput.toString());
-            }
-        }
     }
 
     public interface Factory {
