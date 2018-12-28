@@ -8,9 +8,8 @@ import com.dieyidezui.lancet.plugin.graph.ClassBean;
 import com.dieyidezui.lancet.plugin.graph.MethodBean;
 import com.dieyidezui.lancet.plugin.util.ClassWalker;
 import com.dieyidezui.lancet.plugin.util.ConcurrentHashSet;
+import com.dieyidezui.lancet.plugin.util.Constants;
 import com.dieyidezui.lancet.plugin.util.TypeUtil;
-import com.dieyidezui.lancet.rt.annotations.Meta;
-import com.dieyidezui.lancet.rt.annotations.RemoveWhenTransform;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.objectweb.asm.*;
@@ -20,11 +19,9 @@ import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 
-public class FirstRound implements ClassWalker.Visitor.Factory {
+public class FirstRound implements ClassWalker.Visitor.Factory, Constants {
 
     private static final Logger LOGGER = Logging.getLogger(FirstRound.class);
-    private static final String META = Type.getDescriptor(Meta.class);
-    private static final String REMOVE = Type.getDescriptor(RemoveWhenTransform.class);
 
     private final ApkClassGraph graph;
     private final MetaDispatcher metaDispatcher;

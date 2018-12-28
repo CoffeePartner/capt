@@ -10,6 +10,7 @@ import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
 import com.dieyidezui.lancet.plugin.graph.ApkClassInfo;
 import com.dieyidezui.lancet.plugin.process.plugin.GlobalLancet;
 import com.dieyidezui.lancet.plugin.process.plugin.PluginWrapper;
+import com.dieyidezui.lancet.plugin.process.visitors.MetaDispatcher;
 import com.dieyidezui.lancet.plugin.process.visitors.ThirdRound;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
@@ -113,24 +114,32 @@ public class PluginManager implements Constants {
         return incremental;
     }
 
-    /**
-     * Rerack classes for removed plugin
-     */
-    public Stream<ApkClassInfo> collectRemovedPluginsAffectedClasses(ApkClassGraph graph) {
-        return prePlugins.entrySet()
-                .stream()
-                .filter(e -> !plugins.containsKey(e.getKey()))
-                .map(Map.Entry::getValue)
-                .flatMap(b -> b.getAffectedClasses().stream())
-                .map(graph::get)
-                .filter(Objects::nonNull)
-                .filter(c -> c.status() == Status.NOT_CHANGED);// others are already called.
+    public ThirdRound.TransformProviderFactory forThird() {
+        return new ThirdRound.TransformProviderFactory() {
+            @Override
+            public Stream<ApkClassInfo> collectRemovedPluginsAffectedClasses(ApkClassGraph graph) {
+                return prePlugins.entrySet()
+                        .stream()
+                        .filter(e -> !plugins.containsKey(e.getKey()))
+                        .map(Map.Entry::getValue)
+                        .flatMap(b -> b.getAffectedClasses().stream())
+                        .map(graph::get)
+                        .filter(Objects::nonNull)
+                        .filter(c -> c.status() == Status.NOT_CHANGED);// others are already called.
+            }
+
+            @Override
+            public Stream<ThirdRound.TransformProvider> create() {
+                return wrappers.stream().map(PluginWrapper::newProvider).filter(Objects::nonNull);
+            }
+        };
     }
 
-    public Stream<ThirdRound.PluginProvider> getProviders() {
-        return wrappers.stream().map(PluginWrapper::newProvider).filter(Objects::nonNull);
+    public MetaDispatcher.MetaProcessorFactory forMetas() {
+        return () -> wrappers.stream()
+                .map(PluginWrapper::newMetaProvider)
+                .filter(Objects::nonNull);
     }
-
 
     private Class<? extends Plugin> findPluginInProperties(String id) throws IOException {
         URL url = resource.loadPluginOnLancet(id);

@@ -91,13 +91,13 @@ public class VariantScope implements Constants {
         manager.callCreate();
 
         // Round 2: visit Metas
-        metaDispatcher.dispatchMetas(incremental, variantResource, null);
+        metaDispatcher.dispatchMetas(incremental, graph, variantResource, manager.forMetas());
 
         // Round 3: transform classes
         // use the actual incremental (for plugins input)
         // remember to ignore removed classes if incremental
         new ThirdRound(global, firstRound.getToRemove(), graph)
-                .accept(incremental, walker, manager, invocation);
+                .accept(incremental, walker, manager.forThird(), invocation);
 
         // transform done, store cache
         internalCache.storeAsync(graph.writeClasses());

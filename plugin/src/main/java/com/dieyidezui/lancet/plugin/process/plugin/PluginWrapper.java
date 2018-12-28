@@ -4,8 +4,10 @@ import com.dieyidezui.lancet.plugin.api.Arguments;
 import com.dieyidezui.lancet.plugin.api.LancetInternal;
 import com.dieyidezui.lancet.plugin.api.OutputProvider;
 import com.dieyidezui.lancet.plugin.api.Plugin;
+import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 import com.dieyidezui.lancet.plugin.process.PluginBean;
+import com.dieyidezui.lancet.plugin.process.visitors.MetaDispatcher;
 import com.dieyidezui.lancet.plugin.process.visitors.ThirdRound;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
 
@@ -57,10 +59,10 @@ public class PluginWrapper extends ForwardingLancet {
     }
 
     @Nullable
-    public ThirdRound.PluginProvider newProvider() {
+    public ThirdRound.TransformProvider newProvider() {
         ClassTransformer transformer = plugin.onTransformClass();
         if (transformer != null) {
-            return new ThirdRound.PluginProvider() {
+            return new ThirdRound.TransformProvider() {
 
 
                 @Override
@@ -71,6 +73,27 @@ public class PluginWrapper extends ForwardingLancet {
                 @Override
                 public ClassTransformer transformer() {
                     return transformer;
+                }
+            };
+        }
+        return null;
+    }
+
+    @Nullable
+    public MetaDispatcher.MetaProcessorProvider newMetaProvider() {
+        MetaProcessor processor = plugin.onProcessAnnotations();
+        if (processor != null) {
+            return new MetaDispatcher.MetaProcessorProvider() {
+                Set<String> supported = plugin.getSupportedAnnotations();
+
+                @Override
+                public Set<String> supports() {
+                    return supported;
+                }
+
+                @Override
+                public MetaProcessor processor() {
+                    return processor;
                 }
             };
         }

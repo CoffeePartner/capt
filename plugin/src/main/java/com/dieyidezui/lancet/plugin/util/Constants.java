@@ -1,8 +1,15 @@
 package com.dieyidezui.lancet.plugin.util;
 
+import com.dieyidezui.lancet.rt.annotations.Meta;
+import com.dieyidezui.lancet.rt.annotations.RemoveWhenTransform;
+import org.objectweb.asm.Type;
+
 import java.nio.charset.Charset;
 
 public interface Constants {
+
+    String META = Type.getDescriptor(Meta.class);
+    String REMOVE = Type.getDescriptor(RemoveWhenTransform.class);
 
     int OPT_SIZE = 8192;
 

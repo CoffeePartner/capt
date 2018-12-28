@@ -8,7 +8,6 @@ import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 import com.dieyidezui.lancet.plugin.api.transform.TransformContext;
 import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
 import com.dieyidezui.lancet.plugin.graph.ApkClassInfo;
-import com.dieyidezui.lancet.plugin.process.PluginManager;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.util.ClassWalker;
 import com.dieyidezui.lancet.plugin.util.WaitableTasks;
@@ -36,7 +35,7 @@ public class ThirdRound {
     private final Set<String> toRemove;
     private final ApkClassGraph graph;
     private boolean hasAll = false;
-    ClassVisitorManager manager = new ClassVisitorManager();
+    private final ClassVisitorManager manager = new ClassVisitorManager();
 
     public ThirdRound(GlobalResource global, Set<String> toRemove, ApkClassGraph graph) {
         this.global = global;
@@ -44,8 +43,8 @@ public class ThirdRound {
         this.graph = graph;
     }
 
-    public void accept(boolean incremental, ClassWalker walker, PluginManager manager, TransformInvocation invocation) throws IOException, InterruptedException, TransformException {
-        List<PluginTransform> transforms = manager.getProviders().map(PluginTransform::new).collect(Collectors.toList());
+    public void accept(boolean incremental, ClassWalker walker, TransformProviderFactory manager, TransformInvocation invocation) throws IOException, InterruptedException, TransformException {
+        List<PluginTransform> transforms = manager.create().map(PluginTransform::new).collect(Collectors.toList());
 
         // 1. call beforeTransform to collect class request
         ForkJoinPool pool = global.computation();
@@ -90,6 +89,8 @@ public class ThirdRound {
             } catch (ExecutionException e) {
                 if (e.getCause() instanceof IOException) {
                     throw (IOException) e.getCause();
+                } else if (e.getCause() instanceof RuntimeException) {
+                    throw (RuntimeException) e.getCause();
                 }
                 throw new TransformException(e.getCause());
             }
@@ -169,11 +170,11 @@ public class ThirdRound {
     }
 
     class PluginTransform {
-        final PluginProvider provider;
+        final TransformProvider provider;
         ClassRequest request;
         Set<String> extra;
 
-        PluginTransform(PluginProvider provider) {
+        PluginTransform(TransformProvider provider) {
             this.provider = provider;
         }
 
@@ -228,10 +229,21 @@ public class ThirdRound {
     }
 
 
-    public interface PluginProvider {
+    public interface TransformProvider {
 
         void onClassAffected(String className);
 
         ClassTransformer transformer();
+
+    }
+
+    public interface TransformProviderFactory {
+
+        Stream<TransformProvider> create();
+
+        /**
+         * Rerack classes for removed plugin
+         */
+        Stream<ApkClassInfo> collectRemovedPluginsAffectedClasses(ApkClassGraph graph);
     }
 }

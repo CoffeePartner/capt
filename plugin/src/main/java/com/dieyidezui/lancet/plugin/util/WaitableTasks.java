@@ -40,6 +40,8 @@ public class WaitableTasks {
             } catch (ExecutionException e) {
                 if (e.getCause() instanceof IOException) {
                     throw (IOException) e.getCause();
+                } else if(e.getCause() instanceof RuntimeException) {
+                    throw (RuntimeException) e.getCause();
                 }
                 throw new TransformException(e.getCause());
             }

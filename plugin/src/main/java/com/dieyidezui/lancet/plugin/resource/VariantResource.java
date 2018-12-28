@@ -27,7 +27,6 @@ public class VariantResource implements Constants {
     private final FileManager files;
     private final OutputProviderFactory factory;
     private boolean incremental;
-    private TransformInvocation invocation;
 
     public VariantResource(String variant, FileManager files, OutputProviderFactory factory) {
         this.variant = variant;

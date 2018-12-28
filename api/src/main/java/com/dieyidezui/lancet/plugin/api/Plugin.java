@@ -57,14 +57,18 @@ public abstract class Plugin<T> {
      */
     @Thread(Type.SINGLE)
     @Nullable
-    public abstract MetaProcessor onProcessAnnotations();
+    public MetaProcessor onProcessAnnotations() {
+        return null;
+    }
 
     /**
      * @return
      */
     @Thread(Type.SINGLE)
     @Nullable
-    public abstract ClassTransformer onTransformClass();
+    public ClassTransformer onTransformClass() {
+        return null;
+    }
 
     /**
      * The last time to do your stuff.
