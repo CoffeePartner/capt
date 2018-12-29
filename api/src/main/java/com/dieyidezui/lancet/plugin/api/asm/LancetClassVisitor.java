@@ -44,14 +44,18 @@ public abstract class LancetClassVisitor extends ClassVisitor {
 
     final Iterator<LancetClassVisitor> iterate() {
         return new Iterator<LancetClassVisitor>() {
+            LancetClassVisitor c = LancetClassVisitor.this;
+
             @Override
             public boolean hasNext() {
-                return cv instanceof LancetClassVisitor;
+                return c != null;
             }
 
             @Override
             public LancetClassVisitor next() {
-                return (LancetClassVisitor) cv;
+                LancetClassVisitor cur = c;
+                c = c.cv instanceof LancetClassVisitor ? (LancetClassVisitor) c.cv : null;
+                return cur;
             }
 
             @Override

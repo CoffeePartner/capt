@@ -152,7 +152,6 @@ public class ThirdRound {
 
                     ClassVisitor header = cw;
                     List<LancetClassVisitor> preGroup = null;
-
                     // link every two expanded group
                     for (int i = 0; i < visitors.size(); i++) {
                         LancetClassVisitor v = visitors.get(i);
@@ -179,7 +178,10 @@ public class ThirdRound {
                         LOGGER.warn("Transform class '" + className + "' failed, skip it", e);
                         return new ClassWalker.ClassEntry(className, classBytes);
                     } finally {
-                        visitors.forEach(manager::detach);
+                        if (header instanceof LancetClassVisitor) {
+                            manager.expand((LancetClassVisitor) header)
+                                    .forEach(manager::detach);
+                        }
                     }
                     return new ClassWalker.ClassEntry(className, cw.toByteArray());
                 });
