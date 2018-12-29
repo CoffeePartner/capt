@@ -36,6 +36,7 @@ import java.util.stream.Stream;
 public class PluginManager implements Constants {
 
     private static final Logger LOGGER = Logging.getLogger(PluginManager.class);
+    private boolean hasPluginRemoved = false;
     private final GlobalResource global;
     private final VariantResource resource;
     private final TransformInvocation invocation;
@@ -107,11 +108,14 @@ public class PluginManager implements Constants {
                     resource,
                     globalLancet);
             PluginBean pre = prePlugins.get(entry.getKey());
-            if (pre != null) {
+            if (incremental && pre != null) {
                 wrapper.combinePre(pre);
             }
             wrappers.add(wrapper);
         }
+
+        // optimize for AnnotationDispatcher
+        hasPluginRemoved = incremental && !plugins.keySet().containsAll(prePlugins.keySet());
 
         // priority order
         wrappers.sort(Comparator.comparingInt(l -> l.getArgs().getMyArguments().priority()));
@@ -122,14 +126,16 @@ public class PluginManager implements Constants {
         return new ThirdRound.TransformProviderFactory() {
             @Override
             public Stream<ApkClassInfo> collectRemovedPluginsAffectedClasses(ApkClassGraph graph) {
-                return prePlugins.entrySet()
+                return hasPluginRemoved
+                        ? prePlugins.entrySet()
                         .stream()
                         .filter(e -> !plugins.containsKey(e.getKey()))
                         .map(Map.Entry::getValue)
                         .flatMap(b -> b.getAffectedClasses().stream())
                         .map(graph::get)
                         .filter(Objects::nonNull)
-                        .filter(c -> c.status() == Status.NOT_CHANGED);// others are already called.
+                        .filter(c -> c.status() == Status.NOT_CHANGED)
+                        : Stream.empty();// others are already called.
             }
 
             @Override
@@ -200,6 +206,10 @@ public class PluginManager implements Constants {
         WaitableTasks waitable = WaitableTasks.get(global.io());
         wrappers.forEach(p -> waitable.execute(p::callOnDestroy));
         waitable.await();
+    }
+
+    public boolean hasPluginRemoved() {
+        return hasPluginRemoved;
     }
 
     public static class LastPlugins {

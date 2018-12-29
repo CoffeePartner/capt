@@ -77,7 +77,7 @@ public class AnnotationClassDispatcher {
     }
 
 
-    public void dispatch(boolean incremental, ApkClassGraph graph, VariantResource resource, AnnotationProcessorFactory factory) throws InterruptedException, TransformException, IOException {
+    public void dispatch(boolean recompute, boolean incremental, ApkClassGraph graph, VariantResource resource, AnnotationProcessorFactory factory) throws InterruptedException, TransformException, IOException {
         PerClassDispatcher inner = new PerClassDispatcher(factory);
         ForkJoinPool pool = global.computation();
         WaitableTasks tasks = WaitableTasks.get(global.io());
@@ -92,7 +92,10 @@ public class AnnotationClassDispatcher {
             // full mode only return NOT_EXISTS or NOT_CHANGED
             if (info.exists()) {
                 if (incremental && info.status() == Status.NOT_CHANGED) {
-                    matched.put(className, preMatched.get(className));
+                    Set<String> annos = preMatched.get(className);
+                    if (!recompute || inner.checkStillMatched(annos)) {
+                        matched.put(className, annos);
+                    }
                     continue;
                 }
                 tasks.submit(() -> {
@@ -120,6 +123,7 @@ public class AnnotationClassDispatcher {
 
     class PerClassDispatcher {
         List<AnnotationProcessorProvider> providers;
+        Set<String> allSupported = null;
 
         PerClassDispatcher(AnnotationProcessorFactory factory) {
             this.providers = factory.create().collect(Collectors.toList());
@@ -182,6 +186,14 @@ public class AnnotationClassDispatcher {
                 }
                 return null;
             });
+        }
+
+        public boolean checkStillMatched(Set<String> annos) {
+            Set<String> all = allSupported;
+            if (all == null) {
+                allSupported = all = providers.stream().flatMap(c -> c.supports().stream()).collect(Collectors.toSet());
+            }
+            return !Collections.disjoint(all, annos);
         }
     }
 

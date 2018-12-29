@@ -30,6 +30,9 @@ public class FirstRound {
     }
 
     public void accept(ClassWalker walker, boolean incremental, AnnotationCollector collector) throws IOException, InterruptedException, TransformException {
+        if(!incremental) {
+            graph.clear();
+        }
         walker.visit(incremental, false, asFactory(collector));
     }
 

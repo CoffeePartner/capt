@@ -34,6 +34,20 @@ public class InternalCache {
         this.waitableTasks = WaitableTasks.get(global.io());
     }
 
+    public <T> void loadSync(Consumer<T> consumer) throws IOException, TransformException {
+        try {
+            new SingleReadTask<>(consumer).call();
+        } catch (Exception e) {
+            if (e instanceof IOException) {
+                throw (IOException) e;
+            } else if (e instanceof RuntimeException) {
+                throw (RuntimeException) e;
+            } else {
+                throw new TransformException(e);
+            }
+        }
+    }
+
     public <T> void loadAsync(Consumer<T> consumer) {
         waitableTasks.submit(new SingleReadTask<>(consumer));
     }

@@ -72,25 +72,27 @@ public class VariantScope implements Constants {
         PluginManager manager = new PluginManager(global, variantResource, invocation);
 
         if (invocation.isIncremental()) {
-            internalCache.loadAsync(graph.readClasses());
-            internalCache.loadAsync(manager.readPrePlugins());
-            internalCache.loadAsync(annotationClassDispatcher.readPreMatched());
-            internalCache.await();
+            internalCache.loadSync(manager.readPrePlugins());
         }
-
-        cur = System.currentTimeMillis();
-        LOGGER.lifecycle("Load lancet core cache, cost: {}ms", (cur - pre));
-        pre = cur;
 
         int scope = variant.endsWith(ANDROID_TEST) ? LancetPluginExtension.ANDROID_TEST : LancetPluginExtension.ASSEMBLE;
         boolean incremental = manager.initPlugins(global.gradleLancetExtension(), scope, lancet);
         variantResource.setIncremental(incremental);
 
+        if (incremental) {
+            internalCache.loadAsync(graph.readClasses());
+            internalCache.loadAsync(annotationClassDispatcher.readPreMatched());
+            internalCache.await();
+        }
+
+        cur = System.currentTimeMillis();
+        LOGGER.lifecycle("Prepare, cost: {}ms", (cur - pre));
+        pre = cur;
+
         // Round 1: make class graph & collect metas
-        // use the invocation.isIncremental()
         new FirstRound(graph)
                 .accept(walker,
-                        invocation.isIncremental(),
+                        incremental,
                         annotationClassDispatcher.toCollector(manager.getAllSupportedAnnotations()));
         graph.markRemovedClassesAndBuildGraph();
 
@@ -107,6 +109,7 @@ public class VariantScope implements Constants {
 
         // Round 2: visit Metas
         annotationClassDispatcher.dispatch(
+                manager.hasPluginRemoved(),
                 incremental,
                 graph,
                 variantResource,
@@ -115,9 +118,8 @@ public class VariantScope implements Constants {
         cur = System.currentTimeMillis();
         LOGGER.lifecycle("Dispatch annotations, cost: {}ms", (cur - pre));
         pre = cur;
+
         // Round 3: transform classes
-        // use the actual incremental (for plugins input)
-        // remember to ignore removed classes if incremental
         new ThirdRound(variantResource, global, graph)
                 .accept(incremental,
                         walker,

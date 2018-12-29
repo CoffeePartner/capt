@@ -127,6 +127,10 @@ public class ApkClassGraph implements ClassGraph {
         classes.get(className).markRemoved(throwIfDuplicated, belongsTo);
     }
 
+    public void clear() {
+        classes.clear();
+    }
+
 
     public static class Classes {
         public List<ClassBean> classes;

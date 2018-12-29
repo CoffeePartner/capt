@@ -26,7 +26,15 @@ public class CommonArgs {
                     }
                     return new SimpleArgs(e, plugins.get(e.getName()).defaultPriority());
                 })
-                .filter(a -> a != null && a.allow(scope))
+                .filter(a -> {
+                    if (a != null) {
+                        if (a.allow(scope)) {
+                            return true;
+                        }
+                        plugins.remove(a.name());
+                    }
+                    return false;
+                })
                 .collect(Collectors.toMap(SimpleArgs::name, Function.identity()))
         );
     }
