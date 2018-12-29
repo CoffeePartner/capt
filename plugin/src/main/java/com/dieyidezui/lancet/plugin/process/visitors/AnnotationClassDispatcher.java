@@ -14,7 +14,7 @@ import com.dieyidezui.lancet.plugin.util.asm.AnnotationSniffer;
 import com.google.common.io.ByteStreams;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-import org.objectweb.asm.*;
+import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 
 import javax.annotation.Nullable;
@@ -61,7 +61,7 @@ public class AnnotationClassDispatcher {
 
     public FirstRound.AnnotationCollector toCollector(Set<String> targets) {
         return (className, annotations) -> {
-            if(!Collections.disjoint(targets, annotations)) {
+            if (!Collections.disjoint(targets, annotations)) {
                 matched.put(className, Collections.emptySet());
             }
         };
@@ -128,11 +128,13 @@ public class AnnotationClassDispatcher {
         public void process(ForkJoinPool pool, ApkClassInfo info, @Nullable Set<String> pre, @Nullable Set<String> cur, @Nullable ClassNode node) {
             pool.submit(() -> {
                 boolean hasTrue = false;
+                final ThreadLocal<ClassNode> local = ThreadLocal.withInitial(() -> Util.clone(node));
                 for (Future<Boolean> future : ForkJoinTask.invokeAll(providers.stream()
                         .map(p -> new RecursiveTask<Boolean>() {
                             @Override
                             protected Boolean compute() {
                                 AnnotationProcessor processor = p.processor();
+
                                 Set<String> supported = p.supports();
                                 if (!info.exists() && !Collections.disjoint(pre, supported)) {
                                     // not exists means: pre has, but cur removed
@@ -143,24 +145,24 @@ public class AnnotationClassDispatcher {
                                     switch (info.status()) {
                                         case NOT_CHANGED:
                                             if (matchCur) {
-                                                consume(processor.onAnnotationClassNotChanged(info), node);
+                                                consume(processor.onAnnotationClassNotChanged(info), local);
                                             }
                                             break;
                                         case ADDED:
                                             if (matchCur) {
-                                                consume(processor.onAnnotationClassAdded(info), node);
+                                                consume(processor.onAnnotationClassAdded(info), local);
                                             }
                                             break;
                                         case CHANGED:
                                             if (matchPre) {
                                                 if (matchCur) {
-                                                    consume(processor.onAnnotationChanged(info), node);
+                                                    consume(processor.onAnnotationChanged(info), local);
                                                 } else {
-                                                    consume(processor.onAnnotationMismatch(info), node);
+                                                    consume(processor.onAnnotationMismatch(info), local);
                                                     return false;
                                                 }
                                             } else if (matchCur) {
-                                                consume(processor.onAnnotationMatched(info), node);
+                                                consume(processor.onAnnotationMatched(info), local);
                                             } else {
                                                 throw new AssertionError();
                                             }
@@ -173,6 +175,7 @@ public class AnnotationClassDispatcher {
                     hasTrue |= Util.await(future);
                 }
 
+                local.remove();
                 if (!hasTrue) {
                     //should remove it from map if all mismatch
                     matched.remove(info.name());
@@ -182,9 +185,9 @@ public class AnnotationClassDispatcher {
         }
     }
 
-    static void consume(@Nullable ClassConsumer consumer, ClassNode node) {
+    static void consume(@Nullable ClassConsumer consumer, ThreadLocal<ClassNode> local) {
         if (consumer != null) {
-            consumer.accept(node);
+            consumer.accept(local.get());
         }
     }
 

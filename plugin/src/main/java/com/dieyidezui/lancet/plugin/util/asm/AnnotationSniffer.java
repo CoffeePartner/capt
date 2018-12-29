@@ -1,6 +1,6 @@
 package com.dieyidezui.lancet.plugin.util.asm;
 
-import com.dieyidezui.lancet.plugin.util.TypeUtil;
+import com.dieyidezui.lancet.plugin.util.Util;
 import org.objectweb.asm.*;
 
 import java.util.HashSet;
@@ -21,7 +21,7 @@ public class AnnotationSniffer extends ClassVisitor {
     }
 
     protected void onAnnotationFound(String descriptor, boolean visible) {
-        annotations.add(TypeUtil.objDescToInternalName(descriptor));
+        annotations.add(Util.objDescToInternalName(descriptor));
     }
 
     @Override
