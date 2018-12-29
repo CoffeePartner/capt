@@ -4,7 +4,6 @@ dependencies {
     testCompile "junit:junit:4.12"
 
     compileClasspath "com.android.tools.build:gradle:$android_tools_version"
-    compile project(":rt")
     compile gradleApi()
     compileClasspath "com.google.guava:guava:$guava_version"
     compile "org.ow2.asm:asm:7.0"

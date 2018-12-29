@@ -10,6 +10,7 @@ import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
 import com.dieyidezui.lancet.plugin.graph.ApkClassInfo;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.util.ClassWalker;
+import com.dieyidezui.lancet.plugin.util.Util;
 import com.dieyidezui.lancet.plugin.util.WaitableTasks;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -32,14 +33,12 @@ import java.util.stream.Stream;
 public class ThirdRound {
     private static final Logger LOGGER = Logging.getLogger(ThirdRound.class);
     private final GlobalResource global;
-    private final Set<String> toRemove;
     private final ApkClassGraph graph;
     private boolean hasAll = false;
     private final ClassVisitorManager manager = new ClassVisitorManager();
 
-    public ThirdRound(GlobalResource global, Set<String> toRemove, ApkClassGraph graph) {
+    public ThirdRound(GlobalResource global, ApkClassGraph graph) {
         this.global = global;
-        this.toRemove = toRemove;
         this.graph = graph;
     }
 
@@ -77,23 +76,13 @@ public class ThirdRound {
                                 .filter(Objects::nonNull)
                                 .filter(c -> c.status() == com.dieyidezui.lancet.plugin.api.graph.Status.NOT_CHANGED))
                         // ignore to remove
-                        .filter(c -> !toRemove.contains(c.name()))
                         .collect(Collectors.groupingBy(s -> inputs.get(s.clazz.belongsTo), HashMap::new,
                                 Collector.of(HashSet::new, (s, v) -> s.add(v.name()), (s1, s2) -> {
                                     s1.addAll(s2);
                                     return s1;
                                 }, Collector.Characteristics.UNORDERED)));
             });
-            try {
-                walker.visitTargets(asFactory(transforms), future.get());
-            } catch (ExecutionException e) {
-                if (e.getCause() instanceof IOException) {
-                    throw (IOException) e.getCause();
-                } else if (e.getCause() instanceof RuntimeException) {
-                    throw (RuntimeException) e.getCause();
-                }
-                throw new TransformException(e.getCause());
-            }
+            walker.visitTargets(asFactory(transforms), Util.await(future));
         } else {
             pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         }
@@ -140,7 +129,7 @@ public class ThirdRound {
         @Nullable
         @Override
         public ForkJoinTask<ClassWalker.ClassEntry> onVisit(ForkJoinPool pool, @Nullable byte[] classBytes, String className, Status status) {
-            if (status != Status.REMOVED && !toRemove.contains(className)) {
+            if (status != Status.REMOVED) {
                 return pool.submit(() -> {
                     ClassReader cr = new ClassReader(classBytes);
                     ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS); // just compute max, it may cause 10% slower

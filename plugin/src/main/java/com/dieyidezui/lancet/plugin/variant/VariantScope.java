@@ -1,14 +1,15 @@
 package com.dieyidezui.lancet.plugin.variant;
 
-import com.android.build.api.transform.*;
+import com.android.build.api.transform.TransformException;
+import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.api.BaseVariant;
 import com.dieyidezui.lancet.plugin.cache.*;
 import com.dieyidezui.lancet.plugin.dsl.LancetPluginExtension;
 import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
 import com.dieyidezui.lancet.plugin.process.PluginManager;
 import com.dieyidezui.lancet.plugin.process.plugin.GlobalLancet;
+import com.dieyidezui.lancet.plugin.process.visitors.AnnotationClassDispatcher;
 import com.dieyidezui.lancet.plugin.process.visitors.FirstRound;
-import com.dieyidezui.lancet.plugin.process.visitors.MetaDispatcher;
 import com.dieyidezui.lancet.plugin.process.visitors.ThirdRound;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
@@ -53,8 +54,7 @@ public class VariantScope implements Constants {
 
         // load and prepare
         ClassWalker walker = new ClassWalker(global, invocation);
-        MetaDispatcher metaDispatcher = new MetaDispatcher(global);
-
+        AnnotationClassDispatcher annotationClassDispatcher = new AnnotationClassDispatcher(global);
 
 
         RelativeDirectoryProviderFactory singleFactory = new RelativeDirectoryProviderFactoryImpl();
@@ -72,7 +72,7 @@ public class VariantScope implements Constants {
         if (invocation.isIncremental()) {
             internalCache.loadAsync(graph.readClasses());
             internalCache.loadAsync(manager.readPrePlugins());
-            internalCache.loadAsync(metaDispatcher.readPreMetas());
+            internalCache.loadAsync(annotationClassDispatcher.readPreMatched());
             internalCache.await();
         }
 
@@ -82,26 +82,35 @@ public class VariantScope implements Constants {
 
         // Round 1: make class graph & collect metas
         // use the invocation.isIncremental()
-        FirstRound firstRound = new FirstRound(graph, metaDispatcher);
-        walker.visit(invocation.isIncremental(), false, firstRound);
+        new FirstRound(graph)
+                .accept(walker,
+                        invocation.isIncremental(),
+                        annotationClassDispatcher.toCollector(manager.getAllSupportedAnnotations()));
         graph.markRemovedClassesAndBuildGraph();
 
         // everything ready, call plugin lifecycle
         manager.callCreate();
 
         // Round 2: visit Metas
-        metaDispatcher.dispatchMetas(incremental, graph, variantResource, manager.forMetas());
+        annotationClassDispatcher.dispatchMetas(
+                incremental,
+                graph,
+                variantResource,
+                manager.forAnnotation());
 
         // Round 3: transform classes
         // use the actual incremental (for plugins input)
         // remember to ignore removed classes if incremental
-        new ThirdRound(global, firstRound.getToRemove(), graph)
-                .accept(incremental, walker, manager.forThird(), invocation);
+        new ThirdRound(global, graph)
+                .accept(incremental,
+                        walker,
+                        manager.forThird(),
+                        invocation);
 
         // transform done, store cache
         internalCache.storeAsync(graph.writeClasses());
         internalCache.storeAsync(manager.writePlugins());
-        internalCache.storeAsync(metaDispatcher.writeMetas());
+        internalCache.storeAsync(annotationClassDispatcher.writeMatched());
 
         manager.callDestroy(); // call destroy after store to save time
         internalCache.await();

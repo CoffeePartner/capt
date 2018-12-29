@@ -35,16 +35,7 @@ public class WaitableTasks {
 
     public void await() throws IOException, InterruptedException, TransformException {
         for (Future<?> future : futures) {
-            try {
-                future.get();
-            } catch (ExecutionException e) {
-                if (e.getCause() instanceof IOException) {
-                    throw (IOException) e.getCause();
-                } else if(e.getCause() instanceof RuntimeException) {
-                    throw (RuntimeException) e.getCause();
-                }
-                throw new TransformException(e.getCause());
-            }
+            Util.await(future);
         }
         futures.clear();
     }

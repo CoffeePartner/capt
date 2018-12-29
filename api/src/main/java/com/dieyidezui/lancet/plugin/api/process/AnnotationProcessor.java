@@ -3,83 +3,81 @@ package com.dieyidezui.lancet.plugin.api.process;
 import com.dieyidezui.lancet.plugin.api.graph.ClassInfo;
 import com.dieyidezui.lancet.plugin.api.hint.Thread;
 import com.dieyidezui.lancet.plugin.api.hint.Type;
-import com.dieyidezui.lancet.rt.annotations.Meta;
 
 import javax.annotation.Nullable;
 
 /**
- * Only class contains plugin interested annotations will pass to MetaProcessor
+ * Only class contains plugin interested annotations will pass to AnnotationProcessor
  */
-public abstract class MetaProcessor {
+public abstract class AnnotationProcessor {
     /**
      * Class changed, pre matched, but current mismatched, due to one of the following:
-     * 1.  @Meta removed from class
-     * 2.  No matched annotation in @Def.
+     * 1.  No matched annotation in @Def.
      *
-     * @param basicInfo info
+     * @param info info
      * @return class consumer
      */
     @Thread(Type.COMPUTATION)
     @Nullable
-    public ClassConsumer onMetaMismatch(ClassInfo basicInfo) {
+    public ClassConsumer onAnnotationMismatch(ClassInfo info) {
         return null;
     }
 
     /**
      * Class changed, pre doesn't match, but current does.
      *
-     * @param basicInfo info
+     * @param info info
      * @return class consumer
      */
     @Thread(Type.COMPUTATION)
     @Nullable
-    public ClassConsumer onMetaMatched(ClassInfo basicInfo) {
+    public ClassConsumer onAnnotationMatched(ClassInfo info) {
         return null;
     }
 
     /**
      * Class changed, both matched.
      *
-     * @param basicInfo info
+     * @param info info
      * @return class consumer
      */
     @Thread(Type.COMPUTATION)
     @Nullable
-    public ClassConsumer onMetaChanged(ClassInfo basicInfo) {
+    public ClassConsumer onAnnotationChanged(ClassInfo info) {
         return null;
     }
 
     /**
-     * Class removed, pre has {@link Meta}.
+     * Class removed, pre matched.
      *
-     * @param basicInfo last info
+     * @param info last info
      */
     @Thread(Type.COMPUTATION)
-    public void onMetaClassRemoved(ClassInfo basicInfo) {
+    public void onAnnotationClassRemoved(ClassInfo info) {
     }
 
     /**
-     * Class added, current has {@link Meta}.
+     * Class added, current matched.
      *
-     * @param basicInfo info
+     * @param info info
      * @return class consumer
      */
     @Thread(Type.COMPUTATION)
     @Nullable
-    public ClassConsumer onMetaClassAdded(ClassInfo basicInfo) {
+    public ClassConsumer onAnnotationClassAdded(ClassInfo info) {
         return null;
     }
 
     /**
-     * Class not changed, both have {@link Meta}.
+     * Class not changed, both matched.
      * If we not in incremental mode, we will call this method only.
      *
-     * @param basicInfo info
+     * @param info info
      * @return class consumer
      */
     @Thread(Type.COMPUTATION)
     @Nullable
-    public ClassConsumer onMetaClassNotChanged(ClassInfo basicInfo) {
+    public ClassConsumer onAnnotationClassNotChanged(ClassInfo info) {
         return null;
     }
 

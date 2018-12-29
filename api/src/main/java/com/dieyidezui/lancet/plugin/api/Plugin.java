@@ -3,9 +3,8 @@ package com.dieyidezui.lancet.plugin.api;
 import com.dieyidezui.lancet.plugin.api.annotations.Def;
 import com.dieyidezui.lancet.plugin.api.hint.Thread;
 import com.dieyidezui.lancet.plugin.api.hint.Type;
-import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
+import com.dieyidezui.lancet.plugin.api.process.AnnotationProcessor;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
-import com.dieyidezui.lancet.rt.annotations.Meta;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -17,7 +16,7 @@ import java.util.Set;
  * Lifecycle:
  * 1. beforeCreate in priority order
  * 2. onCreate concurrently
- * 3. Parse classes with {@link Meta} by {@link MetaProcessor}
+ * 3. Parse classes by {@link AnnotationProcessor}
  * 4. Transform every class from inputs by {@link ClassTransformer}
  * 5. onDestroy concurrently
  */
@@ -57,7 +56,7 @@ public abstract class Plugin<T> {
      */
     @Thread(Type.SINGLE)
     @Nullable
-    public MetaProcessor onProcessAnnotations() {
+    public AnnotationProcessor onProcessAnnotations() {
         return null;
     }
 

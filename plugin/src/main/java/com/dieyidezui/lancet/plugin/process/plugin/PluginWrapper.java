@@ -4,10 +4,10 @@ import com.dieyidezui.lancet.plugin.api.Arguments;
 import com.dieyidezui.lancet.plugin.api.LancetInternal;
 import com.dieyidezui.lancet.plugin.api.OutputProvider;
 import com.dieyidezui.lancet.plugin.api.Plugin;
-import com.dieyidezui.lancet.plugin.api.process.MetaProcessor;
+import com.dieyidezui.lancet.plugin.api.process.AnnotationProcessor;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 import com.dieyidezui.lancet.plugin.process.PluginBean;
-import com.dieyidezui.lancet.plugin.process.visitors.MetaDispatcher;
+import com.dieyidezui.lancet.plugin.process.visitors.AnnotationClassDispatcher;
 import com.dieyidezui.lancet.plugin.process.visitors.ThirdRound;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
 
@@ -59,7 +59,7 @@ public class PluginWrapper extends ForwardingLancet {
     }
 
     @Nullable
-    public ThirdRound.TransformProvider newProvider() {
+    public ThirdRound.TransformProvider newTransformProvider() {
         ClassTransformer transformer = plugin.onTransformClass();
         if (transformer != null) {
             return new ThirdRound.TransformProvider() {
@@ -80,10 +80,10 @@ public class PluginWrapper extends ForwardingLancet {
     }
 
     @Nullable
-    public MetaDispatcher.MetaProcessorProvider newMetaProvider() {
-        MetaProcessor processor = plugin.onProcessAnnotations();
+    public AnnotationClassDispatcher.AnnotationProcessorProvider newAnnotationProvider() {
+        AnnotationProcessor processor = plugin.onProcessAnnotations();
         if (processor != null) {
-            return new MetaDispatcher.MetaProcessorProvider() {
+            return new AnnotationClassDispatcher.AnnotationProcessorProvider() {
                 Set<String> supported = plugin.getSupportedAnnotations();
 
                 @Override
@@ -92,7 +92,7 @@ public class PluginWrapper extends ForwardingLancet {
                 }
 
                 @Override
-                public MetaProcessor processor() {
+                public AnnotationProcessor processor() {
                     return processor;
                 }
             };

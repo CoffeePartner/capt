@@ -10,7 +10,7 @@ import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
 import com.dieyidezui.lancet.plugin.graph.ApkClassInfo;
 import com.dieyidezui.lancet.plugin.process.plugin.GlobalLancet;
 import com.dieyidezui.lancet.plugin.process.plugin.PluginWrapper;
-import com.dieyidezui.lancet.plugin.process.visitors.MetaDispatcher;
+import com.dieyidezui.lancet.plugin.process.visitors.AnnotationClassDispatcher;
 import com.dieyidezui.lancet.plugin.process.visitors.ThirdRound;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
 import com.dieyidezui.lancet.plugin.resource.VariantResource;
@@ -130,15 +130,19 @@ public class PluginManager implements Constants {
 
             @Override
             public Stream<ThirdRound.TransformProvider> create() {
-                return wrappers.stream().map(PluginWrapper::newProvider).filter(Objects::nonNull);
+                return wrappers.stream().map(PluginWrapper::newTransformProvider).filter(Objects::nonNull);
             }
         };
     }
 
-    public MetaDispatcher.MetaProcessorFactory forMetas() {
+    public AnnotationClassDispatcher.AnnotationProcessorFactory forAnnotation() {
         return () -> wrappers.stream()
-                .map(PluginWrapper::newMetaProvider)
+                .map(PluginWrapper::newAnnotationProvider)
                 .filter(Objects::nonNull);
+    }
+
+    public Set<String> getAllSupportedAnnotations() {
+        return wrappers.stream().flatMap(w -> w.getSupportedAnnotations().stream()).collect(Collectors.toSet());
     }
 
     private Class<? extends Plugin> findPluginInProperties(String id) throws IOException {
