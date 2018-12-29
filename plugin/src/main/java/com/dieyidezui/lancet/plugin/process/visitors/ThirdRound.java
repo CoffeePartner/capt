@@ -306,9 +306,7 @@ public class ThirdRound {
 
         Stream<TransformProvider> create();
 
-        /**
-         * Rerack classes for removed plugin
-         */
+        // Rerack classes for removed plugin
         Stream<ApkClassInfo> collectRemovedPluginsAffectedClasses(ApkClassGraph graph);
     }
 }

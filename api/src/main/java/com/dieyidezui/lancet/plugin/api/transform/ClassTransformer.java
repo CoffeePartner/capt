@@ -28,6 +28,8 @@ public abstract class ClassTransformer {
 
     /**
      * Invoked after all class transform done.
+     * @throws IOException io
+     * @throws InterruptedException inter
      */
     @Thread(Type.IO)
     public void afterTransform() throws IOException, InterruptedException {

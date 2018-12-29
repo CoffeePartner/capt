@@ -48,6 +48,8 @@ public abstract class Plugin<T> {
      * Do your time-consuming tasks in this function
      *
      * @param lancet Plugin context
+     * @throws IOException io
+     * @throws InterruptedException inter
      */
     @Thread(Type.IO)
     public abstract void onCreate(T lancet) throws IOException, InterruptedException ;
@@ -74,6 +76,8 @@ public abstract class Plugin<T> {
      * The last time to do your stuff.
      *
      * @param lancet Plugin context
+     * @throws IOException io
+     * @throws InterruptedException inter
      */
     @Thread(Type.IO)
     public void onDestroy(T lancet) throws IOException, InterruptedException {

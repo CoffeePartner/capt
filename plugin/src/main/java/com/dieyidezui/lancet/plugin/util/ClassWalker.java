@@ -121,9 +121,7 @@ public final class ClassWalker {
 
     public interface Visitor {
 
-        /**
-         * @param classBytes null for REMOVED
-         */
+        // classBytes null for REMOVED
         @Nullable
         ForkJoinTask<ClassEntry> onVisit(ForkJoinPool pool, @Nullable byte[] classBytes, String className, Status status);
 

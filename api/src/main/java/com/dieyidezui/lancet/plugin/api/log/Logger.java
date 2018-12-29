@@ -3,7 +3,8 @@ package com.dieyidezui.lancet.plugin.api.log;
 public interface Logger {
 
     /**
-     * Returns true if the given log level is enabled for this logger.
+     * @param level level
+     * @return true if the given log level is enabled for this logger.
      */
     boolean isEnabled(LogLevel level);
 

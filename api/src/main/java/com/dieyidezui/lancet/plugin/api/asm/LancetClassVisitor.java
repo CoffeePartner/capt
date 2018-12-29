@@ -80,7 +80,7 @@ public abstract class LancetClassVisitor extends ClassVisitor {
      * {@link ClassWriter#COMPUTE_MAXS}
      * {@link ClassWriter#COMPUTE_FRAMES}
      * <p>
-     * example: ClassWriter.COMPUTE_MAXS << 16 | ClassReader.EXPAND_FRAMES
+     * example: {@code ClassWriter.COMPUTE_MAXS << 16 | ClassReader.EXPAND_FRAMES}
      * Take care, the flags affect every visitor on the chain.
      *
      * @return the required flag
