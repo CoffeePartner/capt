@@ -22,7 +22,6 @@ import okio.Okio;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -79,12 +78,13 @@ public class PluginManager implements Constants {
                     clazz = findPluginInApkGraph(e.getName());
                 }
                 if (clazz == null) {
-                    throw pluginNotFound(e.getName(), null, null);
-                }
-                try {
-                    plugins.put(e.getName(), clazz.newInstance());
-                } catch (IllegalAccessException | InstantiationException ex) {
-                    throw pluginNotFound(e.getName(), clazz.getName(), ex);
+                    LOGGER.warn("Lancet plugin with id '{}' not found", e.getName());
+                } else {
+                    try {
+                        plugins.put(e.getName(), clazz.newInstance());
+                    } catch (IllegalAccessException | InstantiationException ex) {
+                        throw loadClassFailed(e.getName(), clazz.getName(), ex);
+                    }
                 }
                 return null;
             });
@@ -107,7 +107,7 @@ public class PluginManager implements Constants {
                     resource,
                     globalLancet);
             PluginBean pre = prePlugins.get(entry.getKey());
-            if(pre != null) {
+            if (pre != null) {
                 wrapper.combinePre(pre);
             }
             wrappers.add(wrapper);
@@ -175,18 +175,13 @@ public class PluginManager implements Constants {
         try {
             return resource.loadPluginClass(className).asSubclass(Plugin.class);
         } catch (ClassNotFoundException e) {
-            throw pluginNotFound(id, className, e);
+            throw loadClassFailed(id, className, e);
         }
     }
 
-    private IllegalStateException pluginNotFound(String id, @Nullable String className, @Nullable Throwable sup) {
-        StringBuilder sb = new StringBuilder(128);
-        sb.append("Lancet plugin with id '").append(id).append("' ");
-        if (className != null) {
-            sb.append("with className '").append(className).append("' ");
-        }
-        sb.append("not found");
-        return new IllegalStateException(sb.toString(), sup);
+    private IllegalStateException loadClassFailed(String id, String className, Throwable cause) {
+        String sb = "Lancet plugin with id '" + id + "' load class '" + className + "' failed";
+        return new IllegalStateException(sb, cause);
     }
 
     public void callCreate() throws IOException, InterruptedException, TransformException {
