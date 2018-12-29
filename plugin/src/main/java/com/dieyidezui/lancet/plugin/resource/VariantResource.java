@@ -7,17 +7,19 @@ import com.dieyidezui.lancet.plugin.api.Plugin;
 import com.dieyidezui.lancet.plugin.cache.FileManager;
 import com.dieyidezui.lancet.plugin.cache.OutputProviderFactory;
 import com.dieyidezui.lancet.plugin.util.Constants;
+import com.google.common.collect.Streams;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
-import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class VariantResource implements Constants {
@@ -40,8 +42,8 @@ public class VariantResource implements Constants {
         return variant;
     }
 
-    public void init(TransformInvocation invocation, Configuration target) throws IOException {
-        this.loader.initClassLoader(invocation, target);
+    public void init(TransformInvocation invocation, List<File> bootClasspath, Configuration target) throws IOException {
+        this.loader.initClassLoader(invocation, bootClasspath, target);
         this.files.attachContext(incremental, invocation);
     }
 
@@ -59,8 +61,16 @@ public class VariantResource implements Constants {
         return connection.getInputStream();
     }
 
-    public Class<?> loadClass(String className) throws ClassNotFoundException {
-        return loader.loadClass(className);
+    public Class<?> loadApkClass(String className) throws ClassNotFoundException {
+        return loader.runtimeLoader.loadClass(className);
+    }
+
+    public URLClassLoader getFullAndroidLoader() {
+        return loader.fullAndroidLoader;
+    }
+
+    public Class<?> loadPluginClass(String className) throws ClassNotFoundException {
+        return loader.runnerLoader.loadClass(className);
     }
 
     public URL loadPluginOnLancet(String pluginName) {
@@ -83,8 +93,9 @@ public class VariantResource implements Constants {
 
         private URLClassLoader runnerLoader;
         private URLClassLoader runtimeLoader;
+        private URLClassLoader fullAndroidLoader;
 
-        void initClassLoader(TransformInvocation invocation, Configuration target) {
+        void initClassLoader(TransformInvocation invocation, List<File> bootClasspath, Configuration target) {
 
             URL[] runnerUrls = target.resolve().stream()
                     .map(f -> {
@@ -94,7 +105,7 @@ public class VariantResource implements Constants {
                             throw new AssertionError(e);
                         }
                     }).toArray(URL[]::new);
-            URLClassLoader lancetDependencies = URLClassLoader.newInstance(runnerUrls, Plugin.class.getClassLoader());
+            URLClassLoader lancetDependencies = new URLClassLoader(runnerUrls, Plugin.class.getClassLoader());
 
             URL[] runtimeUrls = invocation.getInputs().stream()
                     .flatMap(s -> Stream.concat(s.getDirectoryInputs().stream(), s.getJarInputs().stream()))
@@ -107,17 +118,29 @@ public class VariantResource implements Constants {
                         }
                     })
                     .toArray(URL[]::new);
-            this.runnerLoader = URLClassLoader.newInstance(runtimeUrls, lancetDependencies);
-            this.runtimeLoader = URLClassLoader.newInstance(runtimeUrls);
-        }
 
-        public Class<?> loadClass(String className) throws ClassNotFoundException {
-            return runnerLoader.loadClass(className);
+            URL[] fullAndroidUrls = Streams.concat(
+                    Streams.concat(invocation.getInputs().stream(),
+                            invocation.getReferencedInputs().stream())
+                            .flatMap(s -> Stream.concat(s.getDirectoryInputs().stream(), s.getJarInputs().stream()))
+                            .map(QualifiedContent::getFile),
+                    bootClasspath.stream())
+                    .map(f -> {
+                        try {
+                            return f.toURI().toURL();
+                        } catch (MalformedURLException e) {
+                            throw new AssertionError(e);
+                        }
+                    }).toArray(URL[]::new);
+
+            // runner doesn't have runtime
+            this.runnerLoader = lancetDependencies;
+            this.runtimeLoader = new URLClassLoader(runtimeUrls);
+            this.fullAndroidLoader = new URLClassLoader(fullAndroidUrls);
         }
 
         public URL loadPluginOnLancet(String pluginName) {
-            // getParent() means apk resources are useless
-            return runnerLoader.getParent().getResource(PLUGIN_PATH + pluginName + ".properties");
+            return runnerLoader.getResource(PLUGIN_PATH + pluginName + ".properties");
         }
     }
 

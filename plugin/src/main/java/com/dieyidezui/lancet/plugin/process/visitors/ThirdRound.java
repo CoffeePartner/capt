@@ -9,6 +9,7 @@ import com.dieyidezui.lancet.plugin.api.transform.TransformContext;
 import com.dieyidezui.lancet.plugin.graph.ApkClassGraph;
 import com.dieyidezui.lancet.plugin.graph.ApkClassInfo;
 import com.dieyidezui.lancet.plugin.resource.GlobalResource;
+import com.dieyidezui.lancet.plugin.resource.VariantResource;
 import com.dieyidezui.lancet.plugin.util.ClassWalker;
 import com.dieyidezui.lancet.plugin.util.Util;
 import com.dieyidezui.lancet.plugin.util.WaitableTasks;
@@ -20,6 +21,7 @@ import org.objectweb.asm.ClassWriter;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.net.URLClassLoader;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Function;
@@ -32,12 +34,14 @@ import java.util.stream.Stream;
  */
 public class ThirdRound {
     private static final Logger LOGGER = Logging.getLogger(ThirdRound.class);
+    private final VariantResource variantResource;
     private final GlobalResource global;
     private final ApkClassGraph graph;
     private boolean hasAll = false;
     private final ClassVisitorManager manager = new ClassVisitorManager();
 
-    public ThirdRound(GlobalResource global, ApkClassGraph graph) {
+    public ThirdRound(VariantResource variantResource, GlobalResource global, ApkClassGraph graph) {
+        this.variantResource = variantResource;
         this.global = global;
         this.graph = graph;
     }
@@ -131,22 +135,46 @@ public class ThirdRound {
         public ForkJoinTask<ClassWalker.ClassEntry> onVisit(ForkJoinPool pool, @Nullable byte[] classBytes, String className, Status status) {
             if (status != Status.REMOVED) {
                 return pool.submit(() -> {
-                    ClassReader cr = new ClassReader(classBytes);
-                    ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS); // just compute max, it may cause 10% slower
+                    // retain null to keep the original order map to transform
                     List<LancetClassVisitor> visitors = transforms
                             .stream()
-                            .map(t -> {
-                                LancetClassVisitor visitor = t.createVisitor(graph.get(className));
-                                if (visitor != null) {
-                                    manager.attach(visitor, t.makeContext(className, cw));
-                                }
-                                return visitor;
-                            })
-                            .filter(Objects::nonNull)
+                            .map(t -> t.createVisitor(graph.get(className)))
                             .collect(Collectors.toList());
+                    final int flags = visitors.stream().filter(Objects::nonNull).flatMap(manager::expand)
+                            .map(manager::beforeAttach)
+                            .reduce(0, (l, r) -> l | r);
+                    ClassReader cr = new ClassReader(classBytes);
+
+                    int writeFlag = (flags >> 16) & 0xff;
+                    ClassWriter cw = ((writeFlag & ClassWriter.COMPUTE_FRAMES) != 0)
+                            ? new ComputeFrameClassWriter(cr, writeFlag, variantResource.getFullAndroidLoader())
+                            : new ClassWriter(cr, writeFlag);
+
+                    ClassVisitor header = cw;
+                    List<LancetClassVisitor> preGroup = null;
+
+                    // link every two expanded group
+                    for (int i = 0; i < visitors.size(); i++) {
+                        LancetClassVisitor v = visitors.get(i);
+                        if (v != null) {
+                            TransformContext context = transforms.get(i).makeContext(className, cw);
+                            List<LancetClassVisitor> curGroup = manager.expand(v).peek(s -> manager.attach(s, context)).collect(Collectors.toList());
+                            if (preGroup == null) {
+                                header = curGroup.get(0);
+                            } else {
+                                manager.link(preGroup.get(preGroup.size() - 1), curGroup.get(0));
+                            }
+                            preGroup = curGroup;
+                        }
+                    }
+
+                    // the last group link cw
+                    if (preGroup != null) {
+                        manager.link(preGroup.get(preGroup.size() - 1), cw);
+                    }
 
                     try {
-                        cr.accept(manager.link(visitors, cw), 0);
+                        cr.accept(header, flags & 0xff);
                     } catch (RuntimeException e) {
                         LOGGER.warn("Transform class '" + className + "' failed, skip it", e);
                         return new ClassWalker.ClassEntry(className, classBytes);
@@ -216,6 +244,51 @@ public class ThirdRound {
                     return writer;
                 }
             };
+        }
+    }
+
+    private static class ComputeFrameClassWriter extends ClassWriter {
+
+        private final URLClassLoader classLoader;
+
+        public ComputeFrameClassWriter(int flags, URLClassLoader classLoader) {
+            super(flags);
+            this.classLoader = classLoader;
+        }
+
+        public ComputeFrameClassWriter(ClassReader classReader, int flags, URLClassLoader classLoader) {
+            super(classReader, flags);
+            this.classLoader = classLoader;
+        }
+
+        @Override
+        protected String getCommonSuperClass(String type1, String type2) {
+            Class<?> c;
+            Class<?> d;
+            ClassLoader classLoader = this.classLoader;
+            try {
+                c = Class.forName(type1.replace('/', '.'), false, classLoader);
+                d = Class.forName(type2.replace('/', '.'), false, classLoader);
+            } catch (Exception e) {
+                throw new RuntimeException(
+                        String.format(
+                                "Unable to find common supper type for %s and %s.", type1, type2),
+                        e);
+            }
+            if (c.isAssignableFrom(d)) {
+                return type1;
+            }
+            if (d.isAssignableFrom(c)) {
+                return type2;
+            }
+            if (c.isInterface() || d.isInterface()) {
+                return "java/lang/Object";
+            } else {
+                do {
+                    c = c.getSuperclass();
+                } while (!c.isAssignableFrom(d));
+                return c.getName().replace('.', '/');
+            }
         }
     }
 

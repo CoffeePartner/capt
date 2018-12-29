@@ -61,7 +61,7 @@ public class VariantScope implements Constants {
         OutputProviderFactory factory = new OutputProviderFactory(singleFactory, files.asSelector());
         VariantResource variantResource = new VariantResource(getVariant(),
                 files, factory);
-        variantResource.init(invocation, getLancetConfiguration());
+        variantResource.init(invocation, global.android().getBootClasspath(), getLancetConfiguration());
         InternalCache internalCache = new InternalCache(singleFactory.newProvider(new File(files.variantRoot(), "core"))
                 , global);
         ApkClassGraph graph = new ApkClassGraph(variantResource, global.gradleLancetExtension().getThrowIfDuplicated());
@@ -101,7 +101,7 @@ public class VariantScope implements Constants {
         // Round 3: transform classes
         // use the actual incremental (for plugins input)
         // remember to ignore removed classes if incremental
-        new ThirdRound(global, graph)
+        new ThirdRound(variantResource, global, graph)
                 .accept(incremental,
                         walker,
                         manager.forThird(),

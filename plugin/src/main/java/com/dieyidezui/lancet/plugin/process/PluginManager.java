@@ -169,7 +169,7 @@ public class PluginManager implements Constants {
 
     private Class<? extends Plugin> loadPluginClass(String id, String className) {
         try {
-            return resource.loadClass(className).asSubclass(Plugin.class);
+            return resource.loadPluginClass(className).asSubclass(Plugin.class);
         } catch (ClassNotFoundException e) {
             throw pluginNotFound(id, className, e);
         }

@@ -7,10 +7,12 @@ import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.internal.pipeline.TransformManager;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import com.dieyidezui.lancet.plugin.variant.VariantManager;
+import com.google.common.collect.Sets;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.Set;
 
 public class LancetTransform extends Transform implements Constants {
@@ -35,6 +37,14 @@ public class LancetTransform extends Transform implements Constants {
     @Override
     public Set<? super QualifiedContent.Scope> getScopes() {
         return variantManager.isApplication() ? TransformManager.SCOPE_FULL_PROJECT : TransformManager.PROJECT_ONLY;
+    }
+
+    /**
+     * Needs other scopes to compute frame
+     */
+    @Override
+    public Set<? super QualifiedContent.Scope> getReferencedScopes() {
+        return Sets.difference(EnumSet.allOf(QualifiedContent.Scope.class), getScopes());
     }
 
     @Override

@@ -110,7 +110,7 @@ public class ApkClassInfo implements ClassInfo {
 
     @Override
     public Class<?> loadClass() throws ClassNotFoundException {
-        return resource.loadClass(name());
+        return resource.loadApkClass(name());
     }
 
     @Override
