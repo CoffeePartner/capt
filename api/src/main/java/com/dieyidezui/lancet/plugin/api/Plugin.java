@@ -7,6 +7,7 @@ import com.dieyidezui.lancet.plugin.api.process.AnnotationProcessor;
 import com.dieyidezui.lancet.plugin.api.transform.ClassTransformer;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
@@ -49,7 +50,7 @@ public abstract class Plugin<T> {
      * @param lancet Plugin context
      */
     @Thread(Type.IO)
-    public abstract void onCreate(T lancet);
+    public abstract void onCreate(T lancet) throws IOException, InterruptedException ;
 
     /**
      * @return meta processor
@@ -75,7 +76,7 @@ public abstract class Plugin<T> {
      * @param lancet Plugin context
      */
     @Thread(Type.IO)
-    public void onDestroy(T lancet) {
+    public void onDestroy(T lancet) throws IOException, InterruptedException {
     }
 
     private static Set<String> arrayToSet(String[] array) {

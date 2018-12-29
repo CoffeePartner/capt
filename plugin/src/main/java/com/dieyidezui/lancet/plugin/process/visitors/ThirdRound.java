@@ -93,7 +93,10 @@ public class ThirdRound {
 
         // 3. call afterTransform
         WaitableTasks io = WaitableTasks.get(global.io());
-        transforms.forEach(t -> io.execute(() -> t.provider.transformer().afterTransform()));
+        transforms.forEach(t -> io.submit(() -> {
+            t.provider.transformer().afterTransform();
+            return null;
+        }));
         io.await();
     }
 

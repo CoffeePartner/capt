@@ -17,6 +17,7 @@ import com.dieyidezui.lancet.plugin.util.ConcurrentHashSet;
 import com.google.common.collect.Sets;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 
@@ -50,11 +51,11 @@ public class PluginWrapper extends ForwardingLancet {
         plugin.beforeCreate(this);
     }
 
-    public void callOnCreate() {
+    public void callOnCreate() throws IOException, InterruptedException {
         plugin.onCreate(this);
     }
 
-    public void callOnDestroy() {
+    public void callOnDestroy() throws IOException, InterruptedException {
         plugin.onDestroy(this);
     }
 
@@ -157,7 +158,7 @@ public class PluginWrapper extends ForwardingLancet {
         }
 
         @Override
-        public void afterTransform() {
+        public void afterTransform() throws IOException, InterruptedException {
             classTransformer.afterTransform();
         }
     }

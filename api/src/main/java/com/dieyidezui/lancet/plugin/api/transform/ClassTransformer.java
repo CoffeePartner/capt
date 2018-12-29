@@ -6,6 +6,7 @@ import com.dieyidezui.lancet.plugin.api.hint.Thread;
 import com.dieyidezui.lancet.plugin.api.hint.Type;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 
 public abstract class ClassTransformer {
     /**
@@ -29,6 +30,6 @@ public abstract class ClassTransformer {
      * Invoked after all class transform done.
      */
     @Thread(Type.IO)
-    public void afterTransform() {
+    public void afterTransform() throws IOException, InterruptedException {
     }
 }

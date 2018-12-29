@@ -195,16 +195,21 @@ public class PluginManager implements Constants {
         // before callCreate
         wrappers.forEach(PluginWrapper::callBeforeCreate);
 
-
         // on callCreate
         WaitableTasks waitable = WaitableTasks.get(global.io());
-        wrappers.forEach(p -> waitable.execute(p::callOnCreate));
+        wrappers.forEach(p -> waitable.submit(() -> {
+            p.callOnCreate();
+            return null;
+        }));
         waitable.await();
     }
 
     public void callDestroy() throws IOException, InterruptedException, TransformException {
         WaitableTasks waitable = WaitableTasks.get(global.io());
-        wrappers.forEach(p -> waitable.execute(p::callOnDestroy));
+        wrappers.forEach(p -> waitable.submit(() -> {
+            p.callOnDestroy();
+            return null;
+        }));
         waitable.await();
     }
 
