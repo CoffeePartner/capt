@@ -1,14 +1,14 @@
 package com.dieyidezui.lancet.plugin.process;
 
-import java.util.List;
+import java.util.Set;
 
 public class PluginBean {
 
     private String id;
 
-    private List<String> affectedClasses;
+    private Set<String> affectedClasses;
 
-    public PluginBean(String id, List<String> affectedClasses) {
+    public PluginBean(String id, Set<String> affectedClasses) {
         this.id = id;
         this.affectedClasses = affectedClasses;
     }
@@ -17,7 +17,7 @@ public class PluginBean {
         return id;
     }
 
-    public List<String> getAffectedClasses() {
+    public Set<String> getAffectedClasses() {
         return affectedClasses;
     }
 

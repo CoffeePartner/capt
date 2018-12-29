@@ -106,6 +106,10 @@ public class PluginManager implements Constants {
                     entry.getKey(),
                     resource,
                     globalLancet);
+            PluginBean pre = prePlugins.get(entry.getKey());
+            if(pre != null) {
+                wrapper.combinePre(pre);
+            }
             wrappers.add(wrapper);
         }
 
@@ -130,7 +134,7 @@ public class PluginManager implements Constants {
 
             @Override
             public Stream<ThirdRound.TransformProvider> create() {
-                return wrappers.stream().map(PluginWrapper::newTransformProvider).filter(Objects::nonNull);
+                return wrappers.stream().map(PluginWrapper::newTransformProvider);
             }
         };
     }

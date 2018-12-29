@@ -231,14 +231,10 @@ public class ThirdRound {
 
         TransformContext makeContext(String className, ClassWriter writer) {
             return new TransformContext() {
-                boolean once = false;
 
                 @Override
                 public void notifyChanged() {
-                    if (!once) {
-                        once = true;
-                        provider.onClassAffected(className);
-                    }
+                    provider.onClassAffected(className);
                 }
 
                 @Override

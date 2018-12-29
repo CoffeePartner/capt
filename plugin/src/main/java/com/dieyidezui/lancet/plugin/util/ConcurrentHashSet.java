@@ -41,7 +41,7 @@ public class ConcurrentHashSet<E> extends AbstractSet<E> implements Set<E> {
 
     @Override
     public boolean contains(Object o) {
-        return map.keySet().contains(o);
+        return map.containsKey(o);
     }
 
     @NotNull
@@ -74,7 +74,7 @@ public class ConcurrentHashSet<E> extends AbstractSet<E> implements Set<E> {
 
     @Override
     public boolean remove(Object o) {
-        return false;
+        return map.remove(o) != null;
     }
 
     @Override
