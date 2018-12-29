@@ -13,7 +13,6 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.Set;
 
 public class LancetTransform extends Transform implements Constants {

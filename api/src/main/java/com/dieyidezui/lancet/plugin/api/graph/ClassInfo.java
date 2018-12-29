@@ -35,7 +35,7 @@ public interface ClassInfo {
     String name();
 
     /**
-     * Use it carefully! This class MUST NOT use classes in Android Framework.
+     * Use it carefully! This class MUST NOT depend on classes in Android Framework.
      *
      * @return class of this.
      * @throws ClassNotFoundException not found class
@@ -44,6 +44,8 @@ public interface ClassInfo {
 
 
     /**
+     * if {@link #exists()} returns false, it will open failed.
+     *
      * @return the input stream of class bytes
      * @throws IOException if open failed
      */

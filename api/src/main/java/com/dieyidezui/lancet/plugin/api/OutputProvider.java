@@ -8,6 +8,7 @@ public interface OutputProvider {
 
     /**
      * Ensure the directory exists, unique for every plugin.
+     *
      * @param type type
      * @return dir
      */

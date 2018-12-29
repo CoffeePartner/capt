@@ -271,7 +271,7 @@ public final class ClassWalker {
                     for (File file : Files.fileTreeTraverser().preOrderTraversal(d.getFile())) {
                         if (file.isFile() && file.getName().endsWith(".class")) {
                             String className = fileToClassName(file);
-                            if(targets == null || targets.contains(className)) {
+                            if (targets == null || targets.contains(className)) {
                                 byte[] bytes = Files.toByteArray(file);
                                 ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, className, Status.NOTCHANGED);
                                 if (futures != null && task != null) {
@@ -286,7 +286,7 @@ public final class ClassWalker {
                     Status status = entry.getValue();
                     if (status != Status.NOTCHANGED && entry.getKey().getName().endsWith(".class")) {
                         String className = fileToClassName(entry.getKey());
-                        if(targets == null || targets.contains(className)) {
+                        if (targets == null || targets.contains(className)) {
                             byte[] bytes = status == Status.REMOVED ? null : Files.toByteArray(entry.getKey());
                             ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, className, entry.getValue());
                             if (futures != null && task != null) {

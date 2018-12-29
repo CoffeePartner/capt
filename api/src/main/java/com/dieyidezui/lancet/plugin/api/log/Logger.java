@@ -6,6 +6,7 @@ public interface Logger {
      * Returns true if the given log level is enabled for this logger.
      */
     boolean isEnabled(LogLevel level);
+
     /**
      * Logs the given message at debug log level.
      *
