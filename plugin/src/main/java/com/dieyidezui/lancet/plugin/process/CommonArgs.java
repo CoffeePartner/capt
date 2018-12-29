@@ -19,8 +19,14 @@ public class CommonArgs {
 
     public static CommonArgs createBy(GradleLancetExtension extension, int scope, Map<String, Plugin> plugins) {
         return new CommonArgs(extension.getPlugins().stream()
-                .map(e -> new SimpleArgs(e, plugins.get(e.getName()).defaultPriority()))
-                .filter(a -> a.allow(scope))
+                .map(e -> {
+                    Plugin plugin = plugins.get(e.getName());
+                    if (plugin == null) {
+                        return null;
+                    }
+                    return new SimpleArgs(e, plugins.get(e.getName()).defaultPriority());
+                })
+                .filter(a -> a != null && a.allow(scope))
                 .collect(Collectors.toMap(SimpleArgs::name, Function.identity()))
         );
     }
