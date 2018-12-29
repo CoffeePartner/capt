@@ -7,6 +7,7 @@ import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.internal.pipeline.TransformManager;
 import com.dieyidezui.lancet.plugin.util.Constants;
 import com.dieyidezui.lancet.plugin.variant.VariantManager;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -18,6 +19,13 @@ import java.util.Set;
 public class LancetTransform extends Transform implements Constants {
 
     private static final Logger LOGGER = Logging.getLogger(LancetTransform.class);
+    private static final Set<QualifiedContent.Scope> ALL = ImmutableSet.of(
+            QualifiedContent.Scope.PROJECT,
+            QualifiedContent.Scope.SUB_PROJECTS,
+            QualifiedContent.Scope.EXTERNAL_LIBRARIES,
+            QualifiedContent.Scope.PROVIDED_ONLY,
+            QualifiedContent.Scope.TESTED_CODE);
+
     private final VariantManager variantManager;
 
     public LancetTransform(VariantManager variantManager) {
@@ -44,7 +52,7 @@ public class LancetTransform extends Transform implements Constants {
      */
     @Override
     public Set<? super QualifiedContent.Scope> getReferencedScopes() {
-        return Sets.difference(EnumSet.allOf(QualifiedContent.Scope.class), getScopes());
+        return Sets.difference(ALL, getScopes());
     }
 
     @Override
