@@ -52,6 +52,8 @@ public class VariantScope implements Constants {
 
     public void doTransform(TransformInvocation invocation) throws IOException, TransformException, InterruptedException {
 
+        long pre = System.currentTimeMillis();
+        long cur;
         // load and prepare
         ClassWalker walker = new ClassWalker(global, invocation);
         AnnotationClassDispatcher annotationClassDispatcher = new AnnotationClassDispatcher(global);
@@ -76,6 +78,10 @@ public class VariantScope implements Constants {
             internalCache.await();
         }
 
+        cur = System.currentTimeMillis();
+        LOGGER.lifecycle("Load lancet core cache, cost: {}ms", (cur - pre));
+        pre = cur;
+
         int scope = variant.endsWith(ANDROID_TEST) ? LancetPluginExtension.ANDROID_TEST : LancetPluginExtension.ASSEMBLE;
         boolean incremental = manager.initPlugins(global.gradleLancetExtension(), scope, lancet);
         variantResource.setIncremental(incremental);
@@ -88,16 +94,27 @@ public class VariantScope implements Constants {
                         annotationClassDispatcher.toCollector(manager.getAllSupportedAnnotations()));
         graph.markRemovedClassesAndBuildGraph();
 
+        cur = System.currentTimeMillis();
+        LOGGER.lifecycle("Build class graph, cost: {}ms", (cur - pre));
+        pre = cur;
+
         // everything ready, call plugin lifecycle
         manager.callCreate();
 
+        cur = System.currentTimeMillis();
+        LOGGER.lifecycle("Call plugins create, cost: {}ms", (cur - pre));
+        pre = cur;
+
         // Round 2: visit Metas
-        annotationClassDispatcher.dispatchMetas(
+        annotationClassDispatcher.dispatch(
                 incremental,
                 graph,
                 variantResource,
                 manager.forAnnotation());
 
+        cur = System.currentTimeMillis();
+        LOGGER.lifecycle("Dispatch annotations, cost: {}ms", (cur - pre));
+        pre = cur;
         // Round 3: transform classes
         // use the actual incremental (for plugins input)
         // remember to ignore removed classes if incremental
@@ -107,6 +124,9 @@ public class VariantScope implements Constants {
                         manager.forThird(),
                         invocation);
 
+        cur = System.currentTimeMillis();
+        LOGGER.lifecycle("Transform classes, cost: {}ms", (cur - pre));
+        pre = cur;
         // transform done, store cache
         internalCache.storeAsync(graph.writeClasses());
         internalCache.storeAsync(manager.writePlugins());
@@ -114,6 +134,9 @@ public class VariantScope implements Constants {
 
         manager.callDestroy(); // call destroy after store to save time
         internalCache.await();
+
+        cur = System.currentTimeMillis();
+        LOGGER.lifecycle("Store cache and call plugins destroy, cost: {}ms", (cur - pre));
     }
 
     public interface Factory {

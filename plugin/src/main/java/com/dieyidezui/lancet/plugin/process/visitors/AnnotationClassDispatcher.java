@@ -77,7 +77,7 @@ public class AnnotationClassDispatcher {
     }
 
 
-    public void dispatchMetas(boolean incremental, ApkClassGraph graph, VariantResource resource, AnnotationProcessorFactory factory) throws InterruptedException, TransformException, IOException {
+    public void dispatch(boolean incremental, ApkClassGraph graph, VariantResource resource, AnnotationProcessorFactory factory) throws InterruptedException, TransformException, IOException {
         PerClassDispatcher inner = new PerClassDispatcher(factory);
         ForkJoinPool pool = global.computation();
         WaitableTasks tasks = WaitableTasks.get(global.io());
