@@ -49,6 +49,21 @@ public class LoggerFactory {
         }
 
         @Override
+        public void lifecycle(String message) {
+            logger.lifecycle(message);
+        }
+
+        @Override
+        public void lifecycle(String message, Object... objects) {
+            logger.lifecycle(message, objects);
+        }
+
+        @Override
+        public void lifecycle(String message, Throwable throwable) {
+            logger.lifecycle(message, throwable);
+        }
+
+        @Override
         public void warn(String message) {
             logger.warn(message);
         }
@@ -61,6 +76,21 @@ public class LoggerFactory {
         @Override
         public void warn(String message, Throwable throwable) {
             logger.warn(message, throwable);
+        }
+
+        @Override
+        public void quiet(String message) {
+            logger.quiet(message);
+        }
+
+        @Override
+        public void quiet(String message, Object... objects) {
+            logger.quiet(message, objects);
+        }
+
+        @Override
+        public void quiet(String message, Throwable throwable) {
+            logger.quiet(message, throwable);
         }
 
         @Override
