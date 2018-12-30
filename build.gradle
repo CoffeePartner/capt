@@ -83,7 +83,7 @@ subprojects { pro ->
             repo = "maven"
             name = pro.name
             websiteUrl = "https://github.com/CoffeePartner/capt"
-            vcsUrl = "git@github.com:CoffeePartner/Lancet.git"
+            vcsUrl = "git@github.com:CoffeePartner/capt.git"
             licenses = ["Apache-2.0"]
             publish = true
         }
