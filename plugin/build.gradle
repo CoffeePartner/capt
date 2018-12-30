@@ -11,7 +11,7 @@ dependencies {
 gradlePlugin {
     plugins {
         capt {
-            id = 'coffeepartner-capt'
+            id = 'capt'
             implementationClass = 'coffeepartner.capt.plugin.gradle.GradleCaptPlugin'
         }
     }

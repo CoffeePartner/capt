@@ -82,7 +82,7 @@ subprojects { pro ->
         configurations = ['archives']
         pkg {
             repo = "maven"
-            name = pro.name
+            name = "capt-$pro.name"
             websiteUrl = "https://github.com/CoffeePartner/capt"
             vcsUrl = "git@github.com:CoffeePartner/capt.git"
             licenses = ["Apache-2.0"]
