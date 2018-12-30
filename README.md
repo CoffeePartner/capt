@@ -1,5 +1,4 @@
-capt
-======
+# capt
 
 Capt is short for Class Annotation Processor Tool on Android.
 
@@ -13,8 +12,7 @@ For more information please see the [wiki](https://github.com/CoffeePartner/capt
 
 Hope you enjoy it!
 
-Quick Start
---------
+## Getting Started
 
 ##### Add capt plugin to gradle script classpath:
 
@@ -48,10 +46,12 @@ capt {
 }
 ```
 
-For more usage, see the [example]() and [wiki](https://github.com/CoffeePartner/capt/wiki).
+## Documentation
 
-License
--------
+* [User guide](): This guide contains examples on how to use capt in your gradle script.
+* [Developer guide](): This guide introduce how to develop a plugin of capt.
+* [Design document](): This document discusses issues we faced while designing capt.
+## License
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
