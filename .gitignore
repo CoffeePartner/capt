@@ -13,6 +13,7 @@ target
 pom.xml.*
 # Idea
 .idea
+*.iml
 obj
 #MacOS
 .DS_Store

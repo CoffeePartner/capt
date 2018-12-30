@@ -3,10 +3,9 @@ apply plugin: 'java'
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compileOnly "com.google.code.findbugs:jsr305:3.0.2"
-    compile "com.google.code.gson:gson:2.8.5"
-    compile "com.squareup.okio:okio:1.16.0"
-    compile "org.ow2.asm:asm:7.0"
-    compile 'org.ow2.asm:asm-tree:7.0'
+    compile "com.squareup.okio:okio:$okio_version"
+    compile "org.ow2.asm:asm:$asm_version"
+    compile "org.ow2.asm:asm-tree:$asm_version"
     compileOnly gradleApi()
     compileOnly "com.android.tools.build:gradle:$android_tools_version"
 }
