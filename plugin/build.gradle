@@ -1,14 +1,20 @@
-apply plugin: 'java'
+apply plugin: 'java-gradle-plugin'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation gradleApi()
-    compileOnly "com.android.tools.build:gradle:$android_tools_version"
+    implementation "com.android.tools.build:gradle:$android_tools_version"
     implementation "com.google.code.gson:gson:$gson_version"
-    implementation "com.squareup.okio:okio:$okio_version"
     implementation project(":api")
-    testImplementation gradleTestKit()
     testImplementation 'junit:junit:4.12'
+}
+
+gradlePlugin {
+    plugins {
+        capt {
+            id = 'coffeepartner-capt'
+            implementationClass = 'coffeepartner.capt.plugin.gradle.GradleCaptPlugin'
+        }
+    }
 }
 
 sourceCompatibility = "1.8"

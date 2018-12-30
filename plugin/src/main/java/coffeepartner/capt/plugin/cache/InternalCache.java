@@ -19,7 +19,6 @@ import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-@SuppressWarnings("ResultOfMethodCallIgnored")
 public class InternalCache {
 
     private static Logger LOGGER = LoggerFactory.getLogger(InternalCache.class);
