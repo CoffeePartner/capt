@@ -4,7 +4,7 @@ Capt is short for Class Annotation Processor Tool on Android.
 
 Like apt, capt provide some mechanism to parse annotations at compile time. 
 
-But capt can do more stuff than apt, because capt visit every jvm classes, and apt only visit java sources.
+But capt can do more stuff than apt, because capt visit every class that will packing into APK, and apt only visit java sources.
 
 Further more, capt also provides the chance to update every original class.
 
