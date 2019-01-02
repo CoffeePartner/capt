@@ -1,4 +1,4 @@
 include ':capt-plugin', ':capt-api'
-include ':samples'
+
 rootProject.name = "capt"
 
