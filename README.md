@@ -32,7 +32,9 @@ apply plugin: 'capt'
 
 ```groovy
 dependencies {
-    capt 'xxx'
+    capt 'xxx:xxx:x.y.z'
+    capt files('xxx')
+    capt project(":xxx") // java library and android library both supported
     debugCapt 'xxx'
     androidTestCapt 'xxx'
 }
