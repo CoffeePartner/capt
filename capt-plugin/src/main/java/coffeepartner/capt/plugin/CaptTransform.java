@@ -1,4 +1,4 @@
-package coffeepartner.capt.plugin.gradle;
+package coffeepartner.capt.plugin;
 
 import com.android.build.api.transform.QualifiedContent;
 import com.android.build.api.transform.Transform;

@@ -3,7 +3,7 @@ package coffeepartner.capt.plugin.process;
 import coffeepartner.capt.plugin.api.Arguments;
 import coffeepartner.capt.plugin.api.Plugin;
 import coffeepartner.capt.plugin.dsl.CaptPluginExtension;
-import coffeepartner.capt.plugin.gradle.GradleCaptExtension;
+import coffeepartner.capt.plugin.GradleCaptExtension;
 
 import java.util.Map;
 import java.util.function.Function;

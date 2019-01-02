@@ -12,7 +12,7 @@ gradlePlugin {
     plugins {
         capt {
             id = 'capt'
-            implementationClass = 'coffeepartner.capt.plugin.gradle.GradleCaptPlugin'
+            implementationClass = 'coffeepartner.capt.plugin.GradleCaptPlugin'
         }
     }
 }

@@ -5,7 +5,7 @@ import com.android.build.api.transform.TransformInvocation;
 import coffeepartner.capt.plugin.api.Plugin;
 import coffeepartner.capt.plugin.api.graph.Status;
 import coffeepartner.capt.plugin.dsl.CaptPluginExtension;
-import coffeepartner.capt.plugin.gradle.GradleCaptExtension;
+import coffeepartner.capt.plugin.GradleCaptExtension;
 import coffeepartner.capt.plugin.graph.ApkClassGraph;
 import coffeepartner.capt.plugin.graph.ApkClassInfo;
 import coffeepartner.capt.plugin.process.plugin.GlobalCapt;

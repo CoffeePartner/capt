@@ -1,7 +1,7 @@
 package coffeepartner.capt.plugin.resource;
 
 import com.android.build.gradle.BaseExtension;
-import coffeepartner.capt.plugin.gradle.GradleCaptExtension;
+import coffeepartner.capt.plugin.GradleCaptExtension;
 import com.google.gson.Gson;
 import org.gradle.api.Project;
 

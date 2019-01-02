@@ -1,4 +1,4 @@
-package coffeepartner.capt.plugin.gradle;
+package coffeepartner.capt.plugin;
 
 import coffeepartner.capt.plugin.dsl.CaptPluginExtension;
 import org.gradle.api.Action;
