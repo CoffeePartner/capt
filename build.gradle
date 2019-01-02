@@ -12,93 +12,23 @@ buildscript {
     }
     repositories {
         jcenter()
-        mavenCentral()
     }
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }
 }
-subprojects { pro ->
 
+subprojects {
     repositories {
         google()
         jcenter()
         mavenCentral()
     }
-
-    version = capt_version
-    group = capt_group
-
-
-    apply plugin: 'maven'
-    apply plugin: 'com.jfrog.bintray'
-    afterEvaluate {
-        task sourcesJar(type: Jar) {
-            from sourceSets.main.java.srcDirs
-            classifier = 'sources'
-        }
-
-        task javadocJar(type: Jar, dependsOn: javadoc) {
-            classifier = 'javadoc'
-            from javadoc.destinationDir
-        }
-
-        artifacts {
-            archives sourcesJar
-            archives javadocJar
-        }
-        tasks.install {
-            repositories.mavenInstaller {
-                pom {
-                    project {
-                        packaging 'jar'
-                        licenses {
-                            license {
-                                name 'The Apache Software License, Version 2.0'
-                                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                            }
-                        }
-                        developers {
-                            developer {
-                                id 'dieyi'
-                                name '耿万鹏'
-                                email 'dieyidezui@gmail.com'
-                            }
-
-                            developer {
-                                id 'bxbxbai'
-                                name '白雪斌'
-                                email 'bxbxbai@gmail.com'
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    bintray {
-        user = BINTRAY_USER
-        key = BINTRAY_KEY
-        configurations = ['archives']
-        pkg {
-            repo = "maven"
-            name = "capt-$pro.name"
-            websiteUrl = "https://github.com/CoffeePartner/capt"
-            vcsUrl = "https://github.com/CoffeePartner/capt.git"
-            licenses = ["Apache-2.0"]
-            publish = true
-        }
-    }
 }
 
-evaluationDependsOnChildren()
-
-task jarToTest(type: Copy) {
-    Jar p = project(":plugin").tasks.jar
-    Jar a = project(":api").tasks.jar
-
-    from p.destinationDir, a.destinationDir
-    into TEST_DIR
-    dependsOn p, a
+try {
+    apply from: 'publish.gradle'
+} catch (e) {
+    e.printStackTrace()
 }
 
