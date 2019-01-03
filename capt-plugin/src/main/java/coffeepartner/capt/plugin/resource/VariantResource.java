@@ -42,13 +42,16 @@ public class VariantResource implements Constants {
         return variant;
     }
 
-    public void init(TransformInvocation invocation, List<File> bootClasspath, Configuration target) throws IOException {
+    public void init(TransformInvocation invocation, List<File> bootClasspath, Configuration target) {
         this.loader.initClassLoader(invocation, bootClasspath, target);
-        this.files.attachContext(incremental, invocation);
+        this.files.attachContext(invocation);
     }
 
-    public void setIncremental(boolean incremental) {
+    public void setIncremental(boolean incremental) throws IOException {
         this.incremental = incremental;
+        if(!incremental) {
+            files.clearForFullMode();
+        }
     }
 
     public InputStream openStream(String className) throws IOException {

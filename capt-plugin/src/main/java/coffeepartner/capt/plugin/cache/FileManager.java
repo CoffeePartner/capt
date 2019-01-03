@@ -17,11 +17,8 @@ public class FileManager {
         this.variantRoot = variantRoot;
     }
 
-    public void attachContext(boolean isIncremental, TransformInvocation invocation) throws IOException {
+    public void attachContext(TransformInvocation invocation) {
         this.invocation = invocation;
-        if (!isIncremental) {
-            clearForFullMode();
-        }
     }
 
     public OutputProviderFactory.RootSelector asSelector() {
@@ -58,7 +55,7 @@ public class FileManager {
         return new File(variantRoot, "plugins" + File.separator + id);
     }
 
-    private void clearForFullMode() throws IOException {
+    public void clearForFullMode() throws IOException {
         invocation.getOutputProvider().deleteAll();
         if (!variantRoot.exists()) {
             FileUtils.cleanDirectory(variantRoot);
