@@ -1,4 +1,9 @@
-include ':capt-plugin', ':capt-api'
-
+file('.').eachDir {
+    if (it.name.startsWith('capt-')) {
+        def projectName = ":${it.name.substring(4)}"
+        include projectName
+        project(projectName).projectDir = it
+    }
+}
 rootProject.name = "capt"
 

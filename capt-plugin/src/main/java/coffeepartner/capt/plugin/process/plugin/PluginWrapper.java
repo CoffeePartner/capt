@@ -112,7 +112,7 @@ public class PluginWrapper extends ForwardingCapt {
     }
 
     @Override
-    public OutputProvider outputs() {
+    public OutputProvider getOutputs() {
         return resource.provider(id);
     }
 

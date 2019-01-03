@@ -54,7 +54,7 @@ public class GlobalCapt implements CaptInternal, Context {
     }
 
     @Override
-    public ClassGraph classGraph() {
+    public ClassGraph getClassGraph() {
         return classGraph;
     }
 
@@ -64,7 +64,7 @@ public class GlobalCapt implements CaptInternal, Context {
     }
 
     @Override
-    public OutputProvider outputs() {
+    public OutputProvider getOutputs() {
         throw new UnsupportedOperationException();
     }
 
@@ -79,12 +79,12 @@ public class GlobalCapt implements CaptInternal, Context {
     }
 
     @Override
-    public ForkJoinPool computation() {
+    public ForkJoinPool getComputation() {
         return global.computation();
     }
 
     @Override
-    public ExecutorService io() {
+    public ExecutorService getIo() {
         return global.io();
     }
 }

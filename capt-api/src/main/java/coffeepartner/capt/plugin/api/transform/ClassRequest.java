@@ -4,7 +4,7 @@ package coffeepartner.capt.plugin.api.transform;
 import java.util.Collections;
 import java.util.Set;
 
-public abstract class ClassRequest {
+public class ClassRequest {
 
     public Scope scope() {
         return Scope.CHANGED;

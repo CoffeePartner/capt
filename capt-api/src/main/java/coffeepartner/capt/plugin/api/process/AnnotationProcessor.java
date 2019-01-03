@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 /**
  * Only class contains plugin interested annotations will pass to AnnotationProcessor
  */
-public abstract class AnnotationProcessor {
+public class AnnotationProcessor {
     /**
      * Class changed, pre matched, but current mismatched, due to one of the following:
      * 1.  No matched annotation in @Def.

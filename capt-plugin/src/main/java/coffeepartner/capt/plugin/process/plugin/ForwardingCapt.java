@@ -44,8 +44,8 @@ public class ForwardingCapt implements CaptInternal {
     }
 
     @Override
-    public ClassGraph classGraph() {
-        return delegate.classGraph();
+    public ClassGraph getClassGraph() {
+        return delegate.getClassGraph();
     }
 
     @Override
@@ -54,7 +54,7 @@ public class ForwardingCapt implements CaptInternal {
     }
 
     @Override
-    public OutputProvider outputs() {
-        return delegate.outputs();
+    public OutputProvider getOutputs() {
+        return delegate.getOutputs();
     }
 }

@@ -6,14 +6,28 @@ import org.gradle.internal.HasInternalProtocol;
 
 @HasInternalProtocol
 public interface Capt {
-
+    /**
+     * @return true if this build is incremental
+     */
     boolean isIncremental();
 
+    /**
+     * @return context cpat passed
+     */
     Context getContext();
 
-    ClassGraph classGraph();
+    /**
+     * @return class graph in apk
+     */
+    ClassGraph getClassGraph();
 
+    /**
+     * @return arguments in build.gradle
+     */
     Arguments getArgs();
 
-    OutputProvider outputs();
+    /**
+     * @return output provider to store cache
+     */
+    OutputProvider getOutputs();
 }

@@ -7,11 +7,24 @@ import java.util.concurrent.ForkJoinPool;
 
 public interface Context {
 
+    /**
+     * @return variant name of this build
+     */
     String getVariantName();
 
+    /**
+     * @param clazz class
+     * @return the logger
+     */
     Logger getLogger(Class<?> clazz);
 
-    ForkJoinPool computation();
+    /**
+     * @return thread pool to do computation jobs
+     */
+    ForkJoinPool getComputation();
 
-    ExecutorService io();
+    /**
+     * @return thread pool to do io jobs
+     */
+    ExecutorService getIo();
 }

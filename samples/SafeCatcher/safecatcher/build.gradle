@@ -32,7 +32,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    implementation 'coffeepartner.capt:api:0.0.1'
+    implementation 'coffeepartner.capt:capt-api:0.0.3'
     implementation project(':safecatcherrt')
     implementation 'com.google.code.gson:gson:2.8.5'
 }

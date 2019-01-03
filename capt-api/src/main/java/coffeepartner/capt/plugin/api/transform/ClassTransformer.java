@@ -15,7 +15,9 @@ public abstract class ClassTransformer {
      * @return class request
      */
     @Thread(Type.COMPUTATION)
-    public abstract ClassRequest beforeTransform();
+    public ClassRequest beforeTransform() {
+        return new ClassRequest();
+    }
 
     /**
      * @param classInfo the basic info of class
