@@ -142,7 +142,7 @@ public class MethodReplacer implements ClassConsumer {
         return extra;
     }
 
-    public void onClassRemoved(String c) {
+    public void onClassRemovedOrUpdated(String c) {
         // emm..., it's a example, so we keep it easy.
         for (List<MatchBean> list : map.values()) {
             for (MatchBean b : list) {

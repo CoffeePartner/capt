@@ -3,7 +3,6 @@ package coffeepartner.capt.sample.safecatcher;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -41,10 +40,10 @@ public class SafePlugin extends Plugin<Capt> {
         }
 
         Map<String, Object> args = capt.getArgs().getMyArguments().arguments();
-        if(!args.get("plugin_defined_args1").equals(121322)) {
+        if (!args.get("plugin_defined_args1").equals(121322)) {
             throw new AssertionError();
         }
-        if(!((Map)args.get("plugin_defined_args2")).isEmpty()) {
+        if (!((Map) args.get("plugin_defined_args2")).isEmpty()) {
             throw new AssertionError();
         }
     }
@@ -74,10 +73,11 @@ public class SafePlugin extends Plugin<Capt> {
 
             @Override
             public CaptClassVisitor onTransform(ClassInfo classInfo, boolean required) {
+                if (capt.isIncremental() && classInfo.status() != Status.NOT_CHANGED && classInfo.status() != Status.ADDED) {
+                    replacer.onClassRemovedOrUpdated(classInfo.name());
+                }
                 if (classInfo.exists() && !replacer.isMatchClass(classInfo.name())) {
                     return new SafeClassVisitor();
-                } else if (classInfo.status() == Status.REMOVED && capt.isIncremental()) {
-                    replacer.onClassRemoved(classInfo.name());
                 }
                 return null;
             }
