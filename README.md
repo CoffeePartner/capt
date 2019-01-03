@@ -17,7 +17,7 @@ Hope you enjoy it!
 ##### Add capt plugin to gradle script classpath:
 
 ```groovy
-classpath 'coffeepartner.capt:capt-plugin:1.0.0-RC1'
+classpath 'coffeepartner.capt:plugin:1.0.0-RC1'
 ```
 
 ##### Apply capt plugin on Android application or library module:
@@ -50,9 +50,9 @@ capt {
 
 ## Documentation
 
-* [User guide](): This guide contains examples on how to use capt in your gradle script.
-* [Writing Capt Plugins](): This guide introduce how to develop a plugin of capt.
-* [Design document](): This document discusses issues we faced while designing capt.
+* User guide: This guide contains examples on how to use capt in your gradle script.
+* [Writing Capt Plugins](https://github.com/CoffeePartner/capt/wiki): This guide introduce how to develop a plugin of capt.
+* Design document: This document discusses issues we faced while designing capt.
 ## License
 
     Licensed under the Apache License, Version 2.0 (the "License");
