@@ -2,8 +2,8 @@ apply plugin: 'java-gradle-plugin'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "com.android.tools.build:gradle:$android_tools_version"
-    implementation project(":api")
+    compile "com.android.tools.build:gradle:$android_tools_version"
+    compile project(":api")
     testImplementation 'junit:junit:4.12'
 }
 

@@ -1,7 +1,7 @@
 import coffeepartner.capt.plugin.dsl.CaptPluginExtension
 
-apply plugin: 'com.android.application'
 apply plugin: 'capt'
+apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
