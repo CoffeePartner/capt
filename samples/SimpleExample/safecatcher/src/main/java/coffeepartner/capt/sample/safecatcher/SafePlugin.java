@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.Map;
 import java.util.Set;
 
 import coffeepartner.capt.plugin.api.Capt;
@@ -36,7 +37,15 @@ public class SafePlugin extends Plugin<Capt> {
         provider = capt.outputs().getProvider(OutputProvider.Type.CACHE);
         replacer = new MethodReplacer(capt.getContext().getLogger(MethodReplacer.class));
         if (capt.isIncremental()) {
-            replacer.load(new InputStreamReader(provider.asSource(CACHE_NAME).inputStream()));
+            replacer.read(new InputStreamReader(provider.asSource(CACHE_NAME).inputStream()));
+        }
+
+        Map<String, Object> args = capt.getArgs().getMyArguments().arguments();
+        if(!args.get("plugin_defined_args1").equals(121322)) {
+            throw new AssertionError();
+        }
+        if(!((Map)args.get("plugin_defined_args2")).isEmpty()) {
+            throw new AssertionError();
         }
     }
 

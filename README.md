@@ -51,7 +51,7 @@ capt {
 ## Documentation
 
 * [User guide](): This guide contains examples on how to use capt in your gradle script.
-* [Developer guide](): This guide introduce how to develop a plugin of capt.
+* [Writing Capt Plugins](): This guide introduce how to develop a plugin of capt.
 * [Design document](): This document discusses issues we faced while designing capt.
 ## License
 

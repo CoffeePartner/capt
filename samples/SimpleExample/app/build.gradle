@@ -37,6 +37,12 @@ capt {
     plugins {
         'com.example.safecatcher' {
             scope CaptPluginExtension.ASSEMBLE | CaptPluginExtension.ANDROID_TEST
+
+            plugin_defined_args1 121322
+
+            plugin_defined_args2 {
+
+            }
         }
     }
 }

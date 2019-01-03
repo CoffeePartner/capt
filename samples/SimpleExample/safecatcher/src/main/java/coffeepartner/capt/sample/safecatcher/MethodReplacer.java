@@ -35,6 +35,7 @@ public class MethodReplacer implements ClassConsumer {
     private final Map<String, List<MatchBean>> map = new ConcurrentHashMap<>();
     private Map<String, List<MatchBean>> matchMap;
     private final Set<String> extra = new HashSet<>();
+    private final Gson gson = new Gson();
     private boolean hasNew = false;
 
     public MethodReplacer(Logger logger) {
@@ -60,13 +61,13 @@ public class MethodReplacer implements ClassConsumer {
         for (List<MatchBean> l : map.values()) {
             list.addAll(l);
         }
-        new Gson().toJson(list, writer);
+        gson.toJson(list, writer);
 
         writer.close();
     }
 
-    public void load(Reader reader) throws IOException {
-        List<MatchBean> list = new Gson().fromJson(reader, new TypeToken<List<MatchBean>>() {
+    public void read(Reader reader) throws IOException {
+        List<MatchBean> list = gson.fromJson(reader, new TypeToken<List<MatchBean>>() {
         }.getType());
 
         for (MatchBean m : list) {
@@ -133,7 +134,6 @@ public class MethodReplacer implements ClassConsumer {
                         beans.add(b);
                     }
                 }
-                System.out.println(map);
             }
         };
     }
