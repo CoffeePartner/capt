@@ -1,22 +1,21 @@
 package coffeepartner.capt.plugin;
 
-import com.android.build.gradle.AppExtension;
-import com.android.build.gradle.BaseExtension;
-import com.android.build.gradle.LibraryExtension;
 import coffeepartner.capt.plugin.api.graph.ClassInfo;
 import coffeepartner.capt.plugin.dsl.CaptPluginExtension;
 import coffeepartner.capt.plugin.graph.ClassBean;
 import coffeepartner.capt.plugin.resource.GlobalResource;
-import coffeepartner.capt.plugin.util.Constants;
 import coffeepartner.capt.plugin.util.CaptThreadFactory;
+import coffeepartner.capt.plugin.util.Constants;
 import coffeepartner.capt.plugin.variant.VariantManager;
+import com.android.build.gradle.AppPlugin;
+import com.android.build.gradle.BaseExtension;
+import com.android.build.gradle.LibraryPlugin;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.ProjectConfigurationException;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -31,28 +30,20 @@ public class GradleCaptPlugin implements Plugin<Project>, Constants {
 
     @Override
     public void apply(Project project) {
-        if (project.getPlugins().findPlugin("com.android.application") == null
-                && project.getPlugins().findPlugin("android") == null
-                && project.getPlugins().findPlugin("com.android.library") == null
-                && project.getPlugins().findPlugin("android-library") == null) {
-            throw new ProjectConfigurationException("Need android application or library plugin to be applied first", null);
-        }
+        project.getPlugins().matching(p -> p instanceof AppPlugin || p instanceof LibraryPlugin)
+                .all(c -> {
 
-        BaseExtension baseExtension = (BaseExtension) project.getExtensions().getByName("android");
-        if (!(baseExtension instanceof AppExtension || baseExtension instanceof LibraryExtension)) {
-            throw new ProjectConfigurationException("Only application or library is supported by capt", null);
-        }
+                    BaseExtension baseExtension = (BaseExtension) project.getExtensions().getByName("android");
+                    project.getExtensions().create(NAME, GradleCaptExtension.class, project.container(CaptPluginExtension.class));
 
-        project.getExtensions().create(NAME, GradleCaptExtension.class, project.container(CaptPluginExtension.class));
+                    VariantManager variantManager = new VariantManager(createGlobalResource(project, baseExtension),
+                            baseExtension, project);
+                    // callCreate configurations for separate variant
+                    variantManager.createConfigurationForVariant();
 
-
-        VariantManager variantManager = new VariantManager(createGlobalResource(project, baseExtension),
-                baseExtension, project);
-        // callCreate configurations for separate variant
-        variantManager.createConfigurationForVariant();
-
-        CaptTransform captTransform = new CaptTransform(variantManager);
-        baseExtension.registerTransform(captTransform);
+                    CaptTransform captTransform = new CaptTransform(variantManager);
+                    baseExtension.registerTransform(captTransform);
+                });
     }
 
     private static GlobalResource createGlobalResource(Project project, BaseExtension baseExtension) {
