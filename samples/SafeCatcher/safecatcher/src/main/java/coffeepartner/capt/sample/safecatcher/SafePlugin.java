@@ -34,7 +34,7 @@ public class SafePlugin extends Plugin<Capt> {
     @Override
     public void onCreate(Capt capt) throws IOException {
         this.capt = capt;
-        provider = capt.outputs().getProvider(OutputProvider.Type.CACHE);
+        provider = capt.getOutputs().getProvider(OutputProvider.Type.CACHE);
         replacer = new MethodReplacer(capt.getContext().getLogger(MethodReplacer.class));
         if (capt.isIncremental()) {
             replacer.read(new InputStreamReader(provider.asSource(CACHE_NAME).inputStream()));
