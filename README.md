@@ -1,5 +1,7 @@
 # capt
 
+[ ![Download](https://api.bintray.com/packages/dieyi/maven/capt-api/images/download.svg) ](https://bintray.com/dieyi/maven/capt-api/_latestVersion)
+
 Capt is short for Class Annotation Processor Tool on Android.
 
 Like apt, capt provide some mechanism to parse annotations at compile time. 
