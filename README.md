@@ -55,6 +55,13 @@ capt {
 * User guide: This guide contains examples on how to use capt in your gradle script.
 * [Writing Capt Plugins](https://github.com/CoffeePartner/capt/wiki): This guide introduce how to develop a plugin of capt.
 * Design document: This document discusses issues we faced while designing capt.
+
+ ## Releases Plan
+ 
+-  - **03/01/2019: Release Candidate 1: stabilized API and feature set**
+   - 17/01/2019: Release Candidate 2: addressing feedback from RC 1
+   - 31/01/2019: Stable Release: General availability
+
 ## License
 
     Licensed under the Apache License, Version 2.0 (the "License");
