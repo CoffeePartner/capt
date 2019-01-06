@@ -25,36 +25,42 @@ public class RelativeDirectoryProviderFactoryImpl implements RelativeDirectoryPr
         }
 
         @Override
-        public File root() throws IOException {
-            root.mkdirs();
-            if (!root.isDirectory()) {
-                throw new IOException("Unable to callCreate directories of " + root);
-            }
+        public File root() {
             return root;
         }
 
         @Override
         public BufferedSource asSource(String path) throws IOException {
-            return Okio.buffer(Okio.source(ensure(path)));
+            File target = create(path);
+            Files.createParentDirs(target);
+            return Okio.buffer(Okio.source(target));
+        }
+
+        @Override
+        public void deleteIfExists(String path) throws IOException {
+            File target = create(path);
+            if (target.exists() && !target.delete()) {
+                throw new IOException("delete file " + target + " failed");
+            }
         }
 
         @Override
         public BufferedSink asSink(String path) throws IOException {
-            return Okio.buffer(Okio.sink(ensure(path)));
+            File target = create(path);
+            Files.createParentDirs(target);
+            return Okio.buffer(Okio.sink(target));
         }
 
-        private File ensure(String path) throws IOException {
+        private File create(String path) {
             if ('/' != File.separatorChar) {
                 path = path.replace('/', File.separatorChar);
             }
-            File target = new File(root, path);
-            Files.createParentDirs(target);
-            return target;
+            return new File(root, path);
         }
 
         @Override
         public void deleteAll() throws IOException {
-            FileUtils.cleanDirectory(root());
+            FileUtils.deleteDirectory(root());
         }
     }
 }

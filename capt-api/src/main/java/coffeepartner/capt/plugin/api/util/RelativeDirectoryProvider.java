@@ -9,10 +9,9 @@ import java.io.IOException;
 public interface RelativeDirectoryProvider {
 
     /**
-     * @return get the root directory, ensure exists
-     * @throws IOException if make dir failed
+     * @return get the root directory, may not exists
      */
-    File root() throws IOException;
+    File root();
 
     /**
      * Use '/' as separator, even if windows.
@@ -22,6 +21,15 @@ public interface RelativeDirectoryProvider {
      * @throws IOException If create file failed.
      */
     BufferedSource asSource(String path) throws IOException;
+
+
+    /**
+     * Use '/' as separator, even if windows.
+     *
+     * @param path the relative path
+     * @throws IOException if delete failed
+     */
+    void deleteIfExists(String path) throws IOException;
 
     /**
      * Use '/' as separator, even if windows.
