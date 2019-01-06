@@ -116,12 +116,7 @@ public class ThirdRound {
     }
 
     private ClassWalker.Visitor.Factory asFactory(List<PluginTransform> transforms) {
-        return (incremental, content) -> {
-            if (incremental && content instanceof JarInput && ((JarInput) content).getStatus() == Status.REMOVED) {
-                return null;
-            }
-            return new TransformVisitor(transforms);
-        };
+        return (incremental, content) -> new TransformVisitor(transforms);
     }
 
 
