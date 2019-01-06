@@ -57,8 +57,6 @@ public class FileManager {
 
     public void clearForFullMode() throws IOException {
         invocation.getOutputProvider().deleteAll();
-        if (!variantRoot.exists()) {
-            FileUtils.cleanDirectory(variantRoot);
-        }
+        FileUtils.deleteDirectory(variantRoot);
     }
 }

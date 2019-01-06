@@ -33,7 +33,7 @@ public class FirstRound {
         if(!incremental) {
             graph.clear();
         }
-        walker.visit(incremental, false, asFactory(collector));
+        walker.visit(false, incremental, false, asFactory(collector));
     }
 
     private ClassWalker.Visitor.Factory asFactory(AnnotationCollector collector) {

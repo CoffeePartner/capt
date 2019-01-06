@@ -56,7 +56,8 @@ public class ThirdRound {
         computation.await();
 
         // 2. dispatch classes
-        walker.visit(!hasAll && incremental, true, asFactory(transforms));
+        walker.visit(hasAll, incremental, true, asFactory(transforms));
+
         if (incremental) {
             // dispatch REMOVED
             graph.getAll().values()
