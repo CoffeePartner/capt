@@ -1,6 +1,7 @@
 package coffeepartner.capt.plugin.cache;
 
 import coffeepartner.capt.plugin.api.util.RelativeDirectoryProvider;
+import coffeepartner.capt.plugin.util.Util;
 import com.google.common.io.Files;
 import okio.BufferedSink;
 import okio.BufferedSource;
@@ -38,10 +39,7 @@ public class RelativeDirectoryProviderFactoryImpl implements RelativeDirectoryPr
 
         @Override
         public void deleteIfExists(String path) throws IOException {
-            File target = create(path);
-            if (target.exists() && !target.delete()) {
-                throw new IOException("delete file " + target + " failed");
-            }
+            Util.deleteIFExists(create(path));
         }
 
         @Override
@@ -52,10 +50,7 @@ public class RelativeDirectoryProviderFactoryImpl implements RelativeDirectoryPr
         }
 
         private File create(String path) {
-            if ('/' != File.separatorChar) {
-                path = path.replace('/', File.separatorChar);
-            }
-            return new File(root, path);
+            return new File(root, path.replace('/', File.separatorChar));
         }
 
         @Override

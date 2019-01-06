@@ -1,10 +1,11 @@
 package coffeepartner.capt.plugin.util;
 
-import com.android.build.api.transform.*;
 import coffeepartner.capt.plugin.resource.GlobalResource;
+import com.android.build.api.transform.*;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
+import org.apache.commons.io.FileUtils;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -163,6 +164,10 @@ public final class ClassWalker {
             }
 
             if (jar.getStatus() == Status.REMOVED) {
+                if (write) {
+                    Util.deleteIFExists(invocation.getOutputProvider().getContentLocation(
+                            jar.getName(), jar.getContentTypes(), jar.getScopes(), Format.JAR));
+                }
                 return null;
             }
 
@@ -263,6 +268,8 @@ public final class ClassWalker {
             ForkJoinPool pool = resource.computation();
             List<Future<ClassEntry>> futures = !write ? null : new ArrayList<>();
 
+            File outRoot = invocation.getOutputProvider().getContentLocation(d.getName(), d.getContentTypes(), d.getScopes(), Format.DIRECTORY);
+
             // just process .class, skip others
             if (!incremental) {
                 if (d.getFile().exists()) { // we check if directory removed for capt in  full mode & transform in incremental mode
@@ -278,6 +285,8 @@ public final class ClassWalker {
                             }
                         }
                     }
+                } else { // clean the directory
+                    FileUtils.deleteDirectory(outRoot);
                 }
             } else {
                 for (Map.Entry<File, Status> entry : d.getChangedFiles().entrySet()) {
@@ -285,7 +294,15 @@ public final class ClassWalker {
                     if (status != Status.NOTCHANGED && entry.getKey().getName().endsWith(".class")) {
                         String className = fileToClassName(entry.getKey());
                         if (targets == null || targets.contains(className)) {
-                            byte[] bytes = status == Status.REMOVED ? null : Files.toByteArray(entry.getKey());
+                            byte[] bytes;
+                            if (status == Status.REMOVED) {
+                                bytes = null;
+                                if (write) { // delete the relative out file
+                                    Util.deleteIFExists(new File(outRoot, className.replace('/', File.separatorChar) + ".class"));
+                                }
+                            } else {
+                                bytes = Files.toByteArray(entry.getKey());
+                            }
                             ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, className, entry.getValue());
                             if (futures != null && task != null) {
                                 futures.add(task);
@@ -296,11 +313,10 @@ public final class ClassWalker {
             }
 
             if (futures != null) {
-                File out = invocation.getOutputProvider().getContentLocation(d.getName(), d.getContentTypes(), d.getScopes(), Format.DIRECTORY);
                 for (Future<ClassEntry> future : futures) {
                     ClassEntry e = future.get();
                     if (e != null) {
-                        e.writeTo(out);
+                        e.writeTo(outRoot);
                     }
                 }
             }

@@ -3,6 +3,7 @@ package coffeepartner.capt.plugin.util;
 import com.android.build.api.transform.TransformException;
 import org.objectweb.asm.tree.ClassNode;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -33,5 +34,11 @@ public class Util {
         ClassNode cloned = new ClassNode();
         node.accept(cloned);
         return cloned;
+    }
+
+    public static void deleteIFExists(File target) throws IOException {
+        if (target.exists() && !target.delete()) {
+            throw new IOException("delete file " + target + " failed");
+        }
     }
 }
