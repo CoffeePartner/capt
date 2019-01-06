@@ -154,25 +154,25 @@ public final class ClassWalker {
 
         @Override
         public Void call() throws Exception {
-            if (incremental && jar.getStatus() == Status.NOTCHANGED) {
-                return null;
-            }
 
             Visitor visitor = factory.newVisitor(incremental, jar);
             if (visitor == null) {
                 return null;
             }
 
-            if (jar.getStatus() == Status.REMOVED) {
+            // 1. we can't read removed jar anyway
+            // 2. incremental && not changed, it is illegal, we skip it
+            if (jar.getStatus() == Status.NOTCHANGED) {
+                if (incremental) {
+                    return null;
+                }
+            } else if (jar.getStatus() == Status.REMOVED) {
                 if (write) {
                     Util.deleteIFExists(invocation.getOutputProvider().getContentLocation(
                             jar.getName(), jar.getContentTypes(), jar.getScopes(), Format.JAR));
                 }
                 return null;
             }
-
-            // 1. we can't read removed jar anyway
-            // 2. incremental && not changed, it is illegal, we skip it
 
             Status status = incremental ? jar.getStatus() : Status.NOTCHANGED;
 
@@ -256,12 +256,12 @@ public final class ClassWalker {
 
         @Override
         public Void call() throws Exception {
-            if (incremental && d.getChangedFiles().isEmpty()) {
+            Visitor visitor = factory.newVisitor(incremental, d);
+            if (visitor == null) {
                 return null;
             }
 
-            Visitor visitor = factory.newVisitor(incremental, d);
-            if (visitor == null) {
+            if (incremental && d.getChangedFiles().isEmpty()) {
                 return null;
             }
 
