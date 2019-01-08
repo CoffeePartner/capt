@@ -24,6 +24,8 @@ subprojects {
         jcenter()
         mavenCentral()
     }
+
+    apply plugin: 'checkstyle'
 }
 
 try {

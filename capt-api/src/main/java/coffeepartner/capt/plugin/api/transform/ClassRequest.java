@@ -11,7 +11,7 @@ public class ClassRequest {
     }
 
     /**
-     * Regardless of scope(), extra specified classes
+     * Regardless of scope(), extra specified classes.
      *
      * @return extra specified classes
      */

@@ -21,7 +21,7 @@ import java.util.function.Supplier;
 
 public class InternalCache {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(InternalCache.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InternalCache.class);
 
     private final GlobalResource global;
     private final RelativeDirectoryProvider provider;

@@ -45,7 +45,7 @@ public abstract class Plugin<T> {
     }
 
     /**
-     * Do your time-consuming tasks in this function
+     * Do your time-consuming tasks in this function.
      *
      * @param capt Plugin context
      * @throws IOException io

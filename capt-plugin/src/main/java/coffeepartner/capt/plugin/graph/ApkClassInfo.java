@@ -22,7 +22,7 @@ public class ApkClassInfo implements ClassInfo {
     public ClassBean clazz;
 
     /**
-     * null means removed or not exists
+     * null means removed or not exists.
      */
     @Nullable
     public ApkClassInfo parent;

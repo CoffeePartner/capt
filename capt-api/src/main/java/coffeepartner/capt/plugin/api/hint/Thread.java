@@ -3,7 +3,7 @@ package coffeepartner.capt.plugin.api.hint;
 import java.lang.annotation.*;
 
 /**
- * Notify function on which thread type
+ * Notify function on which thread type.
  */
 @Documented
 @Retention(RetentionPolicy.SOURCE)

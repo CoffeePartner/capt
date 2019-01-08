@@ -1,13 +1,13 @@
 package coffeepartner.capt.plugin.process.visitors;
 
-import com.android.build.api.transform.JarInput;
-import com.android.build.api.transform.Status;
-import com.android.build.api.transform.TransformException;
 import coffeepartner.capt.plugin.graph.ApkClassGraph;
 import coffeepartner.capt.plugin.graph.ClassBean;
 import coffeepartner.capt.plugin.graph.MethodBean;
 import coffeepartner.capt.plugin.util.ClassWalker;
 import coffeepartner.capt.plugin.util.asm.AnnotationSniffer;
+import com.android.build.api.transform.JarInput;
+import com.android.build.api.transform.Status;
+import com.android.build.api.transform.TransformException;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.objectweb.asm.ClassReader;
@@ -30,7 +30,7 @@ public class FirstRound {
     }
 
     public void accept(ClassWalker walker, boolean incremental, AnnotationCollector collector) throws IOException, InterruptedException, TransformException {
-        if(!incremental) {
+        if (!incremental) {
             graph.clear();
         }
         walker.visit(false, incremental, false, asFactory(collector));

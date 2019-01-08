@@ -24,7 +24,7 @@ import java.io.IOException;
 
 
 public class VariantScope implements Constants {
-    private static Logger LOGGER = Logging.getLogger(VariantScope.class);
+    private static final Logger LOGGER = Logging.getLogger(VariantScope.class);
 
     private final String variant;
     private Configuration captConfiguration;

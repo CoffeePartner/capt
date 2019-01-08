@@ -10,6 +10,9 @@ import java.util.concurrent.Future;
 
 public class Util {
 
+    private Util() {
+    }
+
     public static <T> T await(Future<T> future) throws IOException, TransformException, InterruptedException {
         try {
             return future.get();

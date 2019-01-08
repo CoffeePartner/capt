@@ -29,7 +29,7 @@ public class OutputProviderFactory {
 
         private final String id;
 
-        public OutputProviderImpl(String id) {
+        OutputProviderImpl(String id) {
             this.id = id;
         }
 

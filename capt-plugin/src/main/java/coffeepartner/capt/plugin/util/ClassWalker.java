@@ -39,11 +39,14 @@ public final class ClassWalker {
         this.invocation = invocation;
     }
 
-    public void visit(boolean includeNotChanged, boolean incremental, boolean write, Visitor.Factory factory) throws IOException, InterruptedException, TransformException {
+    public void visit(boolean includeNotChanged, boolean incremental, boolean write, Visitor.Factory factory)
+            throws IOException, InterruptedException, TransformException {
         visit(includeNotChanged, incremental, write, factory, null);
     }
 
-    public void visit(boolean includeNotChanged, boolean incremental, boolean write, Visitor.Factory factory, @Nullable Map<QualifiedContent, Set<String>> targets) throws IOException, InterruptedException, TransformException {
+    public void visit(boolean includeNotChanged, boolean incremental, boolean write, Visitor.Factory factory,
+                      @Nullable Map<QualifiedContent, Set<String>> targets)
+            throws IOException, InterruptedException, TransformException {
         WaitableTasks io = WaitableTasks.get(resource.io());
         invocation.getInputs()
                 .forEach(i -> {
@@ -78,7 +81,7 @@ public final class ClassWalker {
     }
 
 
-    public final static class ClassEntry extends InternalEntry {
+    public static final class ClassEntry extends InternalEntry {
         public ClassEntry(String className, byte[] bytes) {
             super(className + ".class", bytes);
         }
@@ -248,7 +251,12 @@ public final class ClassWalker {
         private final Set<String> targets;
         private URI base;
 
-        DirectoryTask(DirectoryInput directory, boolean includeNotChanged, boolean incremental, boolean write, Visitor.Factory factory, @Nullable Set<String> targets) {
+        DirectoryTask(DirectoryInput directory,
+                      boolean includeNotChanged,
+                      boolean incremental,
+                      boolean write,
+                      Visitor.Factory factory,
+                      @Nullable Set<String> targets) {
             this.d = directory;
             this.includeNotChanged = includeNotChanged;
             this.incremental = incremental;

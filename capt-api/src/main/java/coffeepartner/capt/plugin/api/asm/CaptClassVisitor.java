@@ -35,7 +35,8 @@ public abstract class CaptClassVisitor extends ClassVisitor {
             if (cv instanceof CaptClassVisitor) {
                 ((CaptClassVisitor) cv).link(next);
             } else {
-                throw new IllegalStateException("Require CaptClassVisitor or subclass, but is " + cv.getClass().getName());
+                throw new IllegalStateException("Require CaptClassVisitor or subclass, but is "
+                        + cv.getClass().getName());
             }
         } else {
             cv = next;

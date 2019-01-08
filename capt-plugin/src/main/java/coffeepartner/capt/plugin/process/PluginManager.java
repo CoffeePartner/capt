@@ -1,11 +1,9 @@
 package coffeepartner.capt.plugin.process;
 
-import com.android.build.api.transform.TransformException;
-import com.android.build.api.transform.TransformInvocation;
+import coffeepartner.capt.plugin.GradleCaptExtension;
 import coffeepartner.capt.plugin.api.Plugin;
 import coffeepartner.capt.plugin.api.graph.Status;
 import coffeepartner.capt.plugin.dsl.CaptPluginExtension;
-import coffeepartner.capt.plugin.GradleCaptExtension;
 import coffeepartner.capt.plugin.graph.ApkClassGraph;
 import coffeepartner.capt.plugin.graph.ApkClassInfo;
 import coffeepartner.capt.plugin.process.plugin.GlobalCapt;
@@ -16,6 +14,8 @@ import coffeepartner.capt.plugin.resource.GlobalResource;
 import coffeepartner.capt.plugin.resource.VariantResource;
 import coffeepartner.capt.plugin.util.Constants;
 import coffeepartner.capt.plugin.util.WaitableTasks;
+import com.android.build.api.transform.TransformException;
+import com.android.build.api.transform.TransformInvocation;
 import com.google.common.io.Closeables;
 import okio.BufferedSource;
 import okio.Okio;
@@ -135,7 +135,7 @@ public class PluginManager implements Constants {
                         .map(graph::get)
                         .filter(Objects::nonNull)
                         .filter(c -> c.status() == Status.NOT_CHANGED)
-                        : Stream.empty();// others are already called.
+                        : Stream.empty(); // others are already called.
             }
 
             @Override
