@@ -1,0 +1,67 @@
+subprojects { pro ->
+
+    if (!pro.projectDir.name.startsWith("capt-")) return
+
+    version = capt_version
+    group = capt_group
+
+    apply plugin: 'maven'
+    apply plugin: 'com.jfrog.bintray'
+    afterEvaluate {
+        task sourcesJar(type: Jar) {
+            from sourceSets.main.java.srcDirs
+            classifier = 'sources'
+        }
+
+        task javadocJar(type: Jar, dependsOn: javadoc) {
+            classifier = 'javadoc'
+            from javadoc.destinationDir
+        }
+
+        artifacts {
+            archives sourcesJar
+            archives javadocJar
+        }
+        tasks.install {
+            repositories.mavenInstaller {
+                pom {
+                    project {
+                        packaging 'jar'
+                        licenses {
+                            license {
+                                name 'The Apache Software License, Version 2.0'
+                                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            }
+                        }
+                        developers {
+                            developer {
+                                id 'dieyi'
+                                name '耿万鹏'
+                                email 'dieyidezui@gmail.com'
+                            }
+
+                            developer {
+                                id 'bxbxbai'
+                                name '白雪斌'
+                                email 'bxbxbai@gmail.com'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    bintray {
+        user = System.getenv("BINTRAY_USER")
+        key = System.getenv("BINTRAY_KEY")
+        configurations = ['archives']
+        pkg {
+            repo = "maven"
+            name = "capt-$pro.name"
+            websiteUrl = "https://github.com/CoffeePartner/capt"
+            vcsUrl = "https://github.com/CoffeePartner/capt.git"
+            licenses = ["Apache-2.0"]
+            publish = true
+        }
+    }
+}
