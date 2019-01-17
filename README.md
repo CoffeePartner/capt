@@ -19,7 +19,7 @@ Hope you enjoy it!
 ##### Add capt plugin to gradle script classpath:
 
 ```groovy
-classpath 'coffeepartner.capt:plugin:1.0.0-RC1'
+classpath 'coffeepartner.capt:plugin:1.0.0-RC2'
 ```
 
 ##### Apply capt plugin on Android application or library module:
@@ -59,7 +59,7 @@ capt {
  ## Releases Plan
  
 -  - **03/01/2019: Release Candidate 1: stabilized API and feature set**
-   - 17/01/2019: Release Candidate 2: addressing feedback from RC 1
+-  - **17/01/2019: Release Candidate 2: addressing feedback from RC 1**
    - 31/01/2019: Stable Release: General availability
 
 ## License
