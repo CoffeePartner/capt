@@ -47,7 +47,7 @@ public class CaptTransform extends Transform implements Constants {
     }
 
     /**
-     * Needs other scopes to compute frame
+     * Needs other scopes to compute frame.
      */
     @Override
     public Set<? super QualifiedContent.Scope> getReferencedScopes() {

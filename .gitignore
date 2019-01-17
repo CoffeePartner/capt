@@ -17,4 +17,3 @@ pom.xml.*
 obj
 #MacOS
 .DS_Store
-publish.gradle

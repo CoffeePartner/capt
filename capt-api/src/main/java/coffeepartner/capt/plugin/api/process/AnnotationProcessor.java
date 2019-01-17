@@ -7,7 +7,7 @@ import coffeepartner.capt.plugin.api.hint.Type;
 import javax.annotation.Nullable;
 
 /**
- * Only class contains plugin interested annotations will pass to AnnotationProcessor
+ * Only class contains plugin interested annotations will pass to AnnotationProcessor.
  */
 public class AnnotationProcessor {
     /**

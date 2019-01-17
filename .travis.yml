@@ -1,0 +1,19 @@
+anguage: java
+
+jdk:
+  - oraclejdk8
+
+notifications:
+  email: false
+
+sudo: false
+
+
+script: ./gradlew check
+
+after_success:
+
+branches:
+  except:
+    - gh-pages
+

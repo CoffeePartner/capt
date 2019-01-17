@@ -1,12 +1,12 @@
 package coffeepartner.capt.plugin.resource;
 
-import com.android.build.api.transform.QualifiedContent;
-import com.android.build.api.transform.TransformInvocation;
 import coffeepartner.capt.plugin.api.OutputProvider;
 import coffeepartner.capt.plugin.api.Plugin;
 import coffeepartner.capt.plugin.cache.FileManager;
 import coffeepartner.capt.plugin.cache.OutputProviderFactory;
 import coffeepartner.capt.plugin.util.Constants;
+import com.android.build.api.transform.QualifiedContent;
+import com.android.build.api.transform.TransformInvocation;
 import com.google.common.collect.Streams;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.Logger;
@@ -49,7 +49,7 @@ public class VariantResource implements Constants {
 
     public void setIncremental(boolean incremental) throws IOException {
         this.incremental = incremental;
-        if(!incremental) {
+        if (!incremental) {
             files.clearForFullMode();
         }
     }

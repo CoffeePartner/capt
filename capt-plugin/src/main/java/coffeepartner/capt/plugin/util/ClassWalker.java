@@ -1,10 +1,11 @@
 package coffeepartner.capt.plugin.util;
 
-import com.android.build.api.transform.*;
 import coffeepartner.capt.plugin.resource.GlobalResource;
+import com.android.build.api.transform.*;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
+import org.apache.commons.io.FileUtils;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -38,33 +39,36 @@ public final class ClassWalker {
         this.invocation = invocation;
     }
 
-    public void visit(boolean incremental, boolean write, Visitor.Factory factory) throws IOException, InterruptedException, TransformException {
-        visit(incremental, write, factory, null);
+    public void visit(boolean includeNotChanged, boolean incremental, boolean write, Visitor.Factory factory)
+            throws IOException, InterruptedException, TransformException {
+        visit(includeNotChanged, incremental, write, factory, null);
     }
 
-    public void visit(boolean incremental, boolean write, Visitor.Factory factory, @Nullable Map<QualifiedContent, Set<String>> targets) throws IOException, InterruptedException, TransformException {
+    public void visit(boolean includeNotChanged, boolean incremental, boolean write, Visitor.Factory factory,
+                      @Nullable Map<QualifiedContent, Set<String>> targets)
+            throws IOException, InterruptedException, TransformException {
         WaitableTasks io = WaitableTasks.get(resource.io());
         invocation.getInputs()
                 .forEach(i -> {
                     i.getDirectoryInputs()
                             .forEach(d -> {
                                 if (targets == null) {
-                                    io.submit(new DirectoryTask(d, incremental, write, factory, null));
+                                    io.submit(new DirectoryTask(d, includeNotChanged, incremental, write, factory, null));
                                 } else {
                                     Set<String> t = targets.get(d);
                                     if (t != null) {
-                                        io.submit(new DirectoryTask(d, incremental, write, factory, t));
+                                        io.submit(new DirectoryTask(d, includeNotChanged, incremental, write, factory, t));
                                     }
                                 }
                             });
                     i.getJarInputs()
                             .forEach(j -> {
                                 if (targets == null) {
-                                    io.submit(new JarTask(j, incremental, write, factory, null));
+                                    io.submit(new JarTask(j, includeNotChanged, incremental, write, factory, null));
                                 } else {
                                     Set<String> t = targets.get(j);
                                     if (t != null) {
-                                        io.submit(new JarTask(j, incremental, write, factory, t));
+                                        io.submit(new JarTask(j, includeNotChanged, incremental, write, factory, t));
                                     }
                                 }
                             });
@@ -73,11 +77,11 @@ public final class ClassWalker {
     }
 
     public void visitTargets(Visitor.Factory factory, Map<QualifiedContent, Set<String>> targets) throws InterruptedException, TransformException, IOException {
-        visit(false, true, factory, targets);
+        visit(false, false, true, factory, targets);
     }
 
 
-    public final static class ClassEntry extends InternalEntry {
+    public static final class ClassEntry extends InternalEntry {
         public ClassEntry(String className, byte[] bytes) {
             super(className + ".class", bytes);
         }
@@ -137,14 +141,16 @@ public final class ClassWalker {
     class JarTask implements Callable<Void> {
 
         private final JarInput jar;
+        private final boolean includeNotChanged;
         private final boolean incremental;
         private final boolean write;
         private final Visitor.Factory factory;
         @Nullable
         private final Set<String> targets;
 
-        JarTask(JarInput jar, boolean incremental, boolean write, Visitor.Factory factory, @Nullable Set<String> targets) {
+        JarTask(JarInput jar, boolean includeNotChanged, boolean incremental, boolean write, Visitor.Factory factory, @Nullable Set<String> targets) {
             this.jar = jar;
+            this.includeNotChanged = includeNotChanged;
             this.incremental = incremental;
             this.write = write;
             this.factory = factory;
@@ -153,21 +159,25 @@ public final class ClassWalker {
 
         @Override
         public Void call() throws Exception {
-            if (incremental && jar.getStatus() == Status.NOTCHANGED) {
-                return null;
-            }
 
             Visitor visitor = factory.newVisitor(incremental, jar);
             if (visitor == null) {
                 return null;
             }
 
-            if (jar.getStatus() == Status.REMOVED) {
-                return null;
-            }
-
             // 1. we can't read removed jar anyway
             // 2. incremental && not changed, it is illegal, we skip it
+            if (jar.getStatus() == Status.NOTCHANGED) {
+                if (incremental && !includeNotChanged) {
+                    return null;
+                }
+            } else if (jar.getStatus() == Status.REMOVED) {
+                if (write) {
+                    Util.deleteIFExists(invocation.getOutputProvider().getContentLocation(
+                            jar.getName(), jar.getContentTypes(), jar.getScopes(), Format.JAR));
+                }
+                return null;
+            }
 
             Status status = incremental ? jar.getStatus() : Status.NOTCHANGED;
 
@@ -233,6 +243,7 @@ public final class ClassWalker {
     class DirectoryTask implements Callable<Void> {
 
         private final DirectoryInput d;
+        private final boolean includeNotChanged;
         private final boolean incremental;
         private final boolean write;
         private final Visitor.Factory factory;
@@ -240,8 +251,14 @@ public final class ClassWalker {
         private final Set<String> targets;
         private URI base;
 
-        DirectoryTask(DirectoryInput directory, boolean incremental, boolean write, Visitor.Factory factory, @Nullable Set<String> targets) {
+        DirectoryTask(DirectoryInput directory,
+                      boolean includeNotChanged,
+                      boolean incremental,
+                      boolean write,
+                      Visitor.Factory factory,
+                      @Nullable Set<String> targets) {
             this.d = directory;
+            this.includeNotChanged = includeNotChanged;
             this.incremental = incremental;
             this.write = write;
             this.factory = factory;
@@ -251,17 +268,19 @@ public final class ClassWalker {
 
         @Override
         public Void call() throws Exception {
-            if (incremental && d.getChangedFiles().isEmpty()) {
-                return null;
-            }
-
             Visitor visitor = factory.newVisitor(incremental, d);
             if (visitor == null) {
                 return null;
             }
 
+            if (incremental && d.getChangedFiles().isEmpty()) {
+                return null;
+            }
+
             ForkJoinPool pool = resource.computation();
             List<Future<ClassEntry>> futures = !write ? null : new ArrayList<>();
+
+            File outRoot = invocation.getOutputProvider().getContentLocation(d.getName(), d.getContentTypes(), d.getScopes(), Format.DIRECTORY);
 
             // just process .class, skip others
             if (!incremental) {
@@ -278,14 +297,45 @@ public final class ClassWalker {
                             }
                         }
                     }
+                } else { // clean the directory
+                    FileUtils.deleteDirectory(outRoot);
                 }
             } else {
+                Map<File, Status> changed = d.getChangedFiles();
+                if (includeNotChanged) {
+                    for (File file : Files.fileTreeTraverser().preOrderTraversal(d.getFile())) {
+                        if (file.isFile() && file.getName().endsWith(".class")) {
+                            String className = fileToClassName(file);
+                            if (targets == null || targets.contains(className)) {
+                                byte[] bytes = Files.toByteArray(file);
+                                Status status = changed.get(file);
+                                if (status == null) {
+                                    status = Status.NOTCHANGED;
+                                }
+                                ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, className, status);
+                                if (futures != null && task != null) {
+                                    futures.add(task);
+                                }
+                            }
+                        }
+                    }
+                }
                 for (Map.Entry<File, Status> entry : d.getChangedFiles().entrySet()) {
                     Status status = entry.getValue();
-                    if (status != Status.NOTCHANGED && entry.getKey().getName().endsWith(".class")) {
+                    if (entry.getKey().getName().endsWith(".class")) {
                         String className = fileToClassName(entry.getKey());
                         if (targets == null || targets.contains(className)) {
-                            byte[] bytes = status == Status.REMOVED ? null : Files.toByteArray(entry.getKey());
+                            byte[] bytes;
+                            if (status == Status.REMOVED) {
+                                bytes = null;
+                                if (write) { // delete the relative out file
+                                    Util.deleteIFExists(new File(outRoot, className.replace('/', File.separatorChar) + ".class"));
+                                }
+                            } else if (includeNotChanged) { // visited
+                                continue;
+                            } else {
+                                bytes = Files.toByteArray(entry.getKey());
+                            }
                             ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, className, entry.getValue());
                             if (futures != null && task != null) {
                                 futures.add(task);
@@ -296,11 +346,10 @@ public final class ClassWalker {
             }
 
             if (futures != null) {
-                File out = invocation.getOutputProvider().getContentLocation(d.getName(), d.getContentTypes(), d.getScopes(), Format.DIRECTORY);
                 for (Future<ClassEntry> future : futures) {
                     ClassEntry e = future.get();
                     if (e != null) {
-                        e.writeTo(out);
+                        e.writeTo(outRoot);
                     }
                 }
             }

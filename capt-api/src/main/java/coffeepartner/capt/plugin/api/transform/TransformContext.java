@@ -3,6 +3,7 @@ package coffeepartner.capt.plugin.api.transform;
 import org.objectweb.asm.ClassVisitor;
 
 /**
+ * Context during single class transform.
  * TODO: more API
  */
 public interface TransformContext {

@@ -44,5 +44,6 @@ capt {
 
             }
         }
+        'com.example.test' {}
     }
 }

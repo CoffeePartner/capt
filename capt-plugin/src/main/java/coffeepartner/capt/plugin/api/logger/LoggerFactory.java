@@ -7,6 +7,9 @@ import org.gradle.api.logging.Logging;
 
 public class LoggerFactory {
 
+    private LoggerFactory() {
+    }
+
     public static Logger getLogger(Class<?> clazz) {
         return new LoggerImpl(Logging.getLogger(clazz));
     }
@@ -15,7 +18,7 @@ public class LoggerFactory {
 
         private final org.gradle.api.logging.Logger logger;
 
-        public LoggerImpl(org.gradle.api.logging.Logger logger) {
+        LoggerImpl(org.gradle.api.logging.Logger logger) {
             this.logger = logger;
         }
 

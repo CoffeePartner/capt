@@ -1,6 +1,5 @@
 package coffeepartner.capt.plugin.process.visitors;
 
-import com.android.build.api.transform.TransformException;
 import coffeepartner.capt.plugin.api.graph.Status;
 import coffeepartner.capt.plugin.api.process.AnnotationProcessor;
 import coffeepartner.capt.plugin.api.process.ClassConsumer;
@@ -11,6 +10,7 @@ import coffeepartner.capt.plugin.resource.VariantResource;
 import coffeepartner.capt.plugin.util.Util;
 import coffeepartner.capt.plugin.util.WaitableTasks;
 import coffeepartner.capt.plugin.util.asm.AnnotationSniffer;
+import com.android.build.api.transform.TransformException;
 import com.google.common.io.ByteStreams;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -77,7 +77,8 @@ public class AnnotationClassDispatcher {
     }
 
 
-    public void dispatch(boolean recompute, boolean incremental, ApkClassGraph graph, VariantResource resource, AnnotationProcessorFactory factory) throws InterruptedException, TransformException, IOException {
+    public void dispatch(boolean recompute, boolean incremental, ApkClassGraph graph, VariantResource resource, AnnotationProcessorFactory factory)
+            throws InterruptedException, TransformException, IOException {
         PerClassDispatcher inner = new PerClassDispatcher(factory);
         ForkJoinPool pool = global.computation();
         WaitableTasks tasks = WaitableTasks.get(global.io());

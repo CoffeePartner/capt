@@ -1,7 +1,7 @@
 buildscript {
     ext {
         capt_group = 'coffeepartner.capt'
-        capt_version = '1.0.0-RC1'
+        capt_version = '1.0.0-RC2-SNAPSHOT'
 
         gson_version = '2.8.5'
         okio_version = '1.16.0'
@@ -24,6 +24,8 @@ subprojects {
         jcenter()
         mavenCentral()
     }
+
+    apply plugin: 'checkstyle'
 }
 
 try {

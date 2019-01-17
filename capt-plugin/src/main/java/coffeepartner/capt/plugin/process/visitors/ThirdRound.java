@@ -1,8 +1,7 @@
 package coffeepartner.capt.plugin.process.visitors;
 
-import com.android.build.api.transform.*;
-import coffeepartner.capt.plugin.api.asm.ClassVisitorManager;
 import coffeepartner.capt.plugin.api.asm.CaptClassVisitor;
+import coffeepartner.capt.plugin.api.asm.ClassVisitorManager;
 import coffeepartner.capt.plugin.api.transform.ClassRequest;
 import coffeepartner.capt.plugin.api.transform.ClassTransformer;
 import coffeepartner.capt.plugin.api.transform.TransformContext;
@@ -13,6 +12,10 @@ import coffeepartner.capt.plugin.resource.VariantResource;
 import coffeepartner.capt.plugin.util.ClassWalker;
 import coffeepartner.capt.plugin.util.Util;
 import coffeepartner.capt.plugin.util.WaitableTasks;
+import com.android.build.api.transform.QualifiedContent;
+import com.android.build.api.transform.Status;
+import com.android.build.api.transform.TransformException;
+import com.android.build.api.transform.TransformInvocation;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.objectweb.asm.ClassReader;
@@ -29,9 +32,6 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * toRemove is higher than ClassTransformer
- */
 public class ThirdRound {
     private static final Logger LOGGER = Logging.getLogger(ThirdRound.class);
     private final VariantResource variantResource;
@@ -46,7 +46,8 @@ public class ThirdRound {
         this.graph = graph;
     }
 
-    public void accept(boolean incremental, ClassWalker walker, TransformProviderFactory manager, TransformInvocation invocation) throws IOException, InterruptedException, TransformException {
+    public void accept(boolean incremental, ClassWalker walker, TransformProviderFactory manager, TransformInvocation invocation)
+            throws IOException, InterruptedException, TransformException {
         List<PluginTransform> transforms = manager.create().map(PluginTransform::new).collect(Collectors.toList());
 
         // 1. call beforeTransform to collect class request
@@ -56,7 +57,8 @@ public class ThirdRound {
         computation.await();
 
         // 2. dispatch classes
-        walker.visit(!hasAll && incremental, true, asFactory(transforms));
+        walker.visit(hasAll, incremental, true, asFactory(transforms));
+
         if (incremental) {
             // dispatch REMOVED
             graph.getAll().values()
@@ -116,12 +118,7 @@ public class ThirdRound {
     }
 
     private ClassWalker.Visitor.Factory asFactory(List<PluginTransform> transforms) {
-        return (incremental, content) -> {
-            if (incremental && content instanceof JarInput && ((JarInput) content).getStatus() == Status.REMOVED) {
-                return null;
-            }
-            return new TransformVisitor(transforms);
-        };
+        return (incremental, content) -> new TransformVisitor(transforms);
     }
 
 
@@ -248,16 +245,16 @@ public class ThirdRound {
         }
     }
 
-    private static class ComputeFrameClassWriter extends ClassWriter {
+    static class ComputeFrameClassWriter extends ClassWriter {
 
         private final URLClassLoader classLoader;
 
-        public ComputeFrameClassWriter(int flags, URLClassLoader classLoader) {
+        ComputeFrameClassWriter(int flags, URLClassLoader classLoader) {
             super(flags);
             this.classLoader = classLoader;
         }
 
-        public ComputeFrameClassWriter(ClassReader classReader, int flags, URLClassLoader classLoader) {
+        ComputeFrameClassWriter(ClassReader classReader, int flags, URLClassLoader classLoader) {
             super(classReader, flags);
             this.classLoader = classLoader;
         }

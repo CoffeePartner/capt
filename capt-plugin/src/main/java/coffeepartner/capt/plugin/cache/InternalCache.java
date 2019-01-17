@@ -1,10 +1,10 @@
 package coffeepartner.capt.plugin.cache;
 
-import com.android.build.api.transform.TransformException;
 import coffeepartner.capt.plugin.api.util.RelativeDirectoryProvider;
 import coffeepartner.capt.plugin.resource.GlobalResource;
 import coffeepartner.capt.plugin.util.Constants;
 import coffeepartner.capt.plugin.util.WaitableTasks;
+import com.android.build.api.transform.TransformException;
 import com.google.common.io.Closeables;
 import okio.BufferedSink;
 import okio.BufferedSource;
@@ -21,7 +21,7 @@ import java.util.function.Supplier;
 
 public class InternalCache {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(InternalCache.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InternalCache.class);
 
     private final GlobalResource global;
     private final RelativeDirectoryProvider provider;
@@ -108,7 +108,7 @@ public class InternalCache {
                 global.gson().toJson(supplier.get(), os);
                 os.flush();
             } catch (IOException | RuntimeException e) {
-                LOGGER.error("Write failed for {}" + fileName);
+                LOGGER.error("Write failed for {}", fileName);
                 throw e;
             } finally {
                 Closeables.close(bs, true);

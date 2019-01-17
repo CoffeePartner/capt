@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 public interface MethodInfo {
 
     /**
-     * method access with deprecated flag, see Opcodes.ACC_DEPRECATED
+     * method access with deprecated flag, see Opcodes.ACC_DEPRECATED.
      *
      * @return method access
      */

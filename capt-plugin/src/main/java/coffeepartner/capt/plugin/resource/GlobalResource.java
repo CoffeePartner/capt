@@ -20,7 +20,13 @@ public class GlobalResource {
     private final GradleCaptExtension gradleCaptExtension;
     private final BaseExtension extension;
 
-    public GlobalResource(Project project, File root, ForkJoinPool computation, ExecutorService executor, Gson gson, GradleCaptExtension gradleCaptExtension, BaseExtension extension) {
+    public GlobalResource(Project project,
+                          File root,
+                          ForkJoinPool computation,
+                          ExecutorService executor,
+                          Gson gson,
+                          GradleCaptExtension gradleCaptExtension,
+                          BaseExtension extension) {
         this.project = project;
         this.root = root;
         this.computation = computation;

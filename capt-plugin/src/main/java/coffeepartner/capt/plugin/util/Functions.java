@@ -5,18 +5,22 @@ import java.util.function.Supplier;
 
 public class Functions {
 
+    private Functions() {
+
+    }
+
     public static <T> Supplier<T> cache(Supplier<T> supplier) {
         return new LazySupplier<>(supplier);
     }
 
 
-    private static class LazySupplier<T> implements Supplier<T> {
+    static class LazySupplier<T> implements Supplier<T> {
 
         private static Object holder = LazySupplier.class;
         private final AtomicReference<Supplier<T>> ref;
         private T t = (T) holder;
 
-        public LazySupplier(Supplier<T> supplier) {
+        LazySupplier(Supplier<T> supplier) {
             this.ref = new AtomicReference<>(supplier);
         }
 
