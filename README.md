@@ -1,6 +1,6 @@
 # capt
 
-[ ![Download](https://api.bintray.com/packages/dieyi/maven/capt-api/images/download.svg) ](https://bintray.com/dieyi/maven/capt-api/_latestVersion) [![Build Status](https://travis-ci.org/CoffeePartner/capt.svg?branch=master)](https://travis-ci.org/CoffeePartner/capt)
+[ ![Download](https://api.bintray.com/packages/dieyi/maven/capt-api/images/download.svg) ](https://bintray.com/dieyi/maven/capt-api/_latestVersion)[ ![Build Status](https://travis-ci.org/CoffeePartner/capt.svg?branch=master)](https://travis-ci.org/CoffeePartner/capt)[ ![codebeat badge](https://codebeat.co/badges/da0511cf-b82f-4f16-a8d3-69d3b005d61b)](https://codebeat.co/projects/github-com-coffeepartner-capt-master)
 
 Capt is short for Class Annotation Processor Tool on Android.
 
