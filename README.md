@@ -20,6 +20,8 @@ Hope you enjoy it!
 
 ```groovy
 classpath 'coffeepartner.capt:plugin:1.0.0-RC2'
+// Take care, 1.0.0-RC2 is incompatible with Android Gradle Plugin 3.3.0 because of the Guava API's break change,
+// 1.0.0 will fix it by using Gradle API instead.
 ```
 
 ##### Apply capt plugin on Android application or library module:
