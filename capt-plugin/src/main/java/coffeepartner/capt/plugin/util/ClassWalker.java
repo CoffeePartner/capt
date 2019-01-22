@@ -6,6 +6,8 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
+import org.gradle.api.Project;
+import org.gradle.api.file.ConfigurableFileTree;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -285,15 +287,15 @@ public final class ClassWalker {
             // just process .class, skip others
             if (!incremental) {
                 if (d.getFile().exists()) { // we check if directory removed for capt in  full mode & transform in incremental mode
-                    for (File file : Files.fileTreeTraverser().preOrderTraversal(d.getFile())) {
-                        if (file.isFile() && file.getName().endsWith(".class")) {
-                            String className = fileToClassName(file);
-                            if (targets == null || targets.contains(className)) {
-                                byte[] bytes = Files.toByteArray(file);
-                                ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, className, Status.NOTCHANGED);
-                                if (futures != null && task != null) {
-                                    futures.add(task);
-                                }
+                    ConfigurableFileTree fileTree = resource.project().fileTree(d.getFile());
+                    fileTree.include("**/*.class");
+                    for (File file : fileTree) {
+                        String className = fileToClassName(file);
+                        if (targets == null || targets.contains(className)) {
+                            byte[] bytes = Files.toByteArray(file);
+                            ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, className, Status.NOTCHANGED);
+                            if (futures != null && task != null) {
+                                futures.add(task);
                             }
                         }
                     }
@@ -303,19 +305,19 @@ public final class ClassWalker {
             } else {
                 Map<File, Status> changed = d.getChangedFiles();
                 if (includeNotChanged) {
-                    for (File file : Files.fileTreeTraverser().preOrderTraversal(d.getFile())) {
-                        if (file.isFile() && file.getName().endsWith(".class")) {
-                            String className = fileToClassName(file);
-                            if (targets == null || targets.contains(className)) {
-                                byte[] bytes = Files.toByteArray(file);
-                                Status status = changed.get(file);
-                                if (status == null) {
-                                    status = Status.NOTCHANGED;
-                                }
-                                ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, className, status);
-                                if (futures != null && task != null) {
-                                    futures.add(task);
-                                }
+                    ConfigurableFileTree fileTree = resource.project().fileTree(d.getFile());
+                    fileTree.include("**/*.class");
+                    for (File file : fileTree) {
+                        String className = fileToClassName(file);
+                        if (targets == null || targets.contains(className)) {
+                            byte[] bytes = Files.toByteArray(file);
+                            Status status = changed.get(file);
+                            if (status == null) {
+                                status = Status.NOTCHANGED;
+                            }
+                            ForkJoinTask<ClassEntry> task = visitor.onVisit(pool, bytes, className, status);
+                            if (futures != null && task != null) {
+                                futures.add(task);
                             }
                         }
                     }
