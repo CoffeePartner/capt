@@ -12,6 +12,7 @@ import coffeepartner.capt.plugin.util.WaitableTasks;
 import coffeepartner.capt.plugin.util.asm.AnnotationSniffer;
 import com.android.build.api.transform.TransformException;
 import com.google.common.io.ByteStreams;
+import com.google.common.io.Closeables;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.objectweb.asm.ClassReader;
@@ -19,6 +20,7 @@ import org.objectweb.asm.tree.ClassNode;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
@@ -82,6 +84,7 @@ public class AnnotationClassDispatcher {
         PerClassDispatcher inner = new PerClassDispatcher(factory);
         ForkJoinPool pool = global.computation();
         WaitableTasks tasks = WaitableTasks.get(global.io());
+        WaitableTasks computation = WaitableTasks.get(global.computation());
 
         Set<String> set = new HashSet<>(matched.keySet());
         set.addAll(preMatched.keySet());
@@ -100,7 +103,9 @@ public class AnnotationClassDispatcher {
                     continue;
                 }
                 tasks.submit(() -> {
-                    byte[] classBytes = ByteStreams.toByteArray(resource.openStream(className));
+                    InputStream is = resource.openStream(className);
+                    byte[] classBytes = ByteStreams.toByteArray(is);
+                    Closeables.closeQuietly(is);
                     ClassReader cr = new ClassReader(classBytes);
                     ClassNode node = new ClassNode();
                     AnnotationSniffer collector = new AnnotationSniffer(node);
@@ -108,18 +113,18 @@ public class AnnotationClassDispatcher {
                     Set<String> annotations = collector.annotations();
 
                     matched.put(className, annotations);
-                    inner.process(pool, info, preMatched.get(className), annotations, node);
+                    inner.process(computation, info, preMatched.get(className), annotations, node);
                     return null;
                 });
             } else if (incremental) {
                 // class removed
-                inner.process(pool, info, Objects.requireNonNull(preMatched.get(className)), null, null);
+                inner.process(computation, info, Objects.requireNonNull(preMatched.get(className)), null, null);
             }
         }
         tasks.await();
-        pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        inner.providers.forEach(i -> pool.execute(() -> i.processor().onProcessEnd()));
-        pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        computation.await();
+        inner.providers.forEach(i -> computation.execute(() -> i.processor().onProcessEnd()));
+        computation.await();
     }
 
     class PerClassDispatcher {
@@ -130,8 +135,8 @@ public class AnnotationClassDispatcher {
             this.providers = factory.create().collect(Collectors.toList());
         }
 
-        public void process(ForkJoinPool pool, ApkClassInfo info, @Nullable Set<String> pre, @Nullable Set<String> cur, @Nullable ClassNode node) {
-            pool.submit(() -> {
+        public void process(WaitableTasks computation, ApkClassInfo info, @Nullable Set<String> pre, @Nullable Set<String> cur, @Nullable ClassNode node) {
+            computation.submit(() -> {
                 boolean hasTrue = false;
                 final ThreadLocal<ClassNode> local = ThreadLocal.withInitial(() -> Util.clone(node));
                 for (Future<Boolean> future : ForkJoinTask.invokeAll(providers.stream()
@@ -169,7 +174,7 @@ public class AnnotationClassDispatcher {
                                             } else if (matchCur) {
                                                 consume(processor.onAnnotationMatched(info), local);
                                             } else {
-                                                throw new AssertionError();
+                                                return false;
                                             }
                                     }
                                 }

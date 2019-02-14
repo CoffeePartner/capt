@@ -48,11 +48,11 @@ public abstract class Plugin<T> {
      * Do your time-consuming tasks in this function.
      *
      * @param capt Plugin context
-     * @throws IOException io
+     * @throws IOException          io
      * @throws InterruptedException inter
      */
     @Thread(Type.IO)
-    public abstract void onCreate(T capt) throws IOException, InterruptedException ;
+    public abstract void onCreate(T capt) throws IOException, InterruptedException;
 
     /**
      * @return meta processor
@@ -76,7 +76,7 @@ public abstract class Plugin<T> {
      * The last time to do your stuff.
      *
      * @param capt Plugin context
-     * @throws IOException io
+     * @throws IOException          io
      * @throws InterruptedException inter
      */
     @Thread(Type.IO)
