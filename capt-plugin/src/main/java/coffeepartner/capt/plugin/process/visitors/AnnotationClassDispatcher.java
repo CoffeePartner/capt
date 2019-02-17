@@ -138,7 +138,12 @@ public class AnnotationClassDispatcher {
         public void process(WaitableTasks computation, ApkClassInfo info, @Nullable Set<String> pre, @Nullable Set<String> cur, @Nullable ClassNode node) {
             computation.submit(() -> {
                 boolean hasTrue = false;
-                final ThreadLocal<ClassNode> local = ThreadLocal.withInitial(() -> Util.clone(node));
+                final ThreadLocal<ClassNode> local = ThreadLocal.withInitial(new Supplier<ClassNode>() {
+                    @Override
+                    public synchronized ClassNode get() {
+                        return providers.size() > 1 ? Util.clone(node) : node;
+                    }
+                });
                 for (Future<Boolean> future : ForkJoinTask.invokeAll(providers.stream()
                         .map(p -> new RecursiveTask<Boolean>() {
                             @Override
