@@ -121,7 +121,7 @@ public class PluginWrapper extends ForwardingCapt {
     }
 
     public void combinePre(PluginBean pre) {
-        preAffected = pre.getAffectedClasses();
+        preAffected = new ConcurrentHashSet<>(pre.getAffectedClasses());
     }
 
     private static final ClassTransformer NOOP = new ClassTransformer() {
@@ -153,7 +153,9 @@ public class PluginWrapper extends ForwardingCapt {
         @Nullable
         @Override
         public CaptClassVisitor onTransform(ClassInfo classInfo, boolean required) {
-            preAffected.remove(classInfo.name());
+            if (!preAffected.isEmpty()) {
+                preAffected.remove(classInfo.name());
+            }
             return classTransformer.onTransform(classInfo, required);
         }
 
