@@ -7,7 +7,6 @@ import coffeepartner.capt.plugin.cache.OutputProviderFactory;
 import coffeepartner.capt.plugin.util.Constants;
 import com.android.build.api.transform.QualifiedContent;
 import com.android.build.api.transform.TransformInvocation;
-import com.google.common.collect.Streams;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -24,7 +23,7 @@ import java.util.stream.Stream;
 
 public class VariantResource implements Constants {
 
-    private static final Logger LOGGER = Logging.getLogger(Loader.class);
+    private static final Logger LOGGER = Logging.getLogger(VariantResource.class);
 
     private final Loader loader = new Loader();
     private final String variant;
@@ -122,8 +121,8 @@ public class VariantResource implements Constants {
                     })
                     .toArray(URL[]::new);
 
-            URL[] fullAndroidUrls = Streams.concat(
-                    Streams.concat(invocation.getInputs().stream(),
+            URL[] fullAndroidUrls = Stream.concat(
+                    Stream.concat(invocation.getInputs().stream(),
                             invocation.getReferencedInputs().stream())
                             .flatMap(s -> Stream.concat(s.getDirectoryInputs().stream(), s.getJarInputs().stream()))
                             .map(QualifiedContent::getFile),
